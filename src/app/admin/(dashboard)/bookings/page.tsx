@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { format } from "date-fns";
-import { Edit, Eye, Filter, CalendarPlus } from "lucide-react";
+import { Eye, Filter, CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BookingActions } from "@/components/admin/booking-actions";
 
 const prisma = new PrismaClient();
 
@@ -114,9 +115,7 @@ export default async function AdminBookingsPage() {
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                          <Edit className="w-4 h-4" />
-                        </Button>
+                        <BookingActions bookingId={booking.id} currentStatus={booking.status} />
                       </div>
                     </td>
                   </tr>

@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { CopyPlus, Edit, Eye, EyeOff, LayoutTemplate } from "lucide-react";
+import { CopyPlus, LayoutTemplate } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
+import { RoomActions } from "@/components/admin/room-actions";
 
 const prisma = new PrismaClient();
 
@@ -39,7 +41,9 @@ export default async function AdminRoomsPage() {
           <p className="text-muted-foreground mt-1">Kelola listing, harga, dan pengaturan properti granular Anda.</p>
         </div>
         <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2">
-          <CopyPlus className="w-4 h-4" /> Tambah Kamar
+          <Link href="/admin/rooms/new" className="flex items-center gap-2">
+            <CopyPlus className="w-4 h-4" /> Tambah Kamar
+          </Link>
         </Button>
       </div>
 
@@ -107,14 +111,7 @@ export default async function AdminRoomsPage() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                          {room.isShown ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        </Button>
-                      </div>
+                      <RoomActions roomId={room.id} isShown={room.isShown} />
                     </td>
                   </tr>
                 ))}
