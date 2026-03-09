@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Admin {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         String    @default("ADMIN") // SUPER_ADMIN, ADMIN, STAFF
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  updatedBy    String? // Audit log
+
+  // Relations
+  availabilityUpdates RoomAvailability[]
+  bookingsCreated     Booking[]          @relation("CreatedBy")
+}
+
+model Property {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  city        String   // SIDOARJO, SURABAYA, BATU
+  type        String   // HOMESTAY, KOST, VILLA
+  
+  // Info Umum
+  address     String   @default("")
+  description String
+  latitude    Float?
+  longitude   Float?
+  
+  // Fasilitas Umum Area (Stored as JSON array string in SQLite)
+  commonFacilities String @default("[]")
+  
+  // Relations
+  rooms       Room[]
+  bookings    Booking[]
+  
+  // Media
+  heroImage   String?
+  gallery     String?   // JSON string of URLs
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Room {
+  id              String   @id @default(uuid())
+  propertyId      String
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  // Identitas Kamar
+  roomNumber      String
+  roomName        String
+  slug            String   @unique
+  
+  // Detail Spesifik
+  description     String?
+  maxGuests       Int
+  roomSize        String?
+  bedType         String
+  
+  // Fasilitas Individual (Stored as JSON array string)
+  amenities       String   @default("[]")
+  
+  // Media (Stored as JSON array string)
+  photos          String   @default("[]")
+  thumbnail       String
+  
+  // Pricing
+  basePrice       Float
+  weekendPrice    Float?
+  monthlyPrice    Float?   // untuk Surabaya
+  
+  // Status
+  isActive        Boolean  @default(true)
+  isShown         Boolean  @default(true)
+  
+  // Relations
+  availabilities  RoomAvailability[]
+  bookings        Booking[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Booking {
+  id          String   @id @default(uuid())
+  guestName   String
+  guestPhone  String?
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id])
+  checkIn     DateTime
+  checkOut    DateTime
+  status      String   @default("INQUIRY") // INQUIRY, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED
+  totalPrice  Float
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?
+  createdBy   Admin?   @relation("CreatedBy", fields: [createdById], references: [id])
+
+  availabilities RoomAvailability[]
+}
+
+model RoomAvailability {
+  id        String   @id @default(uuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  date      DateTime // Using standard DateTime for mapping, use JS to construct zeroed date objects
+  status    String   @default("AVAILABLE") // AVAILABLE, BOOKED, MAINTENANCE, BLOCKED
+  bookingId String? 
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  // Audit
+  updatedById String
+  updatedBy   Admin    @relation(fields: [updatedById], references: [id])
+  updatedAt   DateTime @updatedAt
+  notes       String? // alasan maintenance/blocking
+
+  @@unique([roomId, date])
+  @@index([date, status])
+}
