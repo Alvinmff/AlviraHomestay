@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,109 +9,82 @@ datasource db {
 }
 
 model Admin {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String
-  name         String
-  role         String    @default("ADMIN") // SUPER_ADMIN, ADMIN, STAFF
-  isActive     Boolean   @default(true)
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  updatedBy    String? // Audit log
-
-  // Relations
-  availabilityUpdates RoomAvailability[]
+  id                  String             @id @default(uuid())
+  email               String             @unique
+  passwordHash        String
+  name                String
+  role                String             @default("ADMIN")
+  isActive            Boolean            @default(true)
+  lastLoginAt         DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  updatedBy           String?
   bookingsCreated     Booking[]          @relation("CreatedBy")
+  availabilityUpdates RoomAvailability[]
 }
 
 model Property {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  city        String   // SIDOARJO, SURABAYA, BATU
-  type        String   // HOMESTAY, KOST, VILLA
-  
-  // Info Umum
-  address     String   @default("")
-  description String   @db.Text
-  latitude    Float?
-  longitude   Float?
-  
-  // Fasilitas Umum Area (Native JSON array)
-  commonFacilities Json @default("[]")
-  
-  // Relations
-  rooms       Room[]
-  bookings    Booking[]
-  
-  // Media
-  heroImage   String?
-  gallery     Json?
-  
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String    @id @default(uuid())
+  name             String
+  slug             String    @unique
+  city             String
+  type             String
+  address          String    @default("")
+  description      String
+  latitude         Float?
+  longitude        Float?
+  commonFacilities Json      @default("[]")
+  heroImage        String?
+  gallery          Json?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  bookings         Booking[]
+  rooms            Room[]
 }
 
 model Room {
-  id              String   @id @default(uuid())
-  propertyId      String
-  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  // Identitas Kamar
-  roomNumber      String
-  roomName        String
-  slug            String   @unique
-  
-  // Detail Spesifik
-  description     String?  @db.Text
-  maxGuests       Int
-  roomSize        String?
-  bedType         String
-  
-  // Fasilitas Individual (Native JSON array)
-  amenities       Json     @default("[]")
-  
-  // Media (Native JSON array)
-  photos          Json     @default("[]")
-  thumbnail       String
-  
-  // Pricing
-  basePrice       Float
-  weekendPrice    Float?
-  monthlyPrice    Float?   // untuk Surabaya
-  
-  // Status
-  isActive        Boolean  @default(true)
-  isShown         Boolean  @default(true)
-  
-  // Relations
-  availabilities  RoomAvailability[]
-  bookings        Booking[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String             @id @default(uuid())
+  propertyId     String
+  roomNumber     String
+  roomName       String
+  slug           String             @unique
+  description    String?
+  maxGuests      Int
+  roomSize       String?
+  bedType        String
+  amenities      Json               @default("[]")
+  photos         Json               @default("[]")
+  thumbnail      String
+  basePrice      Float
+  weekendPrice   Float?
+  monthlyPrice   Float?
+  isActive       Boolean            @default(true)
+  isShown        Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  bookings       Booking[]
+  property       Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  availabilities RoomAvailability[]
 }
 
 model Booking {
-  id          String   @id @default(uuid())
-  guestName   String
-  guestPhone  String?
-  propertyId  String
-  property    Property @relation(fields: [propertyId], references: [id])
-  roomId      String
-  room        Room     @relation(fields: [roomId], references: [id])
-  checkIn     DateTime
-  checkOut    DateTime
-  status      String   @default("INQUIRY") // INQUIRY, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED
-  totalPrice  Float
-  notes       String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdById String?
-  createdBy   Admin?   @relation("CreatedBy", fields: [createdById], references: [id])
-
+  id             String             @id @default(uuid())
+  guestName      String
+  guestPhone     String?
+  propertyId     String
+  roomId         String
+  checkIn        DateTime
+  checkOut       DateTime
+  status         String             @default("INQUIRY")
+  totalPrice     Float
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  createdById    String?
+  createdBy      Admin?             @relation("CreatedBy", fields: [createdById], references: [id])
+  property       Property           @relation(fields: [propertyId], references: [id])
+  room           Room               @relation(fields: [roomId], references: [id])
   availabilities RoomAvailability[]
 
   @@index([roomId, checkIn, checkOut, status])
@@ -123,19 +93,17 @@ model Booking {
 }
 
 model RoomAvailability {
-  id        String   @id @default(uuid())
-  roomId    String
-  room      Room     @relation(fields: [roomId], references: [id])
-  date      DateTime @db.Date
-  status    String   @default("AVAILABLE") // AVAILABLE, BOOKED, MAINTENANCE, BLOCKED
-  bookingId String? 
-  booking   Booking? @relation(fields: [bookingId], references: [id])
-
-  // Audit
+  id          String   @id @default(uuid())
+  roomId      String
+  date        DateTime @db.Date
+  status      String   @default("AVAILABLE")
+  bookingId   String?
   updatedById String
-  updatedBy   Admin    @relation(fields: [updatedById], references: [id])
   updatedAt   DateTime @updatedAt
-  notes       String?  @db.Text
+  notes       String?
+  booking     Booking? @relation(fields: [bookingId], references: [id])
+  room        Room     @relation(fields: [roomId], references: [id])
+  updatedBy   Admin    @relation(fields: [updatedById], references: [id])
 
   @@unique([roomId, date])
   @@index([roomId, date, status])

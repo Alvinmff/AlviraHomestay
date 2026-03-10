@@ -4,6 +4,7 @@ import { Eye, Filter, CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { BookingActions } from "@/components/admin/booking-actions";
 
 const prisma = new PrismaClient();
@@ -42,9 +43,9 @@ export default async function AdminBookingsPage() {
           <h2 className="text-3xl font-serif font-bold tracking-tight text-foreground">Daftar Reservasi</h2>
           <p className="text-muted-foreground mt-1">Lacak dan kelola semua pesanan tamu terpusat pada satu dasbor.</p>
         </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2">
+        <Link href="/admin/bookings/new" className="inline-flex items-center justify-center rounded-md font-medium px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-10 w-full md:w-auto">
           <CalendarPlus className="w-4 h-4" /> Entri Manual
-        </Button>
+        </Link>
       </div>
 
       <Card className="border-border/50 shadow-sm mt-8">
@@ -60,7 +61,7 @@ export default async function AdminBookingsPage() {
           </Button>
         </CardHeader>
         <CardContent className="p-0">
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-muted-foreground">
               <thead className="text-xs text-foreground uppercase bg-muted/50 border-b">
@@ -93,19 +94,19 @@ export default async function AdminBookingsPage() {
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                       <p className="text-xs font-medium text-foreground">In: {format(new Date(booking.checkIn), "dd MMM yyyy")}</p>
-                       <p className="text-xs text-muted-foreground mt-1">Out: {format(new Date(booking.checkOut), "dd MMM yyyy")}</p>
+                      <p className="text-xs font-medium text-foreground">In: {format(new Date(booking.checkIn), "dd MMM yyyy")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Out: {format(new Date(booking.checkOut), "dd MMM yyyy")}</p>
                     </td>
                     <td className="px-6 py-4 text-foreground font-semibold">
-                       {formatRupiah(booking.totalPrice)}
+                      {formatRupiah(booking.totalPrice)}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <Badge variant="outline" className={
                         booking.status === "CONFIRMED" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                        booking.status === "CHECKED_IN" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                        booking.status === "COMPLETED" ? "bg-slate-50 text-slate-700 border-slate-200" :
-                        booking.status === "CANCELLED" ? "bg-red-50 text-red-700 border-red-200" :
-                        "bg-amber-50 text-amber-700 border-amber-200"
+                          booking.status === "CHECKED_IN" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                            booking.status === "COMPLETED" ? "bg-slate-50 text-slate-700 border-slate-200" :
+                              booking.status === "CANCELLED" ? "bg-red-50 text-red-700 border-red-200" :
+                                "bg-amber-50 text-amber-700 border-amber-200"
                       }>
                         {booking.status.replace("_", " ")}
                       </Badge>
@@ -122,7 +123,7 @@ export default async function AdminBookingsPage() {
                 ))}
               </tbody>
             </table>
-            
+
             {bookings.length === 0 && (
               <div className="text-center py-16 text-muted-foreground">
                 <div className="w-12 h-12 rounded-full border border-dashed flex items-center justify-center mx-auto mb-4 bg-muted/20">
@@ -131,7 +132,7 @@ export default async function AdminBookingsPage() {
                 <p>Belum ada data reservasi kamar.</p>
               </div>
             )}
-            
+
           </div>
         </CardContent>
       </Card>

@@ -48,13 +48,6 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center space-x-3">
-          <Link
-            href="/admin/login"
-            className="hidden md:flex items-center text-xs font-semibold text-muted-foreground hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-muted/50"
-          >
-            <User className="w-4 h-4 mr-1.5" />
-            Login Admin
-          </Link>
 
           {/* Mobile Hamburger Button */}
           <button
@@ -129,14 +122,6 @@ export function Navbar() {
             </Link>
 
             <div className="pt-6 mt-2 border-t flex flex-col items-center">
-              <Link
-                href="/admin/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center w-full px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground bg-muted/30 hover:bg-muted transition-colors"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Login Admin
-              </Link>
 
               <a
                 href="https://wa.me/6281231646523"
