@@ -33,14 +33,8 @@ export async function GET(request: Request) {
       }
     });
 
-    // Parse the JSON string fields back to objects for the client
-    const serializedRooms = rooms.map(room => ({
-      ...room,
-      amenities: JSON.parse(room.amenities),
-      photos: JSON.parse(room.photos)
-    }));
-
-    return NextResponse.json(serializedRooms);
+    // With PostgreSQL native Json, Prisma returns real arrays directly
+    return NextResponse.json(rooms);
   } catch (error) {
     console.error("[ROOMS_GET]", error);
     return NextResponse.json({ error: "Failed to fetch rooms" }, { status: 500 });

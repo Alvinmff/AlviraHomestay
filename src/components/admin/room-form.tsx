@@ -18,12 +18,12 @@ interface RoomFormProps {
 export function RoomForm({ initialData, properties }: RoomFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  
+
   // Safe parsing of amenities
   let initialAmenities = "";
   if (initialData?.amenities) {
     try {
-      const parsed = JSON.parse(initialData.amenities);
+      const parsed = Array.isArray(initialData.amenities) ? initialData.amenities : JSON.parse(initialData.amenities);
       if (Array.isArray(parsed)) {
         initialAmenities = parsed.join(", ");
       }
@@ -61,14 +61,14 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
 
     try {
       if (!formData.propertyId) throw new Error("Properti harus dipilih");
-      
+
       const payload = {
         ...formData,
         maxGuests: parseInt(formData.maxGuests) || 2,
         basePrice: parseFloat(formData.basePrice) || 0,
         weekendPrice: formData.weekendPrice ? parseFloat(formData.weekendPrice) : null,
         monthlyPrice: formData.monthlyPrice ? parseFloat(formData.monthlyPrice) : null,
-        amenities: JSON.stringify(formData.amenities.split(",").map((s: string) => s.trim()).filter(Boolean)),
+        amenities: formData.amenities.split(",").map((s: string) => s.trim()).filter(Boolean),
       };
 
       const url = initialData ? `/api/admin/rooms/${initialData.id}` : `/api/admin/rooms`;
@@ -146,7 +146,7 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
           <Label>Thumbnail URL *</Label>
           <Input name="thumbnail" value={formData.thumbnail} onChange={handleChange} placeholder="https://..." required />
         </div>
-        
+
         <div className="space-y-2">
           <Label>Harga Akhir Pekan (Opsional)</Label>
           <Input name="weekendPrice" type="number" value={formData.weekendPrice} onChange={handleChange} placeholder="Contoh: 300000" />

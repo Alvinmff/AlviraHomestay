@@ -2,19 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
-import { 
-  LayoutDashboard, 
-  CalendarDays, 
-  Building2, 
-  ClipboardList, 
+import {
+  LayoutDashboard,
+  CalendarDays,
+  Building2,
+  ClipboardList,
   Settings,
-  LogOut
+  LogOut,
+  Menu,
+  X
 } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const menuGroups = [
     {
@@ -39,12 +43,14 @@ export function Sidebar() {
     }
   ];
 
-  return (
-    <div className="w-64 bg-white border-r border-border/50 h-screen sticky top-0 flex flex-col shadow-sm z-20">
-      
+  const NavContent = () => (
+    <>
       {/* Brand */}
-      <div className="h-16 flex items-center px-6 border-b border-border/50">
+      <div className="h-16 flex items-center justify-between px-6 border-b border-border/50">
         <span className="text-xl font-serif font-bold tracking-tight text-primary">Alvira Admin</span>
+        <button onClick={() => setMobileOpen(false)} className="lg:hidden p-1 rounded-md hover:bg-muted">
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -58,13 +64,14 @@ export function Sidebar() {
               {group.items.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <Link 
-                    key={item.href} 
+                  <Link
+                    key={item.href}
                     href={item.href}
+                    onClick={() => setMobileOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group",
-                      isActive 
-                        ? "bg-primary/10 text-primary" 
+                      isActive
+                        ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                   >
@@ -82,7 +89,7 @@ export function Sidebar() {
 
       {/* Footer / Logout */}
       <div className="p-4 border-t border-border/50">
-        <button 
+        <button
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
           className="flex flex-row items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
         >
@@ -90,6 +97,37 @@ export function Sidebar() {
           Logout
         </button>
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Toggle Button (fixed top-left) */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-3 left-4 z-30 p-2 rounded-lg bg-white border shadow-sm hover:bg-muted transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex w-64 bg-white border-r border-border/50 h-screen sticky top-0 flex-col shadow-sm z-20">
+        <NavContent />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="lg:hidden fixed inset-y-0 left-0 w-72 bg-white z-50 flex flex-col shadow-xl animate-in slide-in-from-left duration-200">
+            <NavContent />
+          </div>
+        </>
+      )}
+    </>
   );
 }

@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -36,12 +37,12 @@ model Property {
   
   // Info Umum
   address     String   @default("")
-  description String
+  description String   @db.Text
   latitude    Float?
   longitude   Float?
   
-  // Fasilitas Umum Area (Stored as JSON array string in SQLite)
-  commonFacilities String @default("[]")
+  // Fasilitas Umum Area (Native JSON array)
+  commonFacilities Json @default("[]")
   
   // Relations
   rooms       Room[]
@@ -49,7 +50,7 @@ model Property {
   
   // Media
   heroImage   String?
-  gallery     String?   // JSON string of URLs
+  gallery     Json?
   
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -67,16 +68,16 @@ model Room {
   slug            String   @unique
   
   // Detail Spesifik
-  description     String?
+  description     String?  @db.Text
   maxGuests       Int
   roomSize        String?
   bedType         String
   
-  // Fasilitas Individual (Stored as JSON array string)
-  amenities       String   @default("[]")
+  // Fasilitas Individual (Native JSON array)
+  amenities       Json     @default("[]")
   
-  // Media (Stored as JSON array string)
-  photos          String   @default("[]")
+  // Media (Native JSON array)
+  photos          Json     @default("[]")
   thumbnail       String
   
   // Pricing
@@ -108,7 +109,7 @@ model Booking {
   checkOut    DateTime
   status      String   @default("INQUIRY") // INQUIRY, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED
   totalPrice  Float
-  notes       String?
+  notes       String?  @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdById String?
@@ -125,7 +126,7 @@ model RoomAvailability {
   id        String   @id @default(uuid())
   roomId    String
   room      Room     @relation(fields: [roomId], references: [id])
-  date      DateTime // Using standard DateTime for mapping, use JS to construct zeroed date objects
+  date      DateTime @db.Date
   status    String   @default("AVAILABLE") // AVAILABLE, BOOKED, MAINTENANCE, BLOCKED
   bookingId String? 
   booking   Booking? @relation(fields: [bookingId], references: [id])
@@ -134,7 +135,7 @@ model RoomAvailability {
   updatedById String
   updatedBy   Admin    @relation(fields: [updatedById], references: [id])
   updatedAt   DateTime @updatedAt
-  notes       String? // alasan maintenance/blocking
+  notes       String?  @db.Text
 
   @@unique([roomId, date])
   @@index([roomId, date, status])

@@ -24,17 +24,17 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
     notFound();
   }
 
-  const amenities = JSON.parse(room.amenities) as string[];
-  const photos = JSON.parse(room.photos) as string[];
-  const commonFacilities = JSON.parse(room.property.commonFacilities) as string[];
+  const amenities = (room.amenities || []) as string[];
+  const photos = (room.photos || []) as string[];
+  const commonFacilities = (room.property.commonFacilities || []) as string[];
 
   return (
     <div className="min-h-screen bg-[#F8FAF9] pb-24">
       {/* Back Navigation Bar */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center">
-          <Link 
-            href={`/properties/${propertySlug}`} 
+          <Link
+            href={`/properties/${propertySlug}`}
             className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -44,7 +44,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        
+
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -62,46 +62,46 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
 
         {/* Media Gallery / Map out Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Main Left Content */}
           <div className="lg:col-span-2 space-y-8">
-            
+
             {/* Enhanced Immersive Gallery Modal */}
-            <RoomGalleryModal 
-              photos={photos} 
-              thumbnail={room.thumbnail} 
-              roomName={room.roomName} 
+            <RoomGalleryModal
+              photos={photos}
+              thumbnail={room.thumbnail}
+              roomName={room.roomName}
             />
 
             {/* Quick Stats Banner */}
             <div className="flex flex-wrap items-center gap-8 py-4 border-y border-border/50">
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                   <Users className="w-5 h-5"/>
-                 </div>
-                 <div>
-                   <p className="text-xs text-muted-foreground mb-0.5">Kapasitas</p>
-                   <p className="text-sm font-semibold">{room.maxGuests} Tamu</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                   <Maximize className="w-5 h-5"/>
-                 </div>
-                 <div>
-                   <p className="text-xs text-muted-foreground mb-0.5">Ukuran</p>
-                   <p className="text-sm font-semibold">{room.roomSize}</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                   <BedDouble className="w-5 h-5"/>
-                 </div>
-                 <div>
-                   <p className="text-xs text-muted-foreground mb-0.5">Tipe Kasur</p>
-                   <p className="text-sm font-semibold">{room.bedType}</p>
-                 </div>
-               </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Kapasitas</p>
+                  <p className="text-sm font-semibold">{room.maxGuests} Tamu</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Maximize className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Ukuran</p>
+                  <p className="text-sm font-semibold">{room.roomSize}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <BedDouble className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Tipe Kasur</p>
+                  <p className="text-sm font-semibold">{room.bedType}</p>
+                </div>
+              </div>
             </div>
 
             {/* Description */}
@@ -140,7 +140,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
 
             {/* Yearly Availability Calendar */}
             <section className="gap-6 pt-6 border-t border-border/50">
-               <YearlyAvailabilityCalendar roomId={room.id} />
+              <YearlyAvailabilityCalendar roomId={room.id} />
             </section>
 
           </div>
@@ -148,7 +148,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
           {/* Right Column: Sticky Booking / Price Card */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border/50 p-6">
-              <RoomWhatsAppForm 
+              <RoomWhatsAppForm
                 roomId={room.id}
                 roomName={room.roomName}
                 propertyName={room.property.name}

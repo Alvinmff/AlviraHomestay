@@ -30,13 +30,13 @@ export function GoogleReviewsSection() {
     loadReviews();
   }, []);
 
-  const filteredReviews = reviews.filter(r => 
+  const filteredReviews = reviews.filter(r =>
     activeTab === "Semua" ? true : r.location === activeTab
   );
 
   // Calculate aggregates
-  const avgRating = reviews.length > 0 
-    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) 
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : "5.0";
 
   return (
@@ -44,10 +44,10 @@ export function GoogleReviewsSection() {
       {/* Background Decor */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -60,8 +60,8 @@ export function GoogleReviewsSection() {
             </div>
             <span className="text-sm font-semibold">Google Reviews</span>
           </motion.div>
-          
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -70,8 +70,8 @@ export function GoogleReviewsSection() {
           >
             Apa Kata Tamu Kami
           </motion.h2>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -82,7 +82,7 @@ export function GoogleReviewsSection() {
           </motion.p>
 
           {/* Filter Tabs */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -93,11 +93,10 @@ export function GoogleReviewsSection() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeTab === tab 
-                    ? "bg-primary text-primary-foreground shadow-md scale-105" 
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === tab
+                    ? "bg-primary text-primary-foreground shadow-md scale-105"
                     : "bg-white text-muted-foreground border hover:bg-muted hover:text-foreground"
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -109,7 +108,7 @@ export function GoogleReviewsSection() {
         <div className="mt-12 min-h-[400px]">
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div 
+              <motion.div
                 key="loading"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="flex items-center justify-center h-64"
@@ -117,7 +116,7 @@ export function GoogleReviewsSection() {
                 <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </motion.div>
             ) : filteredReviews.length === 0 ? (
-              <motion.div 
+              <motion.div
                 key="empty"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="py-24 text-center text-muted-foreground flex flex-col items-center"
@@ -126,27 +125,27 @@ export function GoogleReviewsSection() {
                 <p className="text-lg">Belum ada ulasan untuk lokasi ini.</p>
               </motion.div>
             ) : (
-                <motion.div 
-                  key={`marquee-${activeTab}`}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <TestimonialMarquee reviews={filteredReviews} />
-                </motion.div>
+              <motion.div
+                key={`marquee-${activeTab}`}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                <TestimonialMarquee reviews={filteredReviews} />
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <a 
-            href="#" 
-            target="_blank" 
+          <a
+            href="https://www.google.com/maps/search/Alvira+Homestay"
+            target="_blank"
             referrerPolicy="no-referrer"
             className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors group"
           >

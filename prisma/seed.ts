@@ -52,7 +52,7 @@ async function main() {
       type: "HOMESTAY",
       address: "Pusat Kota Sidoarjo",
       description: "Penginapan nyaman dan strategis untuk keluarga, cocok untuk transit atau kunjungan bisnis.",
-      commonFacilities: JSON.stringify(["Parkir Luas", "Lobby", "Security 24 Jam", "WiFi Area Umum"]),
+      commonFacilities: ["Parkir Luas", "Lobby", "Security 24 Jam", "WiFi Area Umum"],
       heroImage: "/images/properties/sidoarjo-hero.jpg"
     },
     {
@@ -62,7 +62,7 @@ async function main() {
       type: "KOST",
       address: "Pusat Kota Surabaya",
       description: "Fasilitas premium di pusat kota pahlawan, memberikan kenyamanan maksimal untuk mahasiswa dan pekerja.",
-      commonFacilities: JSON.stringify(["Parkir Motor", "Dapur Bersama", "CCTV", "Ruang Cuci/Jemur"]),
+      commonFacilities: ["Parkir Motor", "Dapur Bersama", "CCTV", "Ruang Cuci/Jemur"],
       heroImage: "/images/properties/surabaya-hero.jpg"
     },
     {
@@ -72,7 +72,7 @@ async function main() {
       type: "VILLA",
       address: "Kawasan Pegunungan Batu",
       description: "Liburan tak terlupakan dengan nuansa alam pegunungan, udara sejuk, dan privasi penuh.",
-      commonFacilities: JSON.stringify(["Parkir 4 Mobil", "Taman Luas", "BBQ Area", "Security Area"]),
+      commonFacilities: ["Parkir 4 Mobil", "Taman Luas", "BBQ Area", "Security Area"],
       heroImage: "/images/properties/batu-hero.jpg"
     }
   ];
@@ -92,13 +92,13 @@ async function main() {
 
   // --- 4. SEED ROOMS ---
   if (!propSidoarjo || !propSurabaya || !propBatu) {
-      throw new Error("Missing properties!");
+    throw new Error("Missing properties!");
   }
 
-  const placeholderPhotos = JSON.stringify([
-      "/images/placeholder-room.jpg",
-      "/images/placeholder-room-alt.jpg"
-  ]);
+  const placeholderPhotos = [
+    "/images/placeholder-room.jpg",
+    "/images/placeholder-room-alt.jpg"
+  ];
 
   // SIDOARJO (7 Rooms)
   const sidoarjoRooms = [
@@ -122,7 +122,7 @@ async function main() {
         maxGuests: r.guests,
         roomSize: r.size,
         bedType: r.bed,
-        amenities: JSON.stringify(r.amenities),
+        amenities: r.amenities,
         photos: placeholderPhotos,
         thumbnail: "/images/placeholder-room.jpg",
         basePrice: r.price,
@@ -153,7 +153,7 @@ async function main() {
         maxGuests: r.guests,
         roomSize: r.size,
         bedType: r.bed,
-        amenities: JSON.stringify(r.amenities),
+        amenities: r.amenities,
         photos: placeholderPhotos,
         thumbnail: "/images/placeholder-room.jpg",
         basePrice: r.dailyPrice,
@@ -165,35 +165,35 @@ async function main() {
 
   // BATU (3 Rooms/Options)
   const batuRooms = [
-    { 
-      number: "L1", 
-      name: "Villa Lantai 1", 
-      size: "150m²", 
-      guests: 6, 
-      price: 1500000, 
+    {
+      number: "L1",
+      name: "Villa Lantai 1",
+      size: "150m²",
+      guests: 6,
+      price: 1500000,
       bed: "3 King Beds",
       description: "3 Kamar Tidur, 2 Kamar Mandi, Ruang Tamu, Dapur, Teras. Sangat cocok untuk keluarga medium.",
-      amenities: ["3 Kamar Tidur", "2 Kamar Mandi", "Ruang Tamu Besar", "Dapur Lengkap", "TV 50\"", "WiFi", "Parkir 2 Mobil", "Teras View Gunung"] 
+      amenities: ["3 Kamar Tidur", "2 Kamar Mandi", "Ruang Tamu Besar", "Dapur Lengkap", "TV 50\"", "WiFi", "Parkir 2 Mobil", "Teras View Gunung"]
     },
-    { 
-      number: "L2", 
-      name: "Villa Lantai 2", 
-      size: "150m²", 
-      guests: 6, 
-      price: 1500000, 
+    {
+      number: "L2",
+      name: "Villa Lantai 2",
+      size: "150m²",
+      guests: 6,
+      price: 1500000,
       bed: "3 King Beds",
       description: "3 Kamar Tidur, 2 Kamar Mandi, Ruang Keluarga, Dapur, Balkon. View yang sangat indah dari lantai atas.",
-      amenities: ["3 Kamar Tidur", "2 Kamar Mandi", "Ruang Keluarga", "Dapur Lengkap", "Smart TV", "WiFi", "Balkon View Gunung", "BBQ Area"] 
+      amenities: ["3 Kamar Tidur", "2 Kamar Mandi", "Ruang Keluarga", "Dapur Lengkap", "Smart TV", "WiFi", "Balkon View Gunung", "BBQ Area"]
     },
-    { 
-      number: "FULL", 
-      name: "Full Villa (L1+L2)", 
-      size: "300m²", 
-      guests: 12, 
-      price: 2800000, 
+    {
+      number: "FULL",
+      name: "Full Villa (L1+L2)",
+      size: "300m²",
+      guests: 12,
+      price: 2800000,
       bed: "6 King Beds",
       description: "Seluruh Villa 2 Lantai, 6 Kamar Tidur, 4 Kamar Mandi, Full Fasilitas. Menampung rombongan besar secara privat.",
-      amenities: ["6 Kamar Tidur", "4 Kamar Mandi", "2 Ruang Tamu", "2 Dapur", "Rooftop", "Private Pool", "Parkir 4 Mobil", "Full Privacy"] 
+      amenities: ["6 Kamar Tidur", "4 Kamar Mandi", "2 Ruang Tamu", "2 Dapur", "Rooftop", "Private Pool", "Parkir 4 Mobil", "Full Privacy"]
     }
   ];
 
@@ -208,7 +208,7 @@ async function main() {
         maxGuests: r.guests,
         roomSize: r.size,
         bedType: r.bed,
-        amenities: JSON.stringify(r.amenities),
+        amenities: r.amenities,
         photos: placeholderPhotos,
         thumbnail: "/images/placeholder-room.jpg",
         basePrice: r.price,

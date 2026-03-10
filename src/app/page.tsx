@@ -26,8 +26,8 @@ export default function Home() {
       <section className="relative h-[80vh] flex items-center justify-center bg-primary text-primary-foreground overflow-hidden">
         {/* Overlay for background images later */}
         <div className="absolute inset-0 bg-black/40 z-10" />
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -39,7 +39,7 @@ export default function Home() {
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 opacity-90 text-white">
             Pengalaman menginap premium dengan pilihan akomodasi beragam — dari homestay cozy di Sidoarjo, kost eksklusif di Surabaya, hingga villa mewah di Batu.
           </p>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 1 }}
@@ -48,8 +48,8 @@ export default function Home() {
             <Link href="/properties" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold transition-colors">
               Jelajahi Properti
             </Link>
-            <Link href="#tentang" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm text-foreground border border-border bg-white/90 hover:bg-muted hover:text-primary backdrop-blur-sm font-semibold transition-colors">
-              Lebih Lanjut
+            <Link href="/kontak" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm text-foreground border border-border bg-white/90 hover:bg-muted hover:text-primary backdrop-blur-sm font-semibold transition-colors">
+              Hubungi Kami
             </Link>
           </motion.div>
         </motion.div>
@@ -58,7 +58,7 @@ export default function Home() {
       {/* Featured Properties */}
       <section id="tentang" className="py-24 bg-background">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -68,8 +68,8 @@ export default function Home() {
             <h2 className="text-3xl font-serif font-bold text-foreground mb-4">Destinasi Unggulan</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">Satu platform untuk berbagai kebutuhan akomodasi Anda di Jawa Timur.</p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="show"
@@ -92,7 +92,7 @@ export default function Home() {
                 </Link>
               </div>
             </motion.div>
-            
+
             {/* Surabaya */}
             <motion.div variants={itemVariants} className="group rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] border bg-card transition-transform hover:-translate-y-1">
               <div className="h-56 bg-muted relative">
@@ -108,7 +108,7 @@ export default function Home() {
                 </Link>
               </div>
             </motion.div>
-            
+
             {/* Batu */}
             <motion.div variants={itemVariants} className="group rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] border bg-card transition-transform hover:-translate-y-1">
               <div className="h-56 bg-muted relative">
@@ -124,7 +124,7 @@ export default function Home() {
                 </Link>
               </div>
             </motion.div>
-            
+
           </motion.div>
         </div>
       </section>

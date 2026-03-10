@@ -28,38 +28,38 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
   const today = startOfDay(new Date());
   const currentMonthStart = startOfMonth(today);
-  
+
   // Create a 35-day window for rendering calendar broadly
   const calendarEnd = endOfMonth(new Date(today.getFullYear(), today.getMonth() + 1));
   const days = eachDayOfInterval({ start: currentMonthStart, end: calendarEnd });
 
   const getDailyStatus = (date: Date) => {
     if (isBefore(startOfDay(date), today)) return "PAST";
-    
+
     if (!availabilities || availabilities.length === 0) return "AVAILABLE";
-    
+
     // Find precise availability status for this date
-    // Backend dates come via ISO string format
-    const isoDate = date.toISOString().split("T")[0];
-    const match = availabilities.find((a: { date: string, status: string }) => a.date.startsWith(isoDate));
-    
+    // Match the strict date YYYY-MM-DD instead of generic UTC toISOString which offsets the day
+    const localDateStr = format(date, "yyyy-MM-dd");
+    const match = availabilities.find((a: { date: string, status: string }) => a.date.startsWith(localDateStr));
+
     if (match) return match.status; // BOOKED, MAINTENANCE, BLOCKED
     return "AVAILABLE";
   };
 
   const getStatusColor = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "AVAILABLE": return "bg-green-100 hover:bg-green-200 text-green-700 border-green-200 cursor-help";
       case "BOOKED": return "bg-red-100/50 text-red-500 border-red-200/50 cursor-not-allowed line-through opacity-70";
       case "MAINTENANCE": return "bg-yellow-100/50 text-yellow-600 border-yellow-200/50 cursor-not-allowed opacity-70";
       case "BLOCKED": return "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50";
-      case "PAST": return "bg-gray-50 text-gray-300 border-transparent cursor-not-allowed";
-      default: return "bg-gray-50";
+      case "PAST": return "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
+      default: return "bg-white";
     }
   };
 
   const getStatusText = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "AVAILABLE": return "✅ Tersedia untuk dipesan";
       case "BOOKED": return "❌ Telah Dipesan";
       case "MAINTENANCE": return "⚠️ Dalam Perawatan";
@@ -94,11 +94,11 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
         {days.map((day) => {
           const status = getDailyStatus(day);
-          
+
           return (
             <HoverCard key={day.toISOString()}>
               <HoverCardTrigger>
-                <div 
+                <div
                   className={cn(
                     "p-2 text-xs rounded-md border text-center transition-colors min-w-[36px]",
                     getStatusColor(status),
@@ -111,9 +111,9 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
               </HoverCardTrigger>
               <HoverCardContent side="top" className="w-auto p-2">
                 <p className="text-sm font-medium">{format(day, 'dd MMMM yyyy')}</p>
-                <p className={cn("text-xs font-semibold mt-1", 
-                  status === 'AVAILABLE' ? "text-green-600" : 
-                  status === 'BOOKED' ? "text-red-500" : "text-muted-foreground"
+                <p className={cn("text-xs font-semibold mt-1",
+                  status === 'AVAILABLE' ? "text-green-600" :
+                    status === 'BOOKED' ? "text-red-500" : "text-muted-foreground"
                 )}>
                   {getStatusText(status)}
                 </p>
@@ -122,7 +122,7 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
           );
         })}
       </div>
-      
+
       <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-green-100 border border-green-200"></div> Tersedia</div>
         <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-100/50 border border-red-200/50"></div> Penuh</div>

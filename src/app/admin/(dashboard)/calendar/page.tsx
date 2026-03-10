@@ -30,7 +30,7 @@ const STATUS_LABELS: Record<string, string> = {
 export default function AdminCalendarPage() {
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
   const [currentMonth] = useState(new Date());
-  const [selectedDates, setSelectedDates] = useState<{roomId: string, date: string}[]>([]);
+  const [selectedDates, setSelectedDates] = useState<{ roomId: string, date: string }[]>([]);
   const queryClient = useQueryClient();
 
   // Fetch all rooms
@@ -69,6 +69,8 @@ export default function AdminCalendarPage() {
     }
   });
 
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+
   // Calculate days for the grid
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentMonth),
@@ -76,11 +78,13 @@ export default function AdminCalendarPage() {
   });
 
   // Filter rooms based on selection
-  const filteredRooms = rooms?.filter(room => 
+  const filteredRooms = rooms?.filter(room =>
     propertyFilter === "all" || room.property.slug === propertyFilter
   ) || [];
 
   const handleDateClick = (roomId: string, dateStr: string) => {
+    if (dateStr < todayStr) return; // Prevent clicking past dates
+
     const existing = selectedDates.find(s => s.roomId === roomId && s.date === dateStr);
     if (existing) {
       setSelectedDates(selectedDates.filter(s => !(s.roomId === roomId && s.date === dateStr)));
@@ -91,7 +95,7 @@ export default function AdminCalendarPage() {
 
   const applyBulkStatus = (status: string) => {
     if (selectedDates.length === 0) return;
-    
+
     // Group by roomId because API expects roomId and array of dates
     const grouped = selectedDates.reduce((acc, curr) => {
       if (!acc[curr.roomId]) acc[curr.roomId] = [];
@@ -115,12 +119,12 @@ export default function AdminCalendarPage() {
       const l1 = filteredRooms.find(r => r.property.slug === 'batu' && r.roomNumber === 'L1');
       const l2 = filteredRooms.find(r => r.property.slug === 'batu' && r.roomNumber === 'L2');
       if (l1 && l2) {
-         const l1Status = availabilities?.find(a => a.roomId === l1.id && a.date.startsWith(dateStr))?.status || "AVAILABLE";
-         const l2Status = availabilities?.find(a => a.roomId === l2.id && a.date.startsWith(dateStr))?.status || "AVAILABLE";
-         
-         if (l1Status !== "AVAILABLE" || l2Status !== "AVAILABLE") {
-            status = "BLOCKED"; // Auto block full villa if any floor is booked
-         }
+        const l1Status = availabilities?.find(a => a.roomId === l1.id && a.date.startsWith(dateStr))?.status || "AVAILABLE";
+        const l2Status = availabilities?.find(a => a.roomId === l2.id && a.date.startsWith(dateStr))?.status || "AVAILABLE";
+
+        if (l1Status !== "AVAILABLE" || l2Status !== "AVAILABLE") {
+          status = "BLOCKED"; // Auto block full villa if any floor is booked
+        }
       }
     }
 
@@ -157,7 +161,7 @@ export default function AdminCalendarPage() {
               {format(currentMonth, "MMMM yyyy")}
             </h3>
           </div>
-          
+
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-primary mr-2 bg-primary/10 px-3 py-1 rounded-full">
               {selectedDates.length} terpilih
@@ -167,7 +171,7 @@ export default function AdminCalendarPage() {
             <Button size="sm" variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50" onClick={() => applyBulkStatus("MAINTENANCE")}>Set Maintenance</Button>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="h-[400px] flex items-center justify-center text-muted-foreground">
@@ -197,39 +201,46 @@ export default function AdminCalendarPage() {
               ) : filteredRooms.map(room => (
                 <div key={room.id} className="flex border-b hover:bg-muted/5 transition-colors">
                   <div className="w-72 shrink-0 p-4 border-r flex items-center gap-3">
-                     <span className="font-mono bg-muted/50 px-2 py-1 rounded border text-xs font-semibold text-muted-foreground min-w-[40px] text-center">
-                       {room.roomNumber}
-                     </span>
-                     <div className="overflow-hidden">
-                       <p className="font-bold text-sm text-foreground line-clamp-1" title={room.roomName}>{room.roomName}</p>
-                       <p className="text-xs text-muted-foreground truncate">{room.property.name}</p>
-                     </div>
+                    <span className="font-mono bg-muted/50 px-2 py-1 rounded border text-xs font-semibold text-muted-foreground min-w-[40px] text-center">
+                      {room.roomNumber}
+                    </span>
+                    <div className="overflow-hidden">
+                      <p className="font-bold text-sm text-foreground line-clamp-1" title={room.roomName}>{room.roomName}</p>
+                      <p className="text-xs text-muted-foreground truncate">{room.property.name}</p>
+                    </div>
                   </div>
-                  
+
                   <div className="flex-1 flex">
                     {daysInMonth.map(day => {
-                      const dateStrExact = format(day, "yyyy-MM-dd");
-                      const dateStr = day.toISOString();
-                      
-                      const status = getComputedStatus(room.id, dateStrExact, `${room.property.slug}-${room.roomNumber.toLowerCase()}`);
+                      const dateStr = format(day, "yyyy-MM-dd"); // Strict mapping against UTC shifts
+                      const isPast = dateStr < todayStr;
+
+                      let status = getComputedStatus(room.id, dateStr, `${room.property.slug}-${room.roomNumber.toLowerCase()}`);
                       const isSelected = selectedDates.some(s => s.roomId === room.id && s.date === dateStr);
 
+                      let colorClass = STATUS_COLORS[status] || STATUS_COLORS["AVAILABLE"];
+                      if (isPast) {
+                        colorClass = "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
+                      }
+
                       return (
-                        <div 
+                        <div
                           key={dateStr}
                           onClick={() => handleDateClick(room.id, dateStr)}
                           className={cn(
-                            "flex-1 min-w-[40px] border-r border-border/50 p-1 cursor-pointer transition-all flex items-center justify-center relative group",
-                            isSelected ? "ring-2 ring-primary ring-inset bg-primary/10" : "hover:bg-muted/50"
+                            "flex-1 min-w-[40px] border-r border-border/50 p-1 transition-all flex items-center justify-center relative group",
+                            isPast ? "cursor-not-allowed" : "cursor-pointer",
+                            isSelected && !isPast ? "ring-2 ring-primary ring-inset bg-primary/10" : !isPast && "hover:bg-muted/50"
                           )}
                         >
                           <div className={cn(
-                            "w-full h-full min-h-[40px] rounded border flex items-center justify-center opacity-80 group-hover:opacity-100",
-                            STATUS_COLORS[status] || STATUS_COLORS["AVAILABLE"]
+                            "w-full h-full min-h-[40px] rounded border flex items-center justify-center opacity-80",
+                            !isPast && "group-hover:opacity-100",
+                            colorClass
                           )}
-                          title={`${room.roomName} | ${format(day, "dd MMM")} - ${STATUS_LABELS[status] || "Tersedia"}`}
+                            title={isPast ? "Sudah berlalu" : `${room.roomName} | ${format(day, "dd MMM")} - ${STATUS_LABELS[status] || "Tersedia"}`}
                           >
-                            {isSelected && <Check className="w-4 h-4" />}
+                            {isSelected && !isPast && <Check className="w-4 h-4" />}
                           </div>
                         </div>
                       )
@@ -241,7 +252,7 @@ export default function AdminCalendarPage() {
           )}
         </CardContent>
       </Card>
-      
+
       <div className="text-xs text-muted-foreground flex gap-4 mt-4 px-2">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-200 inline-block"></span> Tersedia</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-red-100 border border-red-200 inline-block"></span> Dipesan</span>
