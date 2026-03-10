@@ -2,24 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, MapPin, ExternalLink, MessageSquareQuote } from "lucide-react";
+import { Star, ExternalLink, MessageSquareQuote } from "lucide-react";
 import { GoogleReview } from "@/lib/google-reviews";
+import { TestimonialMarquee } from "./testimonial-marquee";
+
 const TABS = ["Semua", "Sidoarjo", "Surabaya", "Batu"];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
-};
 
 export function GoogleReviewsSection() {
   const [activeTab, setActiveTab] = useState("Semua");
@@ -118,96 +105,37 @@ export function GoogleReviewsSection() {
           </motion.div>
         </div>
 
-        {/* Reviews Grid */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
+        {/* Reviews Area */}
+        <div className="mt-12 min-h-[400px]">
+          <AnimatePresence mode="wait">
             {loading ? (
-              [...Array(3)].map((_, i) => (
-                 <motion.div
-                    key={`skeleton-${i}`}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-border/50 h-[250px] animate-pulse flex flex-col"
-                  >
-                    <div className="flex gap-1 mb-4">
-                      {[1,2,3,4,5].map(j => <div key={j} className="w-4 h-4 rounded-full bg-muted" />)}
-                    </div>
-                    <div className="space-y-2 mb-8">
-                       <div className="h-4 bg-muted rounded w-full" />
-                       <div className="h-4 bg-muted rounded w-5/6" />
-                       <div className="h-4 bg-muted rounded w-4/6" />
-                    </div>
-                    <div className="mt-auto flex items-center gap-3 pt-4 border-t">
-                       <div className="w-10 h-10 rounded-full bg-muted shrink-0" />
-                       <div className="space-y-2 flex-1">
-                         <div className="h-3 bg-muted rounded w-1/2" />
-                         <div className="h-2 bg-muted rounded w-1/3" />
-                       </div>
-                    </div>
-                  </motion.div>
-              ))
+              <motion.div 
+                key="loading"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center justify-center h-64"
+              >
+                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              </motion.div>
             ) : filteredReviews.length === 0 ? (
               <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="col-span-full py-12 text-center text-muted-foreground flex flex-col items-center"
+                key="empty"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="py-24 text-center text-muted-foreground flex flex-col items-center"
               >
-                <MessageSquareQuote className="w-12 h-12 mb-4 opacity-20" />
-                <p>Belum ada ulasan untuk lokasi ini.</p>
+                <MessageSquareQuote className="w-16 h-16 mb-4 opacity-20" />
+                <p className="text-lg">Belum ada ulasan untuk lokasi ini.</p>
               </motion.div>
             ) : (
-                filteredReviews.map((review) => (
-                  <motion.div
-                    key={review.id}
-                    layout // Animate layout changes when filtering
-                    variants={itemVariants}
-                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg transition-shadow relative flex flex-col h-full"
-                  >
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-4 h-4 ${i < review.rating ? "text-amber-500 fill-amber-500" : "text-muted opacity-50 fill-muted"}`} 
-                        />
-                      ))}
-                    </div>
-                    
-                    <p className="text-muted-foreground text-[15px] leading-relaxed mb-8 flex-1 italic">
-                      &quot;{review.text}&quot;
-                    </p>
-                    
-                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
-                          {review.authorPhoto ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={review.authorPhoto} alt={review.authorName} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="font-bold text-primary text-sm">{review.authorName.charAt(0)}</span>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm text-foreground line-clamp-1">{review.authorName}</p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <MapPin className="w-3 h-3" /> {review.location}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground shrink-0">{review.relativeTime}</span>
-                    </div>
-                  </motion.div>
-                ))
+                <motion.div 
+                  key={`marquee-${activeTab}`}
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <TestimonialMarquee reviews={filteredReviews} />
+                </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

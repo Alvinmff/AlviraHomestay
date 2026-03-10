@@ -68,7 +68,11 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
     setCurrentYear(prev => prev + delta);
   };
 
-  const getDayTooltip = (day: DayData) => {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  const getDayTooltip = (day: DayData, isPast: boolean) => {
+    if (isPast) return `Sudah berlalu (${day.date})`;
     if (day.status === "available") return `Tersedia pada ${day.date}`;
     if (day.status === "booked") return `Sudah dibooking ${day.guestName ? "oleh " + day.guestName : ""}`;
     if (day.status === "maintenance") return `Maintenance: ${day.notes || ""}`;
@@ -158,7 +162,12 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                     
                     {month.days.map((day) => {
                       const dayNum = parseInt(day.date.split('-')[2]);
-                      const colorClass = STATUS_COLORS[day.status] || STATUS_COLORS.available;
+                      const isPast = day.date < todayStr;
+                      
+                      let colorClass = STATUS_COLORS[day.status] || STATUS_COLORS.available;
+                      if (isPast) {
+                        colorClass = "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
+                      }
                       
                       return (
                         <div 
@@ -172,7 +181,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                           
                           {/* CSS Native Tooltip completely disconnected from heavy Radix Tooltips */}
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none scale-95 group-hover:scale-100 origin-bottom">
-                            {getDayTooltip(day)}
+                            {getDayTooltip(day, isPast)}
                             <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
                           </div>
                         </div>

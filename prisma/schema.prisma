@@ -115,6 +115,10 @@ model Booking {
   createdBy   Admin?   @relation("CreatedBy", fields: [createdById], references: [id])
 
   availabilities RoomAvailability[]
+
+  @@index([roomId, checkIn, checkOut, status])
+  @@index([guestPhone])
+  @@index([createdAt])
 }
 
 model RoomAvailability {
@@ -133,5 +137,6 @@ model RoomAvailability {
   notes       String? // alasan maintenance/blocking
 
   @@unique([roomId, date])
+  @@index([roomId, date, status])
   @@index([date, status])
 }
