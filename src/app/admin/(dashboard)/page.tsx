@@ -8,6 +8,7 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SmoothCounter } from "@/components/animations/SmoothCounter";
 
 const prisma = new PrismaClient();
 
@@ -59,10 +60,10 @@ export default async function AdminOverviewPage() {
   });
 
   const stats = [
-    { title: "Total Booking Bulan Ini", value: totalBookingsThisMonth.toString(), icon: <CalendarCheck className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
-    { title: "Properti Aktif", value: activePropertiesCount.toString(), icon: <Building2 className="w-4 h-4 text-muted-foreground" />, trend: "Live" },
-    { title: "Estimasi Revenue", value: formatRupiah(revenueThisMonth), icon: <TrendingUp className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
-    { title: "Estimasi Tamu", value: estGuestsThisMonth.toString(), icon: <Users className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
+    { title: "Total Booking Bulan Ini", value: <SmoothCounter to={totalBookingsThisMonth} />, icon: <CalendarCheck className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
+    { title: "Properti Aktif", value: <SmoothCounter to={activePropertiesCount} />, icon: <Building2 className="w-4 h-4 text-muted-foreground" />, trend: "Live" },
+    { title: "Estimasi Revenue", value: <SmoothCounter to={revenueThisMonth} prefix="Rp " />, icon: <TrendingUp className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
+    { title: "Estimasi Tamu", value: <SmoothCounter to={estGuestsThisMonth} />, icon: <Users className="w-4 h-4 text-muted-foreground" />, trend: "Bulan ini" },
   ];
 
   return (
@@ -116,10 +117,10 @@ export default async function AdminOverviewPage() {
                     </div>
                     <div className="ml-auto font-medium text-sm">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${b.status === "CONFIRMED" ? "bg-emerald-100 text-emerald-700" :
-                          b.status === "CHECKED_IN" ? "bg-blue-100 text-blue-700" :
-                            b.status === "COMPLETED" ? "bg-slate-100 text-slate-700" :
-                              b.status === "CANCELLED" ? "bg-red-100 text-red-700" :
-                                "bg-amber-100 text-amber-700"
+                        b.status === "CHECKED_IN" ? "bg-blue-100 text-blue-700" :
+                          b.status === "COMPLETED" ? "bg-slate-100 text-slate-700" :
+                            b.status === "CANCELLED" ? "bg-red-100 text-red-700" :
+                              "bg-amber-100 text-amber-700"
                         }`}>
                         {b.status}
                       </span>

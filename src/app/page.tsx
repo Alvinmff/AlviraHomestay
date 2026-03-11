@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { GoogleReviewsSection } from "@/components/home/google-reviews-section";
 
 export default function Home() {
@@ -20,12 +20,29 @@ export default function Home() {
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
+  const { scrollY } = useScroll();
+  const yHero = useTransform(scrollY, [0, 1000], [0, 400]);
+  const opacityHero = useTransform(scrollY, [0, 600], [1, 0]);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center justify-center bg-primary text-primary-foreground overflow-hidden">
-        {/* Overlay for background images later */}
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      <section className="relative h-[90vh] flex items-center justify-center bg-zinc-900 text-primary-foreground overflow-hidden">
+        {/* Parallax Background */}
+        <motion.div
+          className="absolute inset-0 z-0 w-full h-[120%]"
+          style={{ y: yHero, opacity: opacityHero }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop"
+            alt="Hero Background Alvira"
+            className="w-full h-full object-cover origin-top"
+          />
+        </motion.div>
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background z-10" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,8 +50,22 @@ export default function Home() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="container relative z-20 mx-auto px-4 text-center mt-32"
         >
-          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight text-white">
-            Tiga Kota, <span className="text-secondary">Satu Kenyamanan.</span>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight text-white flex flex-col sm:flex-row items-center justify-center gap-2">
+            <motion.span
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Tiga Kota,
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="text-secondary"
+            >
+              Satu Kenyamanan.
+            </motion.span>
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 opacity-90 text-white">
             Pengalaman menginap premium dengan pilihan akomodasi beragam — dari homestay cozy di Sidoarjo, kost eksklusif di Surabaya, hingga villa mewah di Batu.
@@ -78,11 +109,13 @@ export default function Home() {
           >
             {/* Sidoarjo */}
             <motion.div variants={itemVariants} className="group rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] border bg-card transition-transform hover:-translate-y-1">
-              <div className="h-56 bg-muted relative">
-                {/* Image Placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <span className="text-muted-foreground font-serif italic">Gambar Homestay Sidoarjo</span>
-                </div>
+              <div className="h-56 bg-muted relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop"
+                  alt="Homestay Sidoarjo"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Homestay Sidoarjo</h3>
@@ -95,10 +128,13 @@ export default function Home() {
 
             {/* Surabaya */}
             <motion.div variants={itemVariants} className="group rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] border bg-card transition-transform hover:-translate-y-1">
-              <div className="h-56 bg-muted relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <span className="text-muted-foreground font-serif italic">Gambar Kost Surabaya</span>
-                </div>
+              <div className="h-56 bg-muted relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1502672260266-1c1de2d93688?q=80&w=800&auto=format&fit=crop"
+                  alt="Kost Surabaya"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Kost Eksklusif Surabaya</h3>
@@ -111,10 +147,13 @@ export default function Home() {
 
             {/* Batu */}
             <motion.div variants={itemVariants} className="group rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] border bg-card transition-transform hover:-translate-y-1">
-              <div className="h-56 bg-muted relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <span className="text-muted-foreground font-serif italic">Gambar Villa Batu</span>
-                </div>
+              <div className="h-56 bg-muted relative overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=800&auto=format&fit=crop"
+                  alt="Villa Batu"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Villa Premium Batu</h3>

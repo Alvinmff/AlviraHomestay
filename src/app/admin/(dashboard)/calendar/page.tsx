@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
-import { Calendar as CalendarIcon, Loader2, Check, AlertCircle } from "lucide-react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from "date-fns";
+import { Calendar as CalendarIcon, Loader2, Check, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -29,7 +29,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function AdminCalendarPage() {
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
-  const [currentMonth] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDates, setSelectedDates] = useState<{ roomId: string, date: string }[]>([]);
   const queryClient = useQueryClient();
 
@@ -156,10 +156,18 @@ export default function AdminCalendarPage() {
                 <SelectItem value="batu">Villa Batu</SelectItem>
               </SelectContent>
             </Select>
-            <h3 className="font-semibold text-lg flex items-center ml-4">
-              <CalendarIcon className="w-5 h-5 mr-2 text-primary" />
-              {format(currentMonth, "MMMM yyyy")}
-            </h3>
+            <div className="flex items-center bg-white rounded-md border shadow-sm ml-4">
+              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <h3 className="font-semibold text-sm w-36 text-center flex items-center justify-center">
+                <CalendarIcon className="w-4 h-4 mr-2 text-primary" />
+                {format(currentMonth, "MMMM yyyy")}
+              </h3>
+              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/providers";
 import { WhatsAppButton } from "@/components/floating/WhatsAppButton";
+import { LivingBackground } from "@/components/animations/LivingBackground";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,8 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={cn(inter.variable, playfair.variable)}>
-      <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground">
+      <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground relative">
         <Providers>
+          <LivingBackground />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

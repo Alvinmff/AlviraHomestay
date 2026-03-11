@@ -39,7 +39,7 @@ export default async function PropertyRoomsPage({ params }: { params: { property
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Property Hero Header */}
-      <section className="relative h-[40vh] min-h-[300px] flex items-end pb-12 overflow-hidden">
+      <section className="relative h-[60vh] min-h-[400px] flex items-end pb-12 overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
         {property.heroImage && (
           <Image

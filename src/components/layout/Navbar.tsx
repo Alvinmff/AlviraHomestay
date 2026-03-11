@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X, User, ChevronDown } from "lucide-react";
+import { DayNightToggle } from "@/components/ui/day-night-toggle";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,6 +49,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center space-x-3">
+          <DayNightToggle />
 
           {/* Mobile Hamburger Button */}
           <button

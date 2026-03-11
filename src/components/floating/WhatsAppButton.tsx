@@ -10,9 +10,6 @@ export function WhatsAppButton() {
     const [isVisible, setIsVisible] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    // Hide on admin pages
-    if (pathname?.startsWith("/admin")) return null;
-
     // Delay entrance animation
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -20,6 +17,9 @@ export function WhatsAppButton() {
         }, 2000); // 2s delay
         return () => clearTimeout(timer);
     }, []);
+
+    // Hide on admin pages
+    if (pathname?.startsWith("/admin")) return null;
 
     const handleWhatsAppClick = () => {
         const link = generateWALink("081231646523", WA_TEMPLATES.general);

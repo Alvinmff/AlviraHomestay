@@ -10,7 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import ReactCrop, { type Crop } from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PropertyForm({ initialData }: { initialData?: any }) {
@@ -19,32 +22,102 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
   const [activeTab, setActiveTab] = useState("info");
   const [imageUrl, setImageUrl] = useState(initialData?.heroImage || "");
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Crop States
+  const [imgSrc, setImgSrc] = useState("");
+  const [crop, setCrop] = useState<Crop>();
+  const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadingImage(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal upload gambar");
-
-      setImageUrl(data.url);
-      toast.success("Gambar berhasil diunggah");
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setUploadingImage(false);
-    }
+    setCrop(undefined); // Reset crop
+    setCompletedCrop(null);
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setImgSrc(reader.result?.toString() || "");
+      setShowCropModal(true);
+    });
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = ""; // Reset input
   }
+
+  async function uploadCroppedImage() {
+    if (!imgRef.current || !completedCrop || !completedCrop.width || !completedCrop.height) {
+      toast.error("Silakan buat area potongan (crop) terlebih dahulu.");
+      return;
+    }
+
+    const image = imgRef.current;
+    const canvas = document.createElement("canvas");
+
+    // Scale X/Y calculate the discrepancy between the physical <img> DOM element size 
+    // and its original natural size. ReactCrop provides absolute pixel values based on the DOM element's visual size.
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+
+    // Convert visually cropped size to actual image pixels
+    const cx = completedCrop.x * scaleX;
+    const cy = completedCrop.y * scaleY;
+    const cw = completedCrop.width * scaleX;
+    const ch = completedCrop.height * scaleY;
+
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    // smooth image rendering
+    ctx.imageSmoothingQuality = "high";
+
+    ctx.drawImage(
+      image,
+      cx,
+      cy,
+      cw,
+      ch,
+      0,
+      0,
+      cw,
+      ch
+    );
+
+    setUploadingImage(true);
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        setUploadingImage(false);
+        return toast.error("Gagal memproses gambar.");
+      }
+
+      const formData = new FormData();
+      formData.append("file", blob, "cropped-hero.jpg");
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Gagal upload gambar");
+
+        setImageUrl(data.url);
+        toast.success("Gambar berhasil dipotong dan diunggah");
+        setShowCropModal(false);
+      } catch (err: any) {
+        toast.error(err.message);
+      } finally {
+        setUploadingImage(false);
+      }
+    }, "image/jpeg", 0.9);
+  }
+
+
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -242,8 +315,45 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                   ref={fileInputRef}
                   className="hidden"
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={handleFileSelect}
                 />
+
+                {/* Crop Dialog Modal */}
+                <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+                  <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Potong Gambar Utama</DialogTitle>
+                      <DialogDescription>
+                        Tarik kursor untuk memotong bagian gambar yang diinginkan. Anda disarankan memotong dengan rasio melebar (landscape).
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-center bg-black/5 p-4 rounded-xl border border-dashed overflow-auto max-h-[60vh] w-full relative">
+                      <ReactCrop
+                        crop={crop}
+                        onChange={(c) => setCrop(c)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                        aspect={16 / 9}
+                        className="max-w-full m-auto flex justify-center w-fit"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          ref={imgRef}
+                          alt="Crop preview"
+                          src={imgSrc}
+                          className="w-auto h-auto max-h-[50vh] max-w-full object-contain mx-auto"
+                        />
+                      </ReactCrop>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={() => setShowCropModal(false)} disabled={uploadingImage}>
+                        Batal
+                      </Button>
+                      <Button type="button" onClick={uploadCroppedImage} disabled={uploadingImage}>
+                        {uploadingImage ? "Menyimpan..." : "Potong & Terapkan"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </TabsContent>

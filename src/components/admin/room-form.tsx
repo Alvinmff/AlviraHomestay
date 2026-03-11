@@ -59,7 +59,6 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
     amenities: initialAmenities,
     thumbnail: initialData?.thumbnail || "",
     basePrice: initialData?.basePrice?.toString() || "",
-    basePrice: initialData?.basePrice?.toString() || "",
     weekendPrice: initialData?.weekendPrice?.toString() || "",
     monthlyPrice: initialData?.monthlyPrice?.toString() || "",
     photos: initialPhotos,
@@ -152,7 +151,6 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
       const payload = {
         ...formData,
         maxGuests: parseInt(formData.maxGuests) || 2,
-        basePrice: parseFloat(formData.basePrice) || 0,
         basePrice: parseFloat(formData.basePrice) || 0,
         weekendPrice: formData.weekendPrice ? parseFloat(formData.weekendPrice) : null,
         monthlyPrice: formData.monthlyPrice ? parseFloat(formData.monthlyPrice) : null,

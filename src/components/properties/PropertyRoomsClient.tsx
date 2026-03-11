@@ -162,15 +162,15 @@ export function PropertyRoomsClient({
                                     <div className="flex items-center gap-2">
                                         <Link
                                             href={`/properties/${property.slug}/${room.slug}#calendar`}
-                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-10 px-4 text-sm font-semibold bg-white border shadow-sm text-foreground hover:bg-muted transition-colors"
+                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-8 px-3 text-xs font-semibold bg-white border shadow-sm text-foreground hover:bg-muted transition-colors"
                                         >
                                             Cek Jadwal
                                         </Link>
                                         <Link
                                             href={`/properties/${property.slug}/${room.slug}`}
-                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-10 px-6 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20"
+                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-8 px-4 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm shadow-primary/20"
                                         >
-                                            Booking
+                                            Lihat Detail
                                         </Link>
                                     </div>
                                 </CardFooter>
