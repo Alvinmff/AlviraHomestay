@@ -135,7 +135,7 @@ export default function ContactPage() {
                                 <Mail className="w-7 h-7" />
                             </div>
                             <h3 className="font-serif font-bold text-xl mb-2 text-foreground">Email</h3>
-                            <p className="text-muted-foreground mb-1">halo@alvira.id</p>
+                            <p className="text-muted-foreground mb-1">alvirahomestay@gmail.com</p>
                             <p className="text-sm font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full mb-6">Kerjasama & Info</p>
                             <a href="mailto:halo@alvira.id" className="mt-auto w-full py-2.5 rounded-lg border border-border text-foreground font-semibold hover:bg-muted transition-colors">
                                 Send Email
