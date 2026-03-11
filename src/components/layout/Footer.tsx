@@ -7,25 +7,27 @@ import { formatPhoneForWA, generateWALink, WA_TEMPLATES } from "@/lib/utils";
 export function Footer() {
 
   return (
-    <footer className="w-full border-t bg-[#F8FAF9] py-16 text-sm">
+    <footer className="w-full border-t bg-[#F8FAF9] dark:bg-zinc-950 py-16 text-sm">
       <div className="container mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
 
         {/* Brand */}
         <div className="flex flex-col space-y-4 lg:col-span-2">
-          <Link href="/" className="inline-block">
+          <Link href="/" className="flex items-center gap-2 w-fit">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/uploads/logo.png" alt="Homestay Alvira" className="h-12 w-auto object-contain" />
             <span className="font-serif text-2xl font-bold text-primary">Homestay Alvira</span>
           </Link>
           <p className="text-muted-foreground leading-relaxed max-w-sm">
             Tiga kota, satu kenyamanan. Pengalaman menginap premium dari homestay hingga villa mewah, semua dalam genggaman Anda.
           </p>
           <div className="flex items-center space-x-4 pt-2">
-            <a href="https://instagram.com/alvira.homestay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border flex items-center justify-center text-muted-foreground hover:text-[#bc1888] hover:border-[#bc1888] transition-colors shadow-sm">
+            <a href="https://instagram.com/alvira.homestay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 border dark:border-zinc-800 flex items-center justify-center text-muted-foreground hover:text-[#bc1888] hover:border-[#bc1888] transition-colors shadow-sm">
               <Instagram className="w-5 h-5" />
             </a>
-            <a href="https://youtube.com/@alvirahomestay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-colors shadow-sm">
+            <a href="https://youtube.com/@alvirahomestay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 border dark:border-zinc-800 flex items-center justify-center text-muted-foreground hover:text-[#FF0000] hover:border-[#FF0000] transition-colors shadow-sm">
               <Youtube className="w-5 h-5" />
             </a>
-            <a href="https://tiktok.com/@alvira_stay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border flex items-center justify-center text-muted-foreground hover:text-black hover:border-black transition-colors shadow-sm">
+            <a href="https://tiktok.com/@alvira_stay" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white dark:bg-zinc-900 border dark:border-zinc-800 flex items-center justify-center text-muted-foreground hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-colors shadow-sm">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
             </a>
           </div>

@@ -162,7 +162,7 @@ export function PropertyRoomsClient({
                                     <div className="flex items-center gap-2">
                                         <Link
                                             href={`/properties/${property.slug}/${room.slug}#calendar`}
-                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-8 px-3 text-xs font-semibold bg-white border shadow-sm text-foreground hover:bg-muted transition-colors"
+                                            className="inline-flex flex-1 sm:flex-none items-center justify-center rounded-lg h-8 px-3 text-xs font-semibold bg-white dark:bg-zinc-800 border dark:border-zinc-700 shadow-sm text-foreground hover:bg-muted dark:hover:bg-zinc-700 transition-colors"
                                         >
                                             Cek Jadwal
                                         </Link>

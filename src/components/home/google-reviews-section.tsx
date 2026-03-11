@@ -51,14 +51,14 @@ export function GoogleReviewsSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-6"
+            className="inline-flex items-center gap-2 bg-white dark:bg-zinc-800 px-4 py-2 rounded-full shadow-sm border dark:border-zinc-700 mb-6"
           >
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-4 h-4 text-amber-500 fill-amber-500" />
               ))}
             </div>
-            <span className="text-sm font-semibold">Google Reviews</span>
+            <span className="text-sm font-semibold text-foreground">Google Reviews</span>
           </motion.div>
 
           <motion.h2
@@ -94,8 +94,8 @@ export function GoogleReviewsSection() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === tab
-                    ? "bg-primary text-primary-foreground shadow-md scale-105"
-                    : "bg-white text-muted-foreground border hover:bg-muted hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-md scale-105 border-transparent"
+                  : "bg-white dark:bg-zinc-800 text-muted-foreground border dark:border-zinc-700 hover:bg-muted dark:hover:bg-zinc-700 hover:text-foreground"
                   }`}
               >
                 {tab}

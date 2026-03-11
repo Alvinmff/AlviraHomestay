@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, MapPin, Image as ImageIcon, Sparkles, Save, ArrowLeft, Loader2, Upload } from "lucide-react";
+import { Building2, MapPin, Image as ImageIcon, Sparkles, Save, ArrowLeft, Loader2, Upload, Plus, Trash2, Map } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,33 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [imageUrl, setImageUrl] = useState(initialData?.heroImage || "");
+  const [galleryItems, setGalleryItems] = useState<{ url: string; description: string }[]>(() => {
+    try {
+      if (!initialData?.gallery) return [];
+      const parsed = typeof initialData.gallery === 'string' ? JSON.parse(initialData.gallery) : initialData.gallery;
+      
+      // Handle legacy string arrays (convert to objects)
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+        return parsed.map(url => ({ url, description: "" }));
+      }
+      return parsed; // Assuming it's already an array of {}
+    } catch {
+      return [];
+    }
+  });
+
+  const [nearbyPlaces, setNearbyPlaces] = useState<{ name: string; distance: string; type: string; imageUrl?: string }[]>(() => {
+    try {
+      if (!initialData?.nearbyPlaces) return [];
+      return typeof initialData.nearbyPlaces === 'string' ? JSON.parse(initialData.nearbyPlaces) : initialData.nearbyPlaces;
+    } catch {
+      return [];
+    }
+  });
+
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingNearby, setUploadingNearby] = useState<number | null>(null);
 
   // Crop States
   const [imgSrc, setImgSrc] = useState("");
@@ -117,7 +143,85 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
     }, "image/jpeg", 0.9);
   }
 
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
+    setUploadingGallery(true);
+    let uploadedCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryItems((prev) => [...prev, { url: data.url, description: "" }]);
+          uploadedCount++;
+        }
+      } catch (err) {
+        console.error("Gallery upload error:", err);
+      }
+    }
+
+    setUploadingGallery(false);
+    toast.success(`${uploadedCount} foto galeri berhasil diunggah.`);
+    if (e.target) e.target.value = "";
+  }
+
+  function removeGalleryImage(index: number) {
+    setGalleryItems((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateGalleryDescription(index: number, newDesc: string) {
+    setGalleryItems((prev) => prev.map((item, i) => i === index ? { ...item, description: newDesc } : item));
+  }
+
+  function addNearbyPlace() {
+    setNearbyPlaces(prev => [...prev, { name: "", distance: "", type: "Wisata", imageUrl: "" }]);
+  }
+
+  function updateNearbyPlace(index: number, field: keyof typeof nearbyPlaces[0], value: string) {
+    setNearbyPlaces(prev => prev.map((place, i) => i === index ? { ...place, [field]: value } : place));
+  }
+
+  function removeNearbyPlace(index: number) {
+    setNearbyPlaces(prev => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleNearbyImageUpload(e: React.ChangeEvent<HTMLInputElement>, index: number) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingNearby(index);
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        updateNearbyPlace(index, "imageUrl", data.url);
+        toast.success("Foto kawasan berhasil diunggah.");
+      } else {
+        toast.error("Gagal mengunggah foto kawasan.");
+      }
+    } catch {
+      toast.error("Terjadi kesalahan saat mengunggah.");
+    } finally {
+      setUploadingNearby(null);
+      if (e.target) e.target.value = "";
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -140,7 +244,8 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
           ...payload,
           // Facilities parser placeholder,
           commonFacilities: "[]",
-          gallery: "[]"
+          gallery: JSON.stringify(galleryItems),
+          nearbyPlaces: JSON.stringify(nearbyPlaces)
         }),
       });
 
@@ -173,7 +278,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/50 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-5 h-12 bg-muted/50 p-1 rounded-xl">
           <TabsTrigger value="info" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Building2 className="w-4 h-4" /> <span className="hidden sm:inline">Info Dasar</span>
           </TabsTrigger>
@@ -181,10 +286,13 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
             <MapPin className="w-4 h-4" /> <span className="hidden sm:inline">Lokasi</span>
           </TabsTrigger>
           <TabsTrigger value="foto" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
-            <ImageIcon className="w-4 h-4" /> <span className="hidden sm:inline">Foto & Media</span>
+            <ImageIcon className="w-4 h-4" /> <span className="hidden sm:inline">Foto</span>
           </TabsTrigger>
           <TabsTrigger value="fasilitas" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Fasilitas</span>
+          </TabsTrigger>
+          <TabsTrigger value="kawasan" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+            <Map className="w-4 h-4" /> <span className="hidden sm:inline">Kawasan</span>
           </TabsTrigger>
         </TabsList>
 
@@ -317,6 +425,74 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                   accept="image/*"
                   onChange={handleFileSelect}
                 />
+              </CardContent>
+            </Card>
+
+            {/* Galeri Fasilitas */}
+            <Card className="shadow-sm border-border/50 mt-6">
+              <CardHeader className="bg-muted/10 border-b">
+                <CardTitle className="font-serif">Galeri Foto Lainnya / Fasilitas</CardTitle>
+                <CardDescription>Tambahkan foto-foto area umum, fasad depan, beserta deskripsi per fasilitasnya.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                {galleryItems.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+                    {galleryItems.map((item, i) => (
+                      <div key={i} className="flex flex-col gap-3 p-3 border rounded-xl bg-card shadow-sm">
+                        <div className="relative group rounded-lg overflow-hidden border aspect-video bg-muted flex items-center justify-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.url} alt={`Gallery ${i}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => removeGalleryImage(i)}
+                            >
+                              Hapus
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground font-semibold">Deskripsi / Keterangan</Label>
+                          <Input
+                            placeholder="Mis: Kolam Renang Umum, Dapur Bersih..."
+                            value={item.description}
+                            onChange={(e) => updateGalleryDescription(i, e.target.value)}
+                            className="bg-surface text-sm border-input font-medium placeholder:font-normal"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-center p-6 border-2 border-dashed rounded-xl bg-muted/10 hover:bg-muted/30 transition-colors">
+                  <div className="text-center">
+                    <div className="p-3 bg-primary/10 rounded-full inline-block mb-3 text-primary">
+                      {uploadingGallery ? <Loader2 className="w-6 h-6 animate-spin" /> : <ImageIcon className="w-6 h-6" />}
+                    </div>
+                    <div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => document.getElementById("gallery-upload")?.click()}
+                        disabled={uploadingGallery}
+                      >
+                        {uploadingGallery ? "Mengunggah..." : "Tambah Foto Galeri"}
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">Bisa pilih lebih dari satu gambar sekaligus</p>
+                    </div>
+                    <input
+                      id="gallery-upload"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleGalleryUpload}
+                    />
+                  </div>
+                </div>
 
                 {/* Crop Dialog Modal */}
                 <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
@@ -367,6 +543,144 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
               <CardContent className="space-y-6 pt-6 text-center text-muted-foreground border-2 border-dashed m-6 rounded-xl p-12">
                 <Sparkles className="w-12 h-12 mb-4 opacity-20 mx-auto" />
                 <p>Sistem multi-select fasilitas pintar akan dinamis melacak metadata JSON. Komponen dalam status mounting.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="kawasan" className="m-0 border-0 p-0 focus-visible:outline-none">
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="bg-muted/10 border-b flex flex-row items-center justify-between py-4">
+                <div>
+                  <CardTitle className="font-serif">Kawasan Terdekat</CardTitle>
+                  <CardDescription>Tambahkan tempat menarik, kampus, mall, atau fasilitas umum di sekitar properti.</CardDescription>
+                </div>
+                <Button type="button" size="sm" onClick={addNearbyPlace} className="gap-2">
+                  <Plus className="w-4 h-4" /> Tambah Tempat
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6 bg-muted/5">
+                {nearbyPlaces.length === 0 ? (
+                  <div className="text-center p-8 border-2 border-dashed rounded-xl border-muted bg-white">
+                    <Map className="w-12 h-12 mb-4 opacity-20 mx-auto" />
+                    <p className="text-muted-foreground">Belum ada kawasan terdekat yang ditambahkan.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {nearbyPlaces.map((place, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 bg-white border rounded-xl shadow-sm items-start">
+                        {/* Image Upload Area */}
+                        <div className="w-full sm:w-32 h-32 flex-shrink-0 relative group rounded-lg overflow-hidden border bg-muted flex flex-col items-center justify-center">
+                          {place.imageUrl ? (
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2 items-center justify-center backdrop-blur-sm">
+                                <Button 
+                                  type="button" 
+                                  variant="secondary" 
+                                  size="sm" 
+                                  className="h-7 text-xs px-2"
+                                  onClick={() => document.getElementById(`nearby-upload-${index}`)?.click()}
+                                >
+                                  Ganti
+                                </Button>
+                                <Button 
+                                  type="button" 
+                                  variant="destructive" 
+                                  size="sm" 
+                                  className="h-7 text-xs px-2"
+                                  onClick={() => updateNearbyPlace(index, "imageUrl", "")}
+                                >
+                                  Hapus
+                                </Button>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-center p-2">
+                              {uploadingNearby === index ? (
+                                <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+                              ) : (
+                                <ImageIcon className="w-6 h-6 mx-auto text-muted-foreground opacity-50 mb-2" />
+                              )}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-[10px] h-6 px-2 w-full"
+                                onClick={() => document.getElementById(`nearby-upload-${index}`)?.click()}
+                                disabled={uploadingNearby === index}
+                              >
+                                {uploadingNearby === index ? "Proses..." : "Pilih Foto"}
+                              </Button>
+                            </div>
+                          )}
+                          <input
+                            id={`nearby-upload-${index}`}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleNearbyImageUpload(e, index)}
+                          />
+                        </div>
+
+                        {/* Fields Array */}
+                        <div className="flex-1 space-y-4 w-full">
+                          <div className="flex flex-col sm:flex-row gap-4 w-full">
+                            <div className="flex-1 space-y-2">
+                              <Label>Nama Tempat</Label>
+                              <Input
+                                placeholder="Mis: Royal Plaza Surabaya"
+                                value={place.name}
+                                onChange={(e) => updateNearbyPlace(index, "name", e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div className="w-full sm:w-48 space-y-2">
+                              <Label>Tipe</Label>
+                              <Select 
+                                value={place.type} 
+                                onValueChange={(val) => updateNearbyPlace(index, "type", val)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Wisata">Wisata / Hiburan</SelectItem>
+                                  <SelectItem value="Belanja">Pusat Perbelanjaan</SelectItem>
+                                  <SelectItem value="Pendidikan">Kampus / Sekolah</SelectItem>
+                                  <SelectItem value="Kesehatan">Rumah Sakit</SelectItem>
+                                  <SelectItem value="Transportasi">Stasiun / Bandara</SelectItem>
+                                  <SelectItem value="Lainnya">Fasilitas Umum</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row gap-4 w-full items-end">
+                            <div className="flex-1 space-y-2">
+                              <Label>Jarak</Label>
+                              <Input
+                                placeholder="Mis: 5 Menit"
+                                value={place.distance}
+                                onChange={(e) => updateNearbyPlace(index, "distance", e.target.value)}
+                                required
+                              />
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="destructive" 
+                              size="icon"
+                              onClick={() => removeNearbyPlace(index)}
+                              className="shrink-0 rounded-lg aspect-square w-10 h-10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

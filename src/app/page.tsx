@@ -79,7 +79,7 @@ export default function Home() {
             <Link href="/properties" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold transition-colors">
               Jelajahi Properti
             </Link>
-            <Link href="/kontak" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm text-foreground border border-border bg-white/90 hover:bg-muted hover:text-primary backdrop-blur-sm font-semibold transition-colors">
+            <Link href="/kontak" className="inline-flex items-center justify-center rounded-lg h-11 px-8 text-sm text-foreground border border-border bg-white/90 dark:bg-white/10 dark:hover:bg-white/20 hover:bg-muted hover:text-primary backdrop-blur-sm font-semibold transition-colors">
               Hubungi Kami
             </Link>
           </motion.div>
@@ -112,7 +112,7 @@ export default function Home() {
               <div className="h-56 bg-muted relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop"
+                  src="/uploads/upload-1773135068512-112765190.jpg"
                   alt="Homestay Sidoarjo"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -120,7 +120,7 @@ export default function Home() {
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Homestay Sidoarjo</h3>
                 <p className="text-muted-foreground mb-6 line-clamp-2">Penginapan nyaman dan strategis untuk keluarga, cocok untuk transit atau kunjungan bisnis.</p>
-                <Link href="/properties/sidoarjo" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary border border-primary/20 hover:bg-primary/5 transition-colors">
+                <Link href="/properties/sidoarjo" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary dark:text-white border border-primary/20 dark:border-white/20 hover:bg-primary/5 dark:hover:bg-white/10 transition-colors">
                   Lihat Detail
                 </Link>
               </div>
@@ -131,7 +131,7 @@ export default function Home() {
               <div className="h-56 bg-muted relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://images.unsplash.com/photo-1502672260266-1c1de2d93688?q=80&w=800&auto=format&fit=crop"
+                  src="uploads/upload-1773153326920-232440692.jpg"
                   alt="Kost Surabaya"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -139,7 +139,7 @@ export default function Home() {
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Kost Eksklusif Surabaya</h3>
                 <p className="text-muted-foreground mb-6 line-clamp-2">Fasilitas premium di pusat kota pahlawan, memberikan kenyamanan maksimal untuk mahasiswa dan pekerja.</p>
-                <Link href="/properties/surabaya" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary border border-primary/20 hover:bg-primary/5 transition-colors">
+                <Link href="/properties/surabaya" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary dark:text-white border border-primary/20 dark:border-white/20 hover:bg-primary/5 dark:hover:bg-white/10 transition-colors">
                   Lihat Detail
                 </Link>
               </div>
@@ -150,7 +150,7 @@ export default function Home() {
               <div className="h-56 bg-muted relative overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=800&auto=format&fit=crop"
+                  src="uploads/upload-1773153580526-220867004.JPG"
                   alt="Villa Batu"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -158,7 +158,7 @@ export default function Home() {
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-foreground">Villa Premium Batu</h3>
                 <p className="text-muted-foreground mb-6 line-clamp-2">Liburan tak terlupakan dengan nuansa alam pegunungan, udara sejuk, dan privasi penuh.</p>
-                <Link href="/properties/batu" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary border border-primary/20 hover:bg-primary/5 transition-colors">
+                <Link href="/properties/batu" className="inline-flex items-center justify-center rounded-lg h-9 px-4 text-sm w-full text-primary dark:text-white border border-primary/20 dark:border-white/20 hover:bg-primary/5 dark:hover:bg-white/10 transition-colors">
                   Lihat Detail
                 </Link>
               </div>

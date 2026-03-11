@@ -45,6 +45,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
                 heroImage: data.heroImage || null,
                 commonFacilities: data.commonFacilities ? JSON.parse(data.commonFacilities) : [],
                 gallery: data.gallery ? JSON.parse(data.gallery) : [],
+                nearbyPlaces: data.nearbyPlaces ? JSON.parse(data.nearbyPlaces) : [],
             }
         });
 

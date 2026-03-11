@@ -2,10 +2,10 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
-import { MapPin, Users, Maximize, BedDouble, Check } from "lucide-react";
+import { MapPin, Users, Maximize, BedDouble, Check, AlertCircle, Info } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PropertyRoomsClient } from "@/components/properties/PropertyRoomsClient";
+import { PropertyContentTabs } from "@/components/properties/PropertyContentTabs";
 
 const prisma = new PrismaClient();
 
@@ -64,8 +64,73 @@ export default async function PropertyRoomsPage({ params }: { params: { property
         </div>
       </section>
 
-      {/* Room Grid Section */}
-      <PropertyRoomsClient property={property} initialRooms={property.rooms} />
+      {/* Conditional Description for Surabaya */}
+      {property.slug === 'surabaya' && (
+        <section className="container mx-auto px-4 -mt-8 relative z-30 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-1 shadow-lg border-border">
+              <CardHeader className="bg-primary/5 pb-4">
+                <h2 className="text-xl font-serif font-bold flex items-center gap-2">
+                  <Info className="w-5 h-5 text-primary" />
+                  Kost Premium di Tempat Strategis dan Nyaman
+                </h2>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <p className="text-sm text-foreground/80 mb-4 leading-relaxed">
+                  Dekat Pusat Bisnis Kota Surabaya (Royal Plaza Mall, Kantor Pertamina Jagir, Kantor Pajak Jagir, Pasar Wonokromo, Stasiun Wonokromo, Universitas Kedokteran Hang Tuah, RSAL, Jatim Expo, DBL, Graha Pangeran).
+                </p>
+                <h3 className="font-bold text-sm mb-3">Fasilitas Tersedia:</h3>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> AC, TV, WIFI, Water Heater</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> Mesin Cuci Bersama Gratis</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> Kompor Elpiji & Kulkas Bersama Gratis</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> Galon Air Minum & Air PDAM Gratis</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> Parkiran Luas & Rumah Sangat Luas</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> Satpam 24 Jam & Dekat Masjid 100 Meter</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="lg:col-span-2 shadow-lg border-border">
+              <CardHeader className="bg-red-50 dark:bg-red-950/20 pb-4">
+                <h2 className="text-xl font-serif font-bold text-red-700 dark:text-red-400 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  Tata Tertib Penghuni dan Tamu
+                </h2>
+              </CardHeader>
+              <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="font-bold text-sm mb-3 text-red-600 dark:text-red-400 border-b pb-2">Tata Tertib Homestay/Kost</h3>
+                  <ul className="space-y-2 text-xs text-muted-foreground list-decimal pl-4">
+                    <li>Setiap Penyewa wajib menyerahkan fotocopy KTP / Identitas diri yang sah.</li>
+                    <li>Penyewa bertanggung jawab terhadap kerapian & kebersihan kamar & lingkungan serta keamanan.</li>
+                    <li>Buanglah sampah pada tempat yang disediakan.</li>
+                    <li>Kehilangan barang-barang penyewa bukan tanggung jawab pemilik.</li>
+                    <li>Dilarang meminjamkan kunci pada siapapun kecuali memberitahu kepada pemilik terlebih dahulu.</li>
+                    <li>Mematikan air, lampu, dan listrik saat meninggalkan kamar.</li>
+                    <li>Saling menghargai, menghormati, serta menjaga kenyamanan sesama penyewa.</li>
+                    <li>Dilarang membawa tamu lawan jenis kedalam kamar (bagi pasangan tidak menikah).</li>
+                    <li>Jumlah penyewa sesuai perjanjian / kesepakatan Bersama.</li>
+                    <li>Dilarang keras menggunakan Narkotika, Minuman Keras, dll.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm mb-3 text-red-600 dark:text-red-400 border-b pb-2">Tata Tertib Tamu</h3>
+                  <ul className="space-y-2 text-xs text-muted-foreground list-decimal pl-4">
+                    <li>Jam Bertamu Maksimal Pukul 22.00 WIB.</li>
+                    <li>Tamu Dilarang Menggunakan Kamar Mandi Untuk Keperluan Yang Tidak Sewajarnya (Mencuci, Mandi, dll).</li>
+                    <li>Tamu Dilarang Menitipkan Kendaraan Dengan Alasan Apapun, mengingat parkiran sangat terbatas.</li>
+                    <li>Jaga Kebersihan, Buang Sampah Pada Tempatnya.</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
+
+      {/* Room Grid & Gallery Section Handler */}
+      <PropertyContentTabs property={property} initialRooms={property.rooms} />
     </div>
   );
 }

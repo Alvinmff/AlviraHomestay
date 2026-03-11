@@ -11,7 +11,9 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-8 flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2 relative z-50">
+        <Link href="/" className="flex items-center gap-2.5 relative z-50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/uploads/logo.png" alt="Homestay Alvira" className="h-10 w-auto object-contain" />
           <span className="font-serif text-xl sm:text-2xl font-bold text-primary tracking-tight">
             Homestay Alvira
           </span>
