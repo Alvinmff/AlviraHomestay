@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 // GET: Fetch availability data (filtered by property or room)
 export async function GET(request: Request) {

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import {
   Building2,
@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SmoothCounter } from "@/components/animations/SmoothCounter";
 
-const prisma = new PrismaClient();
+
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { Eye, Filter, CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookingActions } from "@/components/admin/booking-actions";
 
-const prisma = new PrismaClient();
+
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {

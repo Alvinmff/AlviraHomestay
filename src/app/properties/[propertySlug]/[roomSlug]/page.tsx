@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { ArrowLeft, Users, Maximize, BedDouble, Check, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RoomWhatsAppForm } from "@/components/booking/room-whatsapp-form";
 import { RoomGalleryModal } from "@/components/gallery/room-gallery-modal";
 import { YearlyAvailabilityCalendar } from "@/components/calendar/YearlyAvailabilityCalendar";
-
-const prisma = new PrismaClient();
 
 export default async function RoomDetailPage({ params }: { params: { propertySlug: string, roomSlug: string } }) {
   const { propertySlug, roomSlug } = params;
@@ -114,7 +112,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
 
             {/* Individual Amenities */}
             <section className="space-y-6">
-              <h2 className="text-2xl font-serif font-bold text-foreground">Fasilitas Kamar</h2>
+              <h2 className="text-2xl font-serif font-bold text-foreground">Fasilitas</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {amenities.map((amenity, i) => (
                   <div key={i} className="flex items-start gap-3">

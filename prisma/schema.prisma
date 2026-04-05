@@ -36,10 +36,10 @@ model Property {
   commonFacilities Json      @default("[]")
   heroImage        String?
   gallery          Json?
-  nearbyPlaces     Json      @default("[]")
   isActive         Boolean   @default(true)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  nearbyPlaces     Json      @default("[]")
   bookings         Booking[]
   rooms            Room[]
 }

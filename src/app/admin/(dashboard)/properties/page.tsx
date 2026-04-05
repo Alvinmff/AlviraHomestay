@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { CopyPlus, Edit, Eye, MapPin, BedDouble } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { PropertyActions } from "@/components/admin/property-actions";
 
-const prisma = new PrismaClient();
+
 
 export default async function AdminPropertiesPage() {
   const properties = await prisma.property.findMany({

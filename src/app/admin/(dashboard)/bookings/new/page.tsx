@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ManualBookingForm } from "@/components/admin/manual-booking-form";
-
-const prisma = new PrismaClient();
 
 export default async function NewBookingPage() {
     const properties = await prisma.property.findMany({

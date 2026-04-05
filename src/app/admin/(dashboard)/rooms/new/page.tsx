@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { RoomForm } from "@/components/admin/room-form";
-
-const prisma = new PrismaClient();
 
 export default async function NewRoomPage() {
   const properties = await prisma.property.findMany({

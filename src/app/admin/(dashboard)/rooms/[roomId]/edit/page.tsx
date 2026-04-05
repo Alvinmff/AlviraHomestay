@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { RoomForm } from "@/components/admin/room-form";
 import { notFound } from "next/navigation";
-
-const prisma = new PrismaClient();
 
 interface PageProps {
   params: { roomId: string }

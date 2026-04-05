@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { MapPin, Users, Maximize, BedDouble, Check, AlertCircle, Info } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PropertyContentTabs } from "@/components/properties/PropertyContentTabs";
-
-const prisma = new PrismaClient();
 
 // Format Rupiah helper
 const formatRupiah = (number: number) => {

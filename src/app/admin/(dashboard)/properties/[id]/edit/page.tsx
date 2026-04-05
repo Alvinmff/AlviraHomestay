@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { PropertyForm } from "@/components/admin/property-form";
 import { notFound } from "next/navigation";
-
-const prisma = new PrismaClient();
 
 export default async function EditPropertyPage({ params }: { params: { id: string } }) {
   const property = await prisma.property.findUnique({

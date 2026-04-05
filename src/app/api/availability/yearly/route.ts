@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { format, startOfYear, endOfYear, eachMonthOfInterval, getDaysInMonth, startOfMonth, addDays } from "date-fns";
 import { id } from "date-fns/locale";
-
-const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   try {
