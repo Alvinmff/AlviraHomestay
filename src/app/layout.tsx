@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Providers } from "@/components/providers";
-import { WhatsAppButton } from "@/components/floating/WhatsAppButton";
-import { LivingBackground } from "@/components/animations/LivingBackground";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,11 +28,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={cn(inter.variable, playfair.variable)}>
       <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground relative">
         <Providers>
-          <LivingBackground />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <WhatsAppButton />
+          {children}
         </Providers>
       </body>
     </html>

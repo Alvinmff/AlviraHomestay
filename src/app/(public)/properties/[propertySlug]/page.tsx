@@ -25,28 +25,45 @@ export default async function PropertyRoomsPage({ params }: { params: { property
     include: {
       rooms: {
         where: { isActive: true, isShown: true },
-        orderBy: { roomNumber: 'asc' }
+        // Sort in JS instead of DB to allow smart alphanumeric sorting by roomName
       }
     }
   });
+
+  if (property && property.rooms) {
+    property.rooms.sort((a, b) => 
+      a.roomName.localeCompare(b.roomName, undefined, { numeric: true, sensitivity: 'base' })
+    );
+  }
 
   if (!property) {
     notFound();
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 -mt-[72px]">
       {/* Property Hero Header */}
       <section className="relative h-[60vh] min-h-[400px] flex items-end pb-12 overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
         {property.heroImage && (
-          <Image
-            src={property.heroImage}
-            alt={property.name}
-            fill
-            className="object-cover z-0"
-            priority
-          />
+          <>
+            {/* Blurred Background Layer */}
+            <Image
+              src={property.heroImage}
+              alt={`${property.name} background`}
+              fill
+              className="object-cover z-0 blur-xl opacity-50 scale-110"
+              priority
+            />
+            {/* Main Sharp Image */}
+            <Image
+              src={property.heroImage}
+              alt={property.name}
+              fill
+              className="object-contain z-0 drop-shadow-2xl"
+              priority
+            />
+          </>
         )}
         <div className="container relative z-20 mx-auto px-4">
           <Badge className="mb-4 bg-primary/80 hover:bg-primary/90 text-white border-transparent">

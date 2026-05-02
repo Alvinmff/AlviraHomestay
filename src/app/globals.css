@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @layer utilities {
   .text-balance {
@@ -10,55 +10,63 @@
 
 @layer base {
   :root {
-    --background: 45 20% 97%;
-    --foreground: 0 0% 17%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 17%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 17%;
-    --primary: 162 48% 20%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 45 66% 47%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 41 64% 85%;
-    --muted-foreground: 0 0% 42%;
-    --accent: 127 20% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 17 62% 57%;
+    /* Scandinavian Minimalist — Earthy & Sage Palette */
+    --background: 40 25% 96%;       /* Warm cream #F6F3EF */
+    --foreground: 25 18% 20%;       /* Dark walnut #3D3229 */
+    --card: 40 20% 99%;             /* Near-white warm #FDFCFA */
+    --card-foreground: 25 18% 20%;
+    --popover: 40 20% 99%;
+    --popover-foreground: 25 18% 20%;
+    --primary: 115 12% 44%;         /* Sage green #5E7A5A */
+    --primary-foreground: 40 20% 98%;
+    --secondary: 28 30% 42%;        /* Warm wood brown #8B6B4A */
+    --secondary-foreground: 40 20% 98%;
+    --muted: 35 12% 91%;            /* Soft greige #EAE6E1 */
+    --muted-foreground: 25 8% 48%;  /* Warm grey */
+    --accent: 115 10% 90%;          /* Very light sage tint */
+    --accent-foreground: 115 12% 30%;
+    --destructive: 0 55% 52%;       /* Muted red */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 162 48% 20%;
+    --border: 30 10% 88%;           /* Warm border */
+    --input: 30 10% 88%;
+    --ring: 115 12% 44%;            /* Sage ring */
     --radius: 0.75rem;
   }
   .dark {
-    --background: 0 0% 17%;
-    --foreground: 45 20% 97%;
-    --card: 0 0% 21%;
-    --card-foreground: 45 20% 97%;
-    --popover: 0 0% 21%;
-    --popover-foreground: 45 20% 97%;
-    --primary: 162 48% 20%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 45 66% 47%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 25%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 127 20% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 17 62% 57%;
+    --background: 25 12% 12%;       /* Dark warm #221E1A */
+    --foreground: 35 15% 90%;       /* Light warm */
+    --card: 25 10% 16%;
+    --card-foreground: 35 15% 90%;
+    --popover: 25 10% 16%;
+    --popover-foreground: 35 15% 90%;
+    --primary: 115 14% 50%;         /* Brighter sage for dark mode */
+    --primary-foreground: 25 12% 10%;
+    --secondary: 28 28% 52%;        /* Lighter wood for dark mode */
+    --secondary-foreground: 25 12% 10%;
+    --muted: 25 8% 22%;
+    --muted-foreground: 30 8% 60%;
+    --accent: 115 8% 22%;
+    --accent-foreground: 115 14% 75%;
+    --destructive: 0 50% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 162 48% 20%;
+    --border: 25 8% 24%;
+    --input: 25 8% 24%;
+    --ring: 115 14% 50%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.7;
   }
 }

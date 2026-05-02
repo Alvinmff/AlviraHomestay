@@ -42,6 +42,7 @@ model Property {
   nearbyPlaces     Json      @default("[]")
   bookings         Booking[]
   rooms            Room[]
+  reviews          Review[]
 }
 
 model Room {
@@ -67,6 +68,7 @@ model Room {
   bookings       Booking[]
   property       Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   availabilities RoomAvailability[]
+  reviews        Review[]
 }
 
 model Booking {
@@ -109,4 +111,39 @@ model RoomAvailability {
   @@unique([roomId, date])
   @@index([roomId, date, status])
   @@index([date, status])
+}
+
+enum ReviewSource {
+  GOOGLE
+  MANUAL
+}
+
+model Review {
+  id           String       @id @default(uuid())
+  source       ReviewSource @default(GOOGLE)
+  isVisible    Boolean      @default(true)
+  authorName   String
+  authorPhoto  String?
+  rating       Int
+  text         String       @db.Text
+  relativeTime String?
+  reviewDate   DateTime     @default(now())
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  roomId     String?
+  room       Room?     @relation(fields: [roomId], references: [id])
+
+  googleReviewId String? @unique
+  googlePlaceId  String?
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isVisible, source])
+  @@index([propertyId])
+  @@index([rating])
+  @@index([createdAt])
 }

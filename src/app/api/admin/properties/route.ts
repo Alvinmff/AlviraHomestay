@@ -5,6 +5,23 @@ function generateSlug(name: string) {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 }
 
+export async function GET() {
+    try {
+        const properties = await prisma.property.findMany({
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                name: true,
+                city: true,
+            }
+        });
+        return NextResponse.json(properties);
+    } catch (error: unknown) {
+        console.error("Fetch properties error:", error);
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const data = await req.json();

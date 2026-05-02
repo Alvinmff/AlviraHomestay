@@ -13,10 +13,16 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  MessageSquareQuote
 } from "lucide-react";
 
-export function Sidebar() {
+interface SidebarProps {
+  pendingBookings?: number;
+  totalReviews?: number;
+}
+
+export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -33,6 +39,7 @@ export function Sidebar() {
         { href: "/admin/calendar", icon: <CalendarDays className="w-5 h-5" />, title: "Kalender Ketersediaan" },
         { href: "/admin/bookings", icon: <ClipboardList className="w-5 h-5" />, title: "Data Booking" },
         { href: "/admin/properties", icon: <Building2 className="w-5 h-5" />, title: "Kelola Properti" },
+        { href: "/admin/reviews", icon: <MessageSquareQuote className="w-5 h-5" />, title: "Kelola Ulasan" },
       ]
     },
     {
@@ -46,39 +53,58 @@ export function Sidebar() {
   const NavContent = () => (
     <>
       {/* Brand */}
-      <div className="h-16 flex items-center justify-between px-6 border-b border-border/50">
-        <span className="text-xl font-serif font-bold tracking-tight text-primary">Alvira Admin</span>
-        <button onClick={() => setMobileOpen(false)} className="lg:hidden p-1 rounded-md hover:bg-muted">
+      <div className="h-20 flex items-center px-8">
+        <span className="text-xl font-bold tracking-widest text-black uppercase">Homestay Alvira</span>
+        <button onClick={() => setMobileOpen(false)} className="lg:hidden ml-auto p-1 rounded-md hover:bg-muted">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 py-6 px-4 space-y-8 overflow-y-auto">
+      <div className="flex-1 py-4 px-6 space-y-8 overflow-y-auto">
         {menuGroups.map((group, idx) => (
-          <div key={idx} className="space-y-3">
-            <h4 className="text-xs font-semibold text-muted-foreground tracking-wider px-2">
+          <div key={idx} className="space-y-4">
+            <h4 className="text-xs font-semibold text-gray-400 tracking-[0.1em] px-2 uppercase">
               {group.label}
             </h4>
             <div className="space-y-1">
               {group.items.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                // Avoid matching /admin for all routes
+                const exactMatch = item.href === "/admin" ? pathname === "/admin" : isActive;
+                
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group",
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                      "flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 group",
+                      exactMatch
+                        ? "bg-[#F7F8FA] text-black shadow-sm"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-black"
                     )}
                   >
-                    <span className={cn("transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")}>
-                      {item.icon}
-                    </span>
-                    {item.title}
+                    <div className="flex items-center gap-4">
+                      <span className={cn(
+                        "transition-colors", 
+                        exactMatch ? "text-black" : "text-gray-400 group-hover:text-black"
+                      )}>
+                        {item.icon}
+                      </span>
+                      <span className={cn(exactMatch && "font-bold")}>{item.title}</span>
+                    </div>
+                    {/* Dynamic notification badge */}
+                    {item.title === "Data Booking" && pendingBookings > 0 && (
+                      <span className="bg-[#19A794] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {pendingBookings}
+                      </span>
+                    )}
+                    {item.title === "Kelola Ulasan" && totalReviews > 0 && (
+                      <span className="bg-[#19A794] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        {totalReviews}
+                      </span>
+                    )}
                   </Link>
                 )
               })}
@@ -88,12 +114,12 @@ export function Sidebar() {
       </div>
 
       {/* Footer / Logout */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-6">
         <button
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          className="flex flex-row items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
+          className="flex flex-row items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors w-full text-left"
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
           Logout
         </button>
       </div>

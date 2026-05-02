@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal } from "lucide-react";
+import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +17,31 @@ import { toast } from "sonner";
 export function BookingActions({ bookingId, currentStatus }: { bookingId: string, currentStatus: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  async function deleteBooking() {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus data booking ini secara permanen? Data ketersediaan kamar juga akan dihapus.")) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: "DELETE",
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Gagal menghapus booking");
+      }
+      
+      toast.success("Data booking berhasil dihapus permanen");
+      router.refresh();
+    } catch (e: unknown) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function updateStatus(newStatus: string) {
     try {
@@ -82,10 +107,20 @@ export function BookingActions({ bookingId, currentStatus }: { bookingId: string
         )}
 
         {(currentStatus === "COMPLETED" || currentStatus === "CANCELLED") && (
-          <DropdownMenuItem disabled className="opacity-50 text-xs text-muted-foreground flex justify-center py-2">
-            Status Akhir (Terkunci)
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem disabled className="opacity-50 text-xs text-muted-foreground flex justify-center py-2">
+              Status Akhir (Terkunci)
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
         )}
+
+        <DropdownMenuItem 
+          onClick={deleteBooking} 
+          className="text-red-600 focus:text-white focus:bg-red-600 font-medium"
+        >
+          <Trash2 className="mr-2 h-4 w-4" /> Hapus Permanen
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

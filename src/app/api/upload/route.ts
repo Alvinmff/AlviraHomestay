@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export async function POST(req: Request) {
     try {
@@ -12,29 +10,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No file received." }, { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        // Upload directly to Cloudinary
+        const imageUrl = await uploadToCloudinary(file);
 
-        // Create unique filename
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        const extension = file.name.split('.').pop() || 'jpg';
-        const filename = `upload-${uniqueSuffix}.${extension}`;
-
-        const uploadDir = join(process.cwd(), "public", "uploads");
-
-        // Ensure directory exists
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
-
-        const filepath = join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-
-        const fileUrl = `/uploads/${filename}`;
-
-        return NextResponse.json({ success: true, url: fileUrl });
+        return NextResponse.json({ success: true, url: imageUrl });
     } catch (error) {
-        console.error("Upload error:", error);
-        return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+        console.error("Cloudinary Upload error:", error);
+        return NextResponse.json({ error: "Failed to upload file to Cloudinary" }, { status: 500 });
     }
 }

@@ -68,7 +68,7 @@ export default function ContactPage() {
                 <div className="container relative z-20 mx-auto px-4 text-center">
                     <motion.span
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                        className="inline-block py-1 px-3 rounded-full bg-secondary/20 text-secondary text-sm font-semibold mb-4 border border-secondary/30"
+                        className="inline-block py-1 px-3 rounded-full bg-white/10 text-white/90 text-sm font-semibold mb-4 border border-white/20"
                     >
                         HUBUNGI KAMI
                     </motion.span>
@@ -76,7 +76,7 @@ export default function ContactPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight"
                     >
-                        Kami Siap Membantu Anda <span className="text-secondary">24/7</span>
+                        Kami Siap Membantu Anda <span className="text-white/80 italic font-medium">24/7</span>
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}

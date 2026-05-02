@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/admin/sidebar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { User } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -12,12 +13,19 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect("/admin/login");
   }
 
+  // Fetch real-time counts for badges
+  const pendingBookingsCount = await prisma.booking.count({
+    where: { status: "INQUIRY" }
+  });
+
+  const totalReviewsCount = await prisma.review.count();
+
   return (
-    <div className="flex min-h-screen bg-[#F8FAF9]">
-      <Sidebar />
+    <div className="flex min-h-screen bg-white">
+      <Sidebar pendingBookings={pendingBookingsCount} totalReviews={totalReviewsCount} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b flex items-center justify-between px-4 sm:px-8">
+        <header className="h-20 bg-white flex items-center justify-between px-8">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold ml-10 lg:ml-0">Dashboard</span>
           </div>

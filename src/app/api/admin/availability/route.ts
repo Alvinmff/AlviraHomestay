@@ -42,15 +42,36 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
+      console.warn("[ADMIN_AVAILABILITY_POST] No session or user ID found");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
+    console.log(`[ADMIN_AVAILABILITY_POST] UserID: ${userId}`);
+    
+    // Verify user exists in Admin table to avoid P2003
+    const admin = await prisma.admin.findUnique({ where: { id: userId } });
+    if (!admin) {
+      console.error(`[ADMIN_AVAILABILITY_POST] Admin user ${userId} not found in database. Stale session?`);
+      return NextResponse.json({ 
+        error: "Sesi Anda tidak valid atau admin tidak ditemukan. Silakan logout dan login kembali.",
+        staleSession: true 
+      }, { status: 403 });
+    }
+
     const body = await request.json();
     const { roomId, dates, status, notes } = body;
 
+    console.log(`[ADMIN_AVAILABILITY_POST] RoomID: ${roomId}, Dates count: ${dates?.length}, Status: ${status}`);
+
     if (!roomId || !dates || !Array.isArray(dates) || !status) {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+      return NextResponse.json({ error: "Payload tidak valid" }, { status: 400 });
+    }
+
+    // Verify room exists
+    const room = await prisma.room.findUnique({ where: { id: roomId } });
+    if (!room) {
+      return NextResponse.json({ error: "Ruangan tidak ditemukan" }, { status: 404 });
     }
 
     // Process dates and upsert records
@@ -83,10 +104,18 @@ export async function POST(request: Request) {
 
     await prisma.$transaction(operations);
 
-    return NextResponse.json({ success: true, message: `Updated ${dates.length} dates` });
-  } catch (error) {
-    console.error("[ADMIN_AVAILABILITY_POST]", error);
-    return NextResponse.json({ error: "Failed to update availability" }, { status: 500 });
+    return NextResponse.json({ success: true, message: `Berhasil memperbarui ${dates.length} tanggal` });
+  } catch (error: any) {
+    console.error("[ADMIN_AVAILABILITY_POST] Error:", error);
+    
+    if (error.code === 'P2003') {
+      return NextResponse.json({ 
+        error: "Gagal menyimpan: Terjadi kendala relasi data (Foreign Key). Silakan coba logout dan login kembali.",
+        details: error.meta
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({ error: "Gagal memperbarui ketersediaan" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
