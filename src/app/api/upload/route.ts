@@ -20,9 +20,4 @@ export async function POST(req: Request) {
     }
 }
 
-// Increase body size limit for this route (default is 4.5MB on Vercel)
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
+
