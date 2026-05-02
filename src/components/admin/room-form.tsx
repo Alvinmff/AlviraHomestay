@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { uploadToCloudinaryClient } from "@/lib/upload-client";
 
 interface RoomFormProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,18 +78,9 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
     if (!file) return;
 
     setUploadingImage(true);
-    const formPayload = new FormData();
-    formPayload.append("file", file);
-
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formPayload,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal upload gambar kamar");
-
-      setFormData(prev => ({ ...prev, thumbnail: data.url }));
+      const url = await uploadToCloudinaryClient(file);
+      setFormData(prev => ({ ...prev, thumbnail: url }));
       toast.success("Foto kamar berhasil diunggah");
     } catch (err: any) {
       toast.error(err.message);
@@ -106,18 +98,10 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        const formPayload = new FormData();
-        formPayload.append("file", files[i]);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formPayload,
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          newUrls.push(data.url);
-        } else {
+        try {
+          const url = await uploadToCloudinaryClient(files[i]);
+          newUrls.push(url);
+        } catch {
           toast.error(`Gagal upload ${files[i].name}`);
         }
       }

@@ -8,6 +8,7 @@ import { Loader2, Star, Upload, ImageIcon, X, Trash2, Check } from "lucide-react
 import { toast } from "sonner";
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { uploadToCloudinaryClient } from "@/lib/upload-client";
 
 export function ReviewFormModal({ isOpen, onClose, onSuccess, initialData }: any) {
   const [loading, setLoading] = useState(false);
@@ -97,18 +98,10 @@ export function ReviewFormModal({ isOpen, onClose, onSuccess, initialData }: any
         return toast.error("Gagal memproses gambar.");
       }
 
-      const formData = new FormData();
-      formData.append("file", blob, "avatar.jpg");
-
       try {
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-
-        setAuthorPhoto(data.url);
+        const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
+        const url = await uploadToCloudinaryClient(file);
+        setAuthorPhoto(url);
         toast.success("Foto profil diperbarui");
         setShowCropModal(false);
       } catch (err: any) {

@@ -19,3 +19,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Failed to upload file to Cloudinary" }, { status: 500 });
     }
 }
+
+// Increase body size limit for this route (default is 4.5MB on Vercel)
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};

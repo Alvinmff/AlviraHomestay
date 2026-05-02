@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { toast } from "sonner";
 import ReactCrop, { type Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { uploadToCloudinaryClient } from "@/lib/upload-client";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function PropertyForm({ initialData }: { initialData?: any }) {
@@ -121,18 +122,10 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
         return toast.error("Gagal memproses gambar.");
       }
 
-      const formData = new FormData();
-      formData.append("file", blob, "cropped-hero.jpg");
-
       try {
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Gagal upload gambar");
-
-        setImageUrl(data.url);
+        const file = new File([blob], "cropped-hero.jpg", { type: "image/jpeg" });
+        const url = await uploadToCloudinaryClient(file);
+        setImageUrl(url);
         toast.success("Gambar berhasil dipotong dan diunggah");
         setShowCropModal(false);
       } catch (err: any) {
@@ -152,19 +145,10 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const formData = new FormData();
-      formData.append("file", file, file.name);
-
       try {
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setGalleryItems((prev) => [...prev, { url: data.url, description: "" }]);
-          uploadedCount++;
-        }
+        const url = await uploadToCloudinaryClient(file);
+        setGalleryItems((prev) => [...prev, { url, description: "" }]);
+        uploadedCount++;
       } catch (err) {
         console.error("Gallery upload error:", err);
       }
@@ -200,21 +184,11 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
     if (!file) return;
 
     setUploadingNearby(index);
-    const formData = new FormData();
-    formData.append("file", file, file.name);
 
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        const data = await res.json();
-        updateNearbyPlace(index, "imageUrl", data.url);
-        toast.success("Foto kawasan berhasil diunggah.");
-      } else {
-        toast.error("Gagal mengunggah foto kawasan.");
-      }
+      const url = await uploadToCloudinaryClient(file);
+      updateNearbyPlace(index, "imageUrl", url);
+      toast.success("Foto kawasan berhasil diunggah.");
     } catch {
       toast.error("Terjadi kesalahan saat mengunggah.");
     } finally {
