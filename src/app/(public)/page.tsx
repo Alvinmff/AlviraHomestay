@@ -38,14 +38,14 @@ export default function Home() {
     {
       name: "Kost Eksklusif Surabaya",
       slug: "surabaya",
-      image: "uploads/upload-1773153326920-232440692.jpg",
+      image: "https://res.cloudinary.com/drq4p06mk/image/upload/v1777689605/alvira-static/po0j83tr2qcjv70c6y2v.jpg",
       description: "Fasilitas premium di pusat kota pahlawan, memberikan kenyamanan maksimal untuk mahasiswa dan pekerja.",
       type: "Kost"
     },
     {
       name: "Villa Premium Batu",
       slug: "batu",
-      image: "uploads/btv.jpg",
+      image: "https://res.cloudinary.com/drq4p06mk/image/upload/v1777689612/alvira-static/axlsrjylabvqtxclbcdi.jpg",
       description: "Liburan tak terlupakan dengan nuansa alam pegunungan, udara sejuk, dan privasi penuh.",
       type: "Villa"
     },
