@@ -67,13 +67,13 @@ export function Navbar() {
 
           <div className="relative group">
             <Link
-              href="/properties"
+              href="/#destinasi"
               className={`flex items-center transition-colors duration-300 py-4 relative ${useWhiteText ? "text-white/90 hover:text-white" : "text-foreground/70 hover:text-primary"
                 }`}
             >
               Properti
               <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-all duration-300 ${useWhiteText ? "opacity-70 group-hover:opacity-100 group-hover:translate-y-0.5" : "opacity-40"}`} />
-              <Underline active={pathname.startsWith("/properties")} />
+              <Underline active={pathname === "/" && typeof window !== "undefined" && window.location.hash === "#destinasi"} />
             </Link>
             <div className="absolute top-[80%] left-1/2 -translate-x-1/2 pt-2 hidden group-hover:flex flex-col">
               <div className="bg-card/95 backdrop-blur-xl border border-border/50 shadow-lg shadow-black/[0.04] rounded-2xl overflow-hidden min-w-[220px] animate-in fade-in slide-in-from-top-2 duration-300">
@@ -132,7 +132,7 @@ export function Navbar() {
 
             <div className="flex flex-col">
               <Link
-                href="/properties"
+                href="/#destinasi"
                 onClick={() => setMobileMenuOpen(false)}
                 className="px-4 py-4 rounded-xl text-lg font-bold text-foreground hover:text-primary hover:bg-accent/30 transition-all duration-300 flex items-center justify-between"
               >

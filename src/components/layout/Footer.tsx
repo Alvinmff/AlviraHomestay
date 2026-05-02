@@ -37,7 +37,7 @@ export function Footer() {
         <div className="flex flex-col space-y-4">
           <h3 className="font-serif font-semibold text-foreground text-base mb-1">Navigasi</h3>
           <Link href="/" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-block w-fit text-sm">Beranda</Link>
-          <Link href="/properties" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-block w-fit text-sm">Semua Properti</Link>
+          <Link href="/#destinasi" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-block w-fit text-sm">Semua Properti</Link>
           <Link href="/kontak" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-block w-fit text-sm">Kontak Kami</Link>
           <Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors duration-300 inline-block w-fit text-sm">FAQ</Link>
         </div>

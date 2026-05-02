@@ -117,7 +117,7 @@ export default function Home() {
             className="flex flex-col sm:flex-row justify-center gap-4"
           >
             <Link
-              href="/properties"
+              href="/#destinasi"
               className="inline-flex items-center justify-center gap-2 rounded-xl h-12 px-8 text-sm bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
               Jelajahi Properti
@@ -152,7 +152,7 @@ export default function Home() {
 
       {/* Featured Properties — Airy Layout */}
       <section id="tentang" className="py-32 bg-background">
-        <div className="container mx-auto px-4">
+        <div id="destinasi" className="container mx-auto px-4 pt-10 -mt-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
