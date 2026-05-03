@@ -32,9 +32,9 @@ interface Props {
 const WEEKDAYS = ["M", "S", "S", "R", "K", "J", "S"];
 
 const STATUS_COLORS = {
-  available: "bg-green-100 hover:bg-green-200 text-green-700 border-green-200",
-  booked: "bg-red-100 text-red-700 border-red-200 cursor-not-allowed",
-  maintenance: "bg-amber-100 text-amber-700 border-amber-200 cursor-not-allowed hidden-strips",
+  available: "bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30",
+  booked: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/30 cursor-not-allowed",
+  maintenance: "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 cursor-not-allowed hidden-strips",
   blocked: "bg-muted text-muted-foreground border-border cursor-not-allowed",
 };
 

@@ -33,25 +33,25 @@
     --radius: 0.75rem;
   }
   .dark {
-    --background: 25 12% 12%;       /* Dark warm #221E1A */
-    --foreground: 35 15% 90%;       /* Light warm */
-    --card: 25 10% 16%;
+    --background: 25 15% 5%;       /* Deepest dark walnut/black #0F0D0B */
+    --foreground: 35 15% 90%;       /* Light warm grey */
+    --card: 25 12% 8%;              /* Darker card */
     --card-foreground: 35 15% 90%;
-    --popover: 25 10% 16%;
+    --popover: 25 12% 8%;
     --popover-foreground: 35 15% 90%;
-    --primary: 115 14% 50%;         /* Brighter sage for dark mode */
-    --primary-foreground: 25 12% 10%;
-    --secondary: 28 28% 52%;        /* Lighter wood for dark mode */
-    --secondary-foreground: 25 12% 10%;
-    --muted: 25 8% 22%;
-    --muted-foreground: 30 8% 60%;
-    --accent: 115 8% 22%;
-    --accent-foreground: 115 14% 75%;
-    --destructive: 0 50% 50%;
+    --primary: 115 14% 55%;         /* Slightly more vibrant sage for visibility */
+    --primary-foreground: 25 15% 5%;
+    --secondary: 28 28% 52%;
+    --secondary-foreground: 25 15% 5%;
+    --muted: 25 10% 12%;
+    --muted-foreground: 30 8% 65%;
+    --accent: 115 10% 12%;
+    --accent-foreground: 115 14% 80%;
+    --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 25 8% 24%;
-    --input: 25 8% 24%;
-    --ring: 115 14% 50%;
+    --border: 25 10% 15%;
+    --input: 25 10% 15%;
+    --ring: 115 14% 55%;
   }
 }
 

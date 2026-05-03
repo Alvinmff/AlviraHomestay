@@ -41,12 +41,11 @@ export function Navbar() {
 
   return (
     <nav
-      style={{
-        backgroundColor: (scrolled || !isHome) ? "#F6F3EF" : "transparent",
-        borderBottom: (scrolled || !isHome) ? "1px solid rgba(139, 107, 74, 0.15)" : "1px solid transparent",
-        boxShadow: (scrolled || !isHome) ? "0 4px 20px -5px rgba(0,0,0,0.05)" : "none"
-      }}
-      className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ease-out"
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ease-out ${
+        scrolled || !isHome 
+          ? "bg-background/95 dark:bg-zinc-950/90 backdrop-blur-md border-b border-border/50 shadow-sm" 
+          : "bg-transparent border-transparent"
+      }`}
     >
       <div className="container mx-auto px-4 sm:px-3 flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-3 relative z-[110] group">

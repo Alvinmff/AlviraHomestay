@@ -49,9 +49,9 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "AVAILABLE": return "bg-green-100 hover:bg-green-200 text-green-700 border-green-200 cursor-help";
-      case "BOOKED": return "bg-red-100/50 text-red-500 border-red-200/50 cursor-not-allowed line-through opacity-70";
-      case "MAINTENANCE": return "bg-yellow-100/50 text-yellow-600 border-yellow-200/50 cursor-not-allowed opacity-70";
+      case "AVAILABLE": return "bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30 cursor-help";
+      case "BOOKED": return "bg-red-100/50 dark:bg-red-500/10 text-red-500 dark:text-red-400 border-red-200/50 dark:border-red-900/30 cursor-not-allowed line-through opacity-70";
+      case "MAINTENANCE": return "bg-yellow-100/50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-900/30 cursor-not-allowed opacity-70";
       case "BLOCKED": return "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50";
       case "PAST": return "bg-muted/30 text-muted-foreground/30 border-border/30 cursor-not-allowed";
       default: return "bg-card";
@@ -124,8 +124,8 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
       </div>
 
       <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-green-100 border border-green-200"></div> Tersedia</div>
-        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-100/50 border border-red-200/50"></div> Penuh</div>
+        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-800/50"></div> Tersedia</div>
+        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-100/50 dark:bg-red-500/20 border border-red-200/50 dark:border-red-800/50"></div> Penuh</div>
       </div>
     </div>
   );

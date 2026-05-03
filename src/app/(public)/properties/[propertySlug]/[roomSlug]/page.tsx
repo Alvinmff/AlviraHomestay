@@ -27,9 +27,9 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
   const commonFacilities = (room.property.commonFacilities || []) as string[];
 
   return (
-    <div className="min-h-screen bg-[#F8FAF9] pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Back Navigation Bar */}
-      <div className="bg-white border-b sticky top-0 z-40">
+      <div className="bg-background border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center">
           <Link
             href={`/properties/${propertySlug}`}
@@ -145,7 +145,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
 
           {/* Right Column: Sticky Booking / Price Card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border/50 p-6">
+            <div className="sticky top-24 bg-card rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-border/50 p-6">
               <RoomWhatsAppForm
                 roomId={room.id}
                 roomName={room.roomName}
