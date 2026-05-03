@@ -76,13 +76,13 @@ export default function ContactPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-serif font-bold mb-6 tracking-tight"
                     >
-                        Kami Siap Membantu Anda <span className="text-white/80 italic font-medium">24/7</span>
+                        Jam Operasional <span className="text-white/80 italic font-medium">05.00 - 22.00</span>
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-10"
                     >
-                        Punya pertanyaan mengenai booking, fasilitas, atau kerjasama? Jangan ragu untuk menghubungi tim profesional kami. Respon cepat via WhatsApp!
+                        Untuk informasi dan reservasi jangan ragu untuk menghubungi kami. Respon cepat via WhatsApp!
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
@@ -109,7 +109,7 @@ export default function ContactPage() {
                             </div>
                             <h3 className="font-serif font-bold text-xl mb-2 text-foreground">Telepon</h3>
                             <p className="text-muted-foreground mb-1">0812-3164-6523</p>
-                            <p className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mb-6">Online 24 Jam</p>
+                            <p className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mb-6">05.00 - 22.00 Setiap Hari</p>
                             <a href="tel:081231646523" className="mt-auto w-full py-2.5 rounded-lg border border-primary text-primary font-semibold hover:bg-primary hover:text-primary-foreground transition-colors">
                                 Call Now
                             </a>

@@ -117,7 +117,7 @@ export function PropertyRoomsClient({
                                     )}
 
                                     <div className="absolute top-4 right-4 z-20 md:opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-1 group-hover:translate-y-0">
-                                        <span className="bg-white/90 backdrop-blur-sm text-foreground/80 px-3 py-1.5 text-xs font-medium rounded-lg shadow-sm">
+                                        <span className="bg-background/90 backdrop-blur-sm text-foreground/80 px-3 py-1.5 text-xs font-medium rounded-lg shadow-sm">
                                             Lihat Detail
                                         </span>
                                     </div>

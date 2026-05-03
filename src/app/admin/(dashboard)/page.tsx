@@ -94,8 +94,8 @@ export default async function AdminOverviewPage() {
       
       {/* Header section matching mockup */}
       <div className="space-y-1">
-        <h2 className="text-4xl font-normal tracking-tight text-black">Welcome back</h2>
-        <p className="text-gray-400 text-sm">Welcome to dashboard</p>
+        <h2 className="text-4xl font-normal tracking-tight text-foreground">Welcome back</h2>
+        <p className="text-muted-foreground text-sm">Welcome to dashboard</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -103,15 +103,15 @@ export default async function AdminOverviewPage() {
         {/* Left Column: 4 Pastel Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
           {/* Card 1: Revenue (Peach) */}
-          <Link href="/admin/bookings" className="bg-[#FCEFE4] p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
+          <Link href="/admin/bookings" className="bg-[#FCEFE4] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-black font-medium">Estimasi Pendapatan</span>
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <ArrowUpRight className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-foreground font-medium">Estimasi Pendapatan</span>
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
+                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-medium text-black mb-1">
+              <div className="text-3xl font-medium text-foreground mb-1">
                 {formatRupiah(revenueThisMonth)}
               </div>
               <span className="text-xs text-[#D99A6C] font-medium">Bulan ini</span>
@@ -119,15 +119,15 @@ export default async function AdminOverviewPage() {
           </Link>
 
           {/* Card 2: Bookings (Green) */}
-          <Link href="/admin/bookings" className="bg-[#EAF5E5] p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
+          <Link href="/admin/bookings" className="bg-[#EAF5E5] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-black font-medium">Booking Baru</span>
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <ArrowUpRight className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-foreground font-medium">Booking Baru</span>
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
+                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-medium text-black mb-1">
+              <div className="text-3xl font-medium text-foreground mb-1">
                 {totalBookingsThisMonth}
               </div>
               <span className="text-xs text-[#7DBE7A] font-medium">Bulan ini</span>
@@ -135,15 +135,15 @@ export default async function AdminOverviewPage() {
           </Link>
 
           {/* Card 3: Active Properties (Blue) */}
-          <Link href="/admin/properties" className="bg-[#EEF2FB] p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
+          <Link href="/admin/properties" className="bg-[#EEF2FB] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-black font-medium">Properti Aktif</span>
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <ArrowUpRight className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-foreground font-medium">Properti Aktif</span>
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
+                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-medium text-black mb-1">
+              <div className="text-3xl font-medium text-foreground mb-1">
                 {activePropertiesCount}
               </div>
               <span className="text-xs text-[#6B8FE3] font-medium">Semua properti live</span>
@@ -151,15 +151,15 @@ export default async function AdminOverviewPage() {
           </Link>
 
           {/* Card 4: Estimated Guests (Mint) */}
-          <Link href="/admin/bookings" className="bg-[#E6F5F3] p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
+          <Link href="/admin/bookings" className="bg-[#E6F5F3] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-black font-medium">Estimasi Tamu</span>
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <ArrowUpRight className="w-4 h-4 text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <span className="text-foreground font-medium">Estimasi Tamu</span>
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
+                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
             </div>
             <div>
-              <div className="text-3xl font-medium text-black mb-1">
+              <div className="text-3xl font-medium text-foreground mb-1">
                 {estGuestsThisMonth}
               </div>
               <span className="text-xs text-[#52B7A6] font-medium">Bulan ini</span>
@@ -217,22 +217,22 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Recent Transactions / Bookings */}
-        <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
+        <div className="bg-card border border-border/50 rounded-[24px] p-6 shadow-sm">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium text-black">Booking Terbaru</h3>
-            <Link href="/admin/bookings" className="text-xs font-bold text-gray-400 hover:text-black transition-colors uppercase tracking-wider">Lihat Semua</Link>
+            <h3 className="text-lg font-medium text-foreground">Booking Terbaru</h3>
+            <Link href="/admin/bookings" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Lihat Semua</Link>
           </div>
           
           <div className="space-y-5">
             {recentBookings.length === 0 ? (
-              <p className="text-sm text-gray-400 italic py-4">Belum ada booking.</p>
+              <p className="text-sm text-muted-foreground italic py-4">Belum ada booking.</p>
             ) : (
               recentBookings.map((b) => (
                 <div key={b.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center ${
-                      b.status === "CONFIRMED" ? "bg-[#EAF5E5]" : 
-                      b.status === "INQUIRY" ? "bg-[#FCEFE4]" : "bg-[#EEF2FB]"
+                      b.status === "CONFIRMED" ? "bg-[#EAF5E5] dark:bg-card dark:border" : 
+                      b.status === "INQUIRY" ? "bg-[#FCEFE4] dark:bg-card dark:border" : "bg-[#EEF2FB] dark:bg-card dark:border"
                     }`}>
                       <CalendarCheck className={`w-5 h-5 ${
                         b.status === "CONFIRMED" ? "text-[#7DBE7A]" : 
@@ -240,17 +240,17 @@ export default async function AdminOverviewPage() {
                       }`} />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-black">{b.guestName}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{b.property.name}</p>
+                      <p className="text-sm font-bold text-foreground">{b.guestName}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{b.property.name}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-bold ${
-                      b.status === "CONFIRMED" ? "text-black" : "text-gray-500"
+                      b.status === "CONFIRMED" ? "text-foreground" : "text-muted-foreground"
                     }`}>
                       {formatRupiah(b.totalPrice)}
                     </p>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{b.status}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{b.status}</p>
                   </div>
                 </div>
               ))
@@ -259,28 +259,28 @@ export default async function AdminOverviewPage() {
         </div>
 
         {/* Categories / Properties Overview */}
-        <div className="bg-white border border-gray-100 rounded-[24px] p-6 shadow-sm">
+        <div className="bg-card border border-border/50 rounded-[24px] p-6 shadow-sm">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium text-black">Performa Properti</h3>
-            <Link href="/admin/properties" className="text-xs font-bold text-gray-400 hover:text-black transition-colors uppercase tracking-wider">Lihat Semua</Link>
+            <h3 className="text-lg font-medium text-foreground">Performa Properti</h3>
+            <Link href="/admin/properties" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Lihat Semua</Link>
           </div>
           
           <div className="grid grid-cols-3 gap-4">
             {propertiesPerformance.length === 0 ? (
-              <p className="col-span-3 text-sm text-gray-400 italic text-center py-10">Belum ada properti aktif.</p>
+              <p className="col-span-3 text-sm text-muted-foreground italic text-center py-10">Belum ada properti aktif.</p>
             ) : (
               propertiesPerformance.map((prop, idx) => {
                 const bgColors = ["bg-[#EEF2FB]", "bg-[#FCEFE4]", "bg-[#EAF5E5]"];
                 const colorTheme = bgColors[idx % bgColors.length];
                 
                 return (
-                  <Link href={`/admin/properties`} key={prop.id} className={`${colorTheme} rounded-[20px] p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer`}>
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-black" />
+                  <Link href={`/admin/properties`} key={prop.id} className={`${colorTheme} dark:bg-card dark:border border-transparent rounded-[20px] p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer border`}>
+                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border dark:border-border/50">
+                      <Building2 className="w-5 h-5 text-foreground" />
                     </div>
                     <div>
-                      <p className="text-xs text-black font-medium mb-1 line-clamp-1" title={prop.name}>{prop.name}</p>
-                      <p className="text-[10px] text-gray-500">{prop._count.bookings} Total Booking</p>
+                      <p className="text-xs text-foreground font-medium mb-1 line-clamp-1" title={prop.name}>{prop.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{prop._count.bookings} Total Booking</p>
                     </div>
                   </Link>
                 )

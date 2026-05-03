@@ -76,7 +76,7 @@ export function ReviewTable({ data, loading, onRefresh, onEdit }: any) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-zinc-900">
+    <div className="flex flex-col h-full bg-card rounded-xl border">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b">
         <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

@@ -167,7 +167,7 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl bg-white p-6 md:p-8 rounded-xl border shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl bg-card p-6 md:p-8 rounded-xl border shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label>Properti Tautan *</Label>

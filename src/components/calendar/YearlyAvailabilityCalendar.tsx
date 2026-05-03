@@ -35,7 +35,7 @@ const STATUS_COLORS = {
   available: "bg-green-100 hover:bg-green-200 text-green-700 border-green-200",
   booked: "bg-red-100 text-red-700 border-red-200 cursor-not-allowed",
   maintenance: "bg-amber-100 text-amber-700 border-amber-200 cursor-not-allowed hidden-strips",
-  blocked: "bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed",
+  blocked: "bg-muted text-muted-foreground border-border cursor-not-allowed",
 };
 
 export function YearlyAvailabilityCalendar({ roomId }: Props) {
@@ -80,7 +80,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col">
+    <div className="bg-card rounded-2xl border shadow-sm overflow-hidden flex flex-col">
       {/* Header Controls */}
       <div className="flex items-center justify-between p-4 md:p-6 border-b bg-muted/20">
         <div>
@@ -90,7 +90,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
           <p className="text-sm text-muted-foreground mt-1">Cek ketersediaan untuk merencanakan liburan panjang.</p>
         </div>
         
-        <div className="flex items-center bg-white rounded-lg border shadow-sm p-1">
+        <div className="flex items-center bg-background rounded-lg border shadow-sm p-1">
           <button 
             onClick={() => changeYear(-1)}
             className="p-2 hover:bg-muted rounded-md transition-colors text-muted-foreground"
@@ -114,13 +114,13 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
         <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /> Tersedia</span>
         <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-400" /> Booked</span>
         <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /> Maintenance</span>
-        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-gray-300" /> Tutup</span>
+        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-muted" /> Tutup</span>
       </div>
 
       {/* Calendar Matrix Viewport */}
       <div className="p-6 relative">
         {loading && (
-          <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-sm flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         )}
@@ -141,7 +141,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
             const paddingCells = Array.from({ length: startDayIndex });
 
             return (
-              <div key={month.month} className="min-w-[280px] shrink-0 border rounded-xl overflow-hidden bg-white">
+              <div key={month.month} className="min-w-[280px] shrink-0 border rounded-xl overflow-hidden bg-card">
                 <div className="bg-primary text-primary-foreground py-2 text-center font-bold text-sm tracking-wider uppercase">
                   {month.name}
                 </div>
@@ -166,7 +166,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                       
                       let colorClass = STATUS_COLORS[day.status] || STATUS_COLORS.available;
                       if (isPast) {
-                        colorClass = "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
+                        colorClass = "bg-muted/50 text-muted-foreground/50 border-border cursor-not-allowed";
                       }
                       
                       return (

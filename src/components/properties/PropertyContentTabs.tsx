@@ -38,8 +38,8 @@ export function PropertyContentTabs({ property, initialRooms }: { property: any,
             onClick={() => setActiveTab("kamar")}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
               activeTab === "kamar"
-                ? "bg-white dark:bg-zinc-800 text-primary shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
+                ? "bg-background text-primary shadow-md"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -51,8 +51,8 @@ export function PropertyContentTabs({ property, initialRooms }: { property: any,
               onClick={() => setActiveTab("fasilitas")}
               className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
                 activeTab === "fasilitas"
-                  ? "bg-white dark:bg-zinc-800 text-primary shadow-md"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
+                  ? "bg-background text-primary shadow-md"
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
               }`}
             >
               <ImageIcon className="w-4 h-4" />
@@ -64,8 +64,8 @@ export function PropertyContentTabs({ property, initialRooms }: { property: any,
             onClick={() => setActiveTab("kawasan")}
             className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
               activeTab === "kawasan"
-                ? "bg-white dark:bg-zinc-800 text-primary shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
+                ? "bg-background text-primary shadow-md"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
             }`}
           >
             <Map className="w-4 h-4" />

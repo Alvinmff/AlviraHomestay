@@ -52,9 +52,9 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
       case "AVAILABLE": return "bg-green-100 hover:bg-green-200 text-green-700 border-green-200 cursor-help";
       case "BOOKED": return "bg-red-100/50 text-red-500 border-red-200/50 cursor-not-allowed line-through opacity-70";
       case "MAINTENANCE": return "bg-yellow-100/50 text-yellow-600 border-yellow-200/50 cursor-not-allowed opacity-70";
-      case "BLOCKED": return "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50";
-      case "PAST": return "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
-      default: return "bg-white";
+      case "BLOCKED": return "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50";
+      case "PAST": return "bg-muted/30 text-muted-foreground/30 border-border/30 cursor-not-allowed";
+      default: return "bg-card";
     }
   };
 

@@ -253,19 +253,19 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5 h-12 bg-muted/50 p-1 rounded-xl">
-          <TabsTrigger value="info" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="info" className="rounded-lg font-medium text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Building2 className="w-4 h-4" /> <span className="hidden sm:inline">Info Dasar</span>
           </TabsTrigger>
-          <TabsTrigger value="lokasi" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="lokasi" className="rounded-lg font-medium text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <MapPin className="w-4 h-4" /> <span className="hidden sm:inline">Lokasi</span>
           </TabsTrigger>
-          <TabsTrigger value="foto" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="foto" className="rounded-lg font-medium text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <ImageIcon className="w-4 h-4" /> <span className="hidden sm:inline">Foto</span>
           </TabsTrigger>
-          <TabsTrigger value="fasilitas" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="fasilitas" className="rounded-lg font-medium text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Fasilitas</span>
           </TabsTrigger>
-          <TabsTrigger value="kawasan" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="kawasan" className="rounded-lg font-medium text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Map className="w-4 h-4" /> <span className="hidden sm:inline">Kawasan</span>
           </TabsTrigger>
         </TabsList>
@@ -354,7 +354,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={imageUrl} alt="Hero property" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                    <div className="relative z-10 flex flex-col items-center p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border">
+                    <div className="relative z-10 flex flex-col items-center p-6 bg-background/90 backdrop-blur-sm rounded-xl shadow-sm border">
                       <ImageIcon className="w-10 h-10 mb-3 text-primary" />
                       <p className="font-medium text-foreground mb-4">Gambar Berhasil Diunggah</p>
                       <div className="flex gap-2">
@@ -534,14 +534,14 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
               </CardHeader>
               <CardContent className="space-y-6 pt-6 bg-muted/5">
                 {nearbyPlaces.length === 0 ? (
-                  <div className="text-center p-8 border-2 border-dashed rounded-xl border-muted bg-white">
+                  <div className="text-center p-8 border-2 border-dashed rounded-xl border-muted bg-card">
                     <Map className="w-12 h-12 mb-4 opacity-20 mx-auto" />
                     <p className="text-muted-foreground">Belum ada kawasan terdekat yang ditambahkan.</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     {nearbyPlaces.map((place, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 bg-white border rounded-xl shadow-sm items-start">
+                      <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 bg-card border rounded-xl shadow-sm items-start">
                         {/* Image Upload Area */}
                         <div className="w-full sm:w-32 h-32 flex-shrink-0 relative group rounded-lg overflow-hidden border bg-muted flex flex-col items-center justify-center">
                           {place.imageUrl ? (
@@ -613,7 +613,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                               <Label>Tipe</Label>
                               <Select 
                                 value={place.type} 
-                                onValueChange={(val) => updateNearbyPlace(index, "type", val)}
+                                onValueChange={(val) => updateNearbyPlace(index, "type", val || "")}
                               >
                                 <SelectTrigger>
                                   <SelectValue />

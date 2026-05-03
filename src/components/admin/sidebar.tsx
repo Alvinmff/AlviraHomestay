@@ -54,8 +54,8 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
     <>
       {/* Brand */}
       <div className="h-20 flex items-center px-8">
-        <span className="text-xl font-bold tracking-widest text-black uppercase">Homestay Alvira</span>
-        <button onClick={() => setMobileOpen(false)} className="lg:hidden ml-auto p-1 rounded-md hover:bg-muted">
+        <span className="text-xl font-bold tracking-widest text-foreground uppercase">Homestay Alvira</span>
+        <button onClick={() => setMobileOpen(false)} className="lg:hidden ml-auto p-1 rounded-md hover:bg-muted text-muted-foreground">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -64,7 +64,7 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
       <div className="flex-1 py-4 px-6 space-y-8 overflow-y-auto">
         {menuGroups.map((group, idx) => (
           <div key={idx} className="space-y-4">
-            <h4 className="text-xs font-semibold text-gray-400 tracking-[0.1em] px-2 uppercase">
+            <h4 className="text-xs font-semibold text-muted-foreground/70 tracking-[0.1em] px-2 uppercase">
               {group.label}
             </h4>
             <div className="space-y-1">
@@ -81,14 +81,14 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
                     className={cn(
                       "flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 group",
                       exactMatch
-                        ? "bg-[#F7F8FA] text-black shadow-sm"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-black"
+                        ? "bg-accent text-accent-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                   >
                     <div className="flex items-center gap-4">
                       <span className={cn(
                         "transition-colors", 
-                        exactMatch ? "text-black" : "text-gray-400 group-hover:text-black"
+                        exactMatch ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
                       )}>
                         {item.icon}
                       </span>
@@ -117,9 +117,9 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
       <div className="p-6">
         <button
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          className="flex flex-row items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors w-full text-left"
+          className="flex flex-row items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left group"
         >
-          <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
+          <LogOut className="w-5 h-5 text-muted-foreground/70 group-hover:text-destructive" />
           Logout
         </button>
       </div>
@@ -131,14 +131,14 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
       {/* Mobile Toggle Button (fixed top-left) */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-3 left-4 z-30 p-2 rounded-lg bg-white border shadow-sm hover:bg-muted transition-colors"
+        className="lg:hidden fixed top-3 left-4 z-30 p-2 rounded-lg bg-background text-foreground border shadow-sm hover:bg-muted transition-colors"
         aria-label="Open menu"
       >
         <Menu className="w-5 h-5" />
       </button>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex w-64 bg-white border-r border-border/50 h-screen sticky top-0 flex-col shadow-sm z-20">
+      <div className="hidden lg:flex w-64 bg-card border-r border-border/50 h-screen sticky top-0 flex-col shadow-sm z-20">
         <NavContent />
       </div>
 
@@ -149,7 +149,7 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
             className="lg:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="lg:hidden fixed inset-y-0 left-0 w-72 bg-white z-50 flex flex-col shadow-xl animate-in slide-in-from-left duration-200">
+          <div className="lg:hidden fixed inset-y-0 left-0 w-72 bg-card z-50 flex flex-col shadow-xl animate-in slide-in-from-left duration-200">
             <NavContent />
           </div>
         </>

@@ -107,7 +107,7 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.7 }}
             className="text-base md:text-lg max-w-xl mx-auto mb-12 text-white/80 leading-relaxed"
           >
-            Pengalaman menginap premium dengan pilihan akomodasi beragam dari homestay cozy di Sidoarjo, kost eksklusif di Surabaya, hingga villa mewah di Batu.
+            Penginapan murah, bersih, dan nyaman dengan lokasi strategis dengan pilihan akomodasi beragam dari homestay cozy di Sidoarjo, kost eksklusif di Surabaya, hingga villa dengan pemandangan indah Gunung Arjuno di Batu.
           </motion.p>
 
           <motion.div

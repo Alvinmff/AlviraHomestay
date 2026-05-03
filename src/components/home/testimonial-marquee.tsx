@@ -38,7 +38,7 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
 
   // Function to render a single review card
   const ReviewCard = ({ review }: { review: any }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg transition-shadow relative flex flex-col h-full w-[350px] shrink-0 mx-3">
+    <div className="bg-card rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg transition-shadow relative flex flex-col h-full w-[350px] shrink-0 mx-3">
       <div className="flex items-center gap-1 mb-4">
         {[...Array(5)].map((_, i) => (
           <Star 
