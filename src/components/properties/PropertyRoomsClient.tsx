@@ -98,8 +98,8 @@ export function PropertyRoomsClient({
                         const amenities = (room.amenities || []) as string[];
 
                         return (
-                            <Card key={room.id} className="overflow-hidden flex flex-col group border-border/40 shadow-sm transition-all duration-500 h-full hover:shadow-lg hover:-translate-y-1">
-                                <Link href={`/properties/${property.slug}/${room.slug}`} className="relative h-60 w-full overflow-hidden bg-muted block">
+                            <Card key={room.id} className="overflow-hidden flex flex-col group border-border/40 shadow-sm transition-all duration-500 h-full hover:shadow-lg hover:-translate-y-1 p-0 gap-0">
+                                <Link href={`/properties/${property.slug}/${room.slug}`} className="relative h-80 w-full overflow-hidden bg-muted block">
                                     <Image
                                         src={room.thumbnail || "/images/placeholder-room.jpg"}
                                         alt={room.roomName}
