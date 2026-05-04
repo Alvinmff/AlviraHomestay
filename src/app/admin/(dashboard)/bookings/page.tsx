@@ -76,7 +76,7 @@ export default async function AdminBookingsPage() {
               </thead>
               <tbody>
                 {bookings.map((booking) => (
-                  <tr key={booking.id} className="bg-white border-b hover:bg-muted/20 transition-colors">
+                  <tr key={booking.id} className="bg-background border-b border-border/40 hover:bg-muted/20 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-semibold text-foreground">{booking.guestName}</p>
                       <p className="text-xs font-mono text-muted-foreground mt-1">ID: ...{booking.id.slice(-6)}</p>
@@ -102,11 +102,11 @@ export default async function AdminBookingsPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <Badge variant="outline" className={
-                        booking.status === "CONFIRMED" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                          booking.status === "CHECKED_IN" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                            booking.status === "COMPLETED" ? "bg-slate-50 text-slate-700 border-slate-200" :
-                              booking.status === "CANCELLED" ? "bg-red-50 text-red-700 border-red-200" :
-                                "bg-amber-50 text-amber-700 border-amber-200"
+                        booking.status === "CONFIRMED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                          booking.status === "CHECKED_IN" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                            booking.status === "COMPLETED" ? "bg-slate-500/10 text-slate-500 border-slate-500/20" :
+                              booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                                "bg-amber-500/10 text-amber-500 border-amber-500/20"
                       }>
                         {booking.status.replace("_", " ")}
                       </Badge>

@@ -17,20 +17,20 @@ export default function AdminSettingsPage() {
 
       <Tabs defaultValue="account" className="w-full mt-8">
         <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/50 p-1 rounded-xl mb-8">
-          <TabsTrigger value="account" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="account" className="rounded-lg font-medium text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <User className="w-4 h-4" /> <span className="hidden sm:inline">Pengaturan Akun</span>
           </TabsTrigger>
-          <TabsTrigger value="security" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="security" className="rounded-lg font-medium text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <Lock className="w-4 h-4" /> <span className="hidden sm:inline">Keamanan & Password</span>
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="rounded-lg font-medium text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex items-center gap-2">
+          <TabsTrigger value="integrations" className="rounded-lg font-medium text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all flex items-center gap-2">
             <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">Integrasi WhatsApp</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="account">
           <Card className="border-border/50 shadow-sm relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-primary/20 rounded-xl">
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-primary/20 rounded-xl">
               <AlertCircle className="w-10 h-10 text-primary mb-3 opacity-80" />
               <h3 className="text-lg font-bold text-foreground">Dalam Pengembangan</h3>
               <p className="text-sm text-muted-foreground text-center max-w-md mt-1">
@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
 
         <TabsContent value="security">
           <Card className="border-border/50 shadow-sm relative overflow-hidden">
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-primary/20 rounded-xl">
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-primary/20 rounded-xl">
               <AlertCircle className="w-10 h-10 text-primary mb-3 opacity-80" />
               <h3 className="text-lg font-bold text-foreground">Dalam Pengembangan</h3>
               <p className="text-sm text-muted-foreground text-center max-w-md mt-1">
@@ -90,7 +90,7 @@ export default function AdminSettingsPage() {
 
         <TabsContent value="integrations">
           <Card className="border-border/50 shadow-sm relative overflow-hidden">
-            <div className="absolute inset-0 bg-emerald-50/70 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-emerald-500/30 rounded-xl">
+            <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center border-2 border-dashed border-emerald-500/30 rounded-xl">
               <Settings className="w-10 h-10 text-emerald-600 mb-3 opacity-80 animate-spin-slow" />
               <h3 className="text-lg font-bold text-emerald-900">Integrasi API Sedang Dibuat</h3>
               <p className="text-sm text-emerald-800/70 text-center max-w-md mt-1">
@@ -104,7 +104,7 @@ export default function AdminSettingsPage() {
               <CardDescription>Kirim invoice dan pengingat check-in otomatis ke nomor tamu.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 opacity-40 pointer-events-none">
-              <div className="flex items-center justify-between p-4 border rounded-lg bg-emerald-50/50">
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-emerald-500/5">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
                     <MessageCircle className="w-6 h-6" />

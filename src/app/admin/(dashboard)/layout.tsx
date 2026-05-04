@@ -21,11 +21,11 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const totalReviewsCount = await prisma.review.count();
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar pendingBookings={pendingBookingsCount} totalReviews={totalReviewsCount} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-20 bg-white flex items-center justify-between px-8">
+        <header className="h-20 bg-background border-b border-border/50 flex items-center justify-between px-8">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold ml-10 lg:ml-0">Dashboard</span>
           </div>

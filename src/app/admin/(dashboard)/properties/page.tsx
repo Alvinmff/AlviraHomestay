@@ -49,7 +49,7 @@ export default async function AdminPropertiesPage() {
                 </Badge>
               </div>
               <div className="absolute top-3 left-3 flex gap-2">
-                <Badge variant="secondary" className="bg-white/95 text-foreground shadow-sm">
+                <Badge variant="secondary" className="bg-background/90 text-foreground shadow-sm backdrop-blur-sm">
                   {property.type}
                 </Badge>
               </div>
@@ -92,7 +92,7 @@ export default async function AdminPropertiesPage() {
         ))}
 
         {properties.length === 0 && (
-          <div className="col-span-full py-24 text-center text-muted-foreground flex flex-col items-center bg-white rounded-xl border border-dashed">
+          <div className="col-span-full py-24 text-center text-muted-foreground flex flex-col items-center bg-card rounded-xl border border-dashed border-border/50">
             <span className="text-4xl mb-4">🏠</span>
             <p className="text-lg">Belum ada portofolio properti.</p>
             <Link href="/admin/properties/new" className={cn("inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors h-9 px-4 py-2", "text-primary underline-offset-4 hover:underline mt-2 bg-transparent")}>

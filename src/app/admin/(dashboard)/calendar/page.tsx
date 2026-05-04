@@ -14,10 +14,10 @@ type Room = { id: string; roomName: string; roomNumber: string; property: { name
 type Availability = { id: string; roomId: string; date: string; status: string };
 
 const STATUS_COLORS: Record<string, string> = {
-  AVAILABLE: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  BOOKED: "bg-red-100 text-red-700 border-red-200",
-  MAINTENANCE: "bg-amber-100 text-amber-700 border-amber-200",
-  BLOCKED: "bg-slate-100 text-slate-700 border-slate-200"
+  AVAILABLE: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  BOOKED: "bg-red-500/10 text-red-500 border-red-500/20",
+  MAINTENANCE: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  BLOCKED: "bg-slate-500/10 text-slate-500 border-slate-500/20"
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -146,7 +146,7 @@ export default function AdminCalendarPage() {
         <CardHeader className="flex flex-col md:flex-row md:items-center justify-between bg-muted/20 border-b py-4 gap-4">
           <div className="flex items-center gap-4">
             <Select value={propertyFilter} onValueChange={(v) => v && setPropertyFilter(v)}>
-              <SelectTrigger className="w-[200px] bg-white">
+              <SelectTrigger className="w-[200px] bg-background">
                 <SelectValue placeholder="Semua Properti" />
               </SelectTrigger>
               <SelectContent>
@@ -156,7 +156,7 @@ export default function AdminCalendarPage() {
                 <SelectItem value="batu">Villa Batu</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center bg-white rounded-md border shadow-sm ml-4">
+            <div className="flex items-center bg-background rounded-md border shadow-sm ml-4">
               <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -174,9 +174,9 @@ export default function AdminCalendarPage() {
             <span className="text-sm font-semibold text-primary mr-2 bg-primary/10 px-3 py-1 rounded-full">
               {selectedDates.length} terpilih
             </span>
-            <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={() => applyBulkStatus("AVAILABLE")}>Set Tersedia</Button>
-            <Button size="sm" variant="outline" className="border-red-200 text-red-700 hover:bg-red-50" onClick={() => applyBulkStatus("BOOKED")}>Set Dipesan</Button>
-            <Button size="sm" variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50" onClick={() => applyBulkStatus("MAINTENANCE")}>Set Maintenance</Button>
+            <Button size="sm" variant="outline" className="border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/10" onClick={() => applyBulkStatus("AVAILABLE")}>Set Tersedia</Button>
+            <Button size="sm" variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10" onClick={() => applyBulkStatus("BOOKED")}>Set Dipesan</Button>
+            <Button size="sm" variant="outline" className="border-amber-500/20 text-amber-500 hover:bg-amber-500/10" onClick={() => applyBulkStatus("MAINTENANCE")}>Set Maintenance</Button>
           </div>
         </CardHeader>
 
@@ -228,7 +228,7 @@ export default function AdminCalendarPage() {
 
                       let colorClass = STATUS_COLORS[status] || STATUS_COLORS["AVAILABLE"];
                       if (isPast) {
-                        colorClass = "bg-white text-gray-300 border-gray-100 cursor-not-allowed";
+                        colorClass = "bg-muted text-muted-foreground/30 border-border/50 cursor-not-allowed";
                       }
 
                       return (
@@ -262,10 +262,10 @@ export default function AdminCalendarPage() {
       </Card>
 
       <div className="text-xs text-muted-foreground flex gap-4 mt-4 px-2">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-200 inline-block"></span> Tersedia</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-red-100 border border-red-200 inline-block"></span> Dipesan</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-amber-100 border border-amber-200 inline-block"></span> Maintenance</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-slate-100 border border-slate-200 inline-block"></span> Diblokir (Auto)</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30 inline-block"></span> Tersedia</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-red-500/20 border border-red-500/30 inline-block"></span> Dipesan</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-amber-500/20 border border-amber-500/30 inline-block"></span> Maintenance</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-slate-500/20 border border-slate-500/30 inline-block"></span> Diblokir (Auto)</span>
       </div>
     </div>
   );

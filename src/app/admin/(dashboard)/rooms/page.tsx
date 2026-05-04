@@ -92,7 +92,7 @@ export default async function AdminRoomsPage() {
                 <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
               </div>
 
-              <div className="rounded-xl border border-border/50 overflow-hidden shadow-sm bg-white">
+              <div className="rounded-xl border border-border/50 overflow-hidden shadow-sm bg-card">
                 <table className="w-full text-sm text-left">
                   <thead className="text-[11px] text-muted-foreground uppercase bg-muted/30 border-b font-bold tracking-wider">
                     <tr>
@@ -120,7 +120,7 @@ export default async function AdminRoomsPage() {
                             <div>
                               <p className="font-bold text-foreground leading-tight text-sm">{room.roomName}</p>
                               <div className="flex items-center gap-2 mt-1.5">
-                                <span className="text-[10px] bg-sky-50 text-sky-700 font-bold px-2 py-0.5 rounded border border-sky-100 shadow-sm">
+                                <span className="text-[10px] bg-sky-500/10 text-sky-500 font-bold px-2 py-0.5 rounded border border-sky-500/20 shadow-sm">
                                   Kamar {room.roomNumber}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
@@ -144,7 +144,7 @@ export default async function AdminRoomsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <Badge variant="outline" className={room.isShown ? "border-emerald-200 bg-emerald-50 text-emerald-700 font-bold text-[10px] py-0.5" : "border-zinc-200 bg-zinc-50 text-zinc-500 font-bold text-[10px] py-0.5"}>
+                          <Badge variant="outline" className={room.isShown ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500 font-bold text-[10px] py-0.5" : "border-zinc-500/20 bg-zinc-500/10 text-zinc-500 font-bold text-[10px] py-0.5"}>
                             {room.isShown ? "PUBLISHED" : "HIDDEN"}
                           </Badge>
                         </td>

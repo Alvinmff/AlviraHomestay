@@ -120,7 +120,7 @@ export default function AdminReviewsPage() {
         </Card>
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 border rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
         <ReviewTable 
           data={reviews} 
           loading={loading} 
