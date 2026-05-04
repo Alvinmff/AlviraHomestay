@@ -41,21 +41,21 @@ export default function ContactPage() {
     const locations = {
         sidoarjo: {
             name: "Alvira Homestay Sidoarjo",
-            address: "Pusat Kota Sidoarjo, Jawa Timur",
+            address: "Homestay Alvira, Sidoarjo, Jawa Timur",
             landmark: "Dekat dengan Alun-alun Sidoarjo dan Stasiun Kota.",
-            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126442.23847551066!2d112.6394!3d-7.4478!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMjYnNTIuMSJTIDExMsKwMzgnMjEuOCJF!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid" // Placeholder embedded map
+            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.0157894575104!2d112.70343299999999!3d-7.4635041!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e1003fa67b7b%3A0xc63175bbfcdf908c!2sHomestay%20Alvira%201%20%26%202%20Sidoarjo!5e0!3m2!1sid!2sid!4v1777907802857!5m2!1sid!2sid"
         },
         surabaya: {
             name: "Kost Eksklusif Surabaya",
-            address: "Pusat Kota Pahlawan, Surabaya, Jawa Timur",
+            address: "Alvira Kost Bendul Merisi, Surabaya, Jawa Timur",
             landmark: "Strategis dekat dengan Tunjungan Plaza dan perkantoran.",
-            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126646.20967597148!2d112.6713437!3d-7.2756141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMTYnMzIuMiJTIDExMsKwNDAnMTYuOCJF!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid"
+            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.4146494168745!2d112.747965!3d-7.307226099999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fbf87299d323%3A0xfd95f68768522d14!2sHomestay%20Alvira%20Bendul%20Merisi%20Surabaya!5e0!3m2!1sid!2sid!4v1777907907205!5m2!1sid!2sid"
         },
         batu: {
             name: "Villa Premium Batu",
-            address: "Kawasan Pegunungan Batu, Malang Raya, Jawa Timur",
+            address: "Villa Alvira Batu Top View Residence, Kota Batu, Jawa Timur",
             landmark: "5 menit dari Jatim Park dan Museum Angkut.",
-            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3951.812379532549!2d112.5204432!3d-7.8727283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwNTInMjEuOCJTIDExMsKwMzEnMTMuNiJF!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid"
+            mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3952.0854677329066!2d112.55745557488339!3d-7.886126792136415!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e78810059194a81%3A0xe897d0023a652dfc!2sVilla%20Alvira%20Batu%20Top%20View%20Residence!5e0!3m2!1sid!2sid!4v1777907928566!5m2!1sid!2sid"
         }
     };
 
