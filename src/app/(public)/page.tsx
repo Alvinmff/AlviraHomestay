@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { GoogleReviewsSection } from "@/components/home/google-reviews-section";
 import { ScrollingBanner } from "@/components/home/scrolling-banner";
+import { TikTokSection } from "@/components/home/tiktok-section";
 
 export default function Home() {
   const containerVariants = {
@@ -218,6 +219,9 @@ export default function Home() {
 
       {/* Scrolling Banner Transition */}
       <ScrollingBanner />
+
+      {/* TikTok Section — VIDEO REAL */}
+      <TikTokSection />
 
       {/* Google Reviews Testimonials */}
       <GoogleReviewsSection />
