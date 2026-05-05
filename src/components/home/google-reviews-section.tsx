@@ -105,28 +105,32 @@ export function GoogleReviewsSection() {
           </motion.div>
         </div>
 
-        {/* Reviews Area */}
-        <div className="mt-12 min-h-[400px]">
+        {/* Reviews Area - Full Width Bleed */}
+        <div className="mt-12 min-h-[400px] w-full">
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="flex items-center justify-center h-64"
-              >
-                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              </motion.div>
+              <div className="container mx-auto px-4">
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex items-center justify-center h-64"
+                >
+                  <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                </motion.div>
+              </div>
             ) : filteredReviews.length === 0 ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="py-24 text-center text-muted-foreground flex flex-col items-center"
-              >
-                <MessageSquareQuote className="w-12 h-12 mb-4 opacity-15" />
-                <p className="text-base">Belum ada ulasan untuk lokasi ini.</p>
-              </motion.div>
+              <div className="container mx-auto px-4">
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="py-24 text-center text-muted-foreground flex flex-col items-center"
+                >
+                  <MessageSquareQuote className="w-12 h-12 mb-4 opacity-15" />
+                  <p className="text-base">Belum ada ulasan untuk lokasi ini.</p>
+                </motion.div>
+              </div>
             ) : (
               <motion.div
                 key={`marquee-${activeTab}`}

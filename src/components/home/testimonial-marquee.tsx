@@ -114,10 +114,11 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
   const row2Loops = Array(15).fill(row2).flat();
 
   return (
-    <div className="relative flex flex-col gap-6 overflow-hidden w-full py-4 px-0">
+    <div className="relative flex flex-col gap-6 overflow-hidden w-screen left-1/2 -translate-x-1/2 py-4 px-0">
       {/* Edge Gradients for smooth fade */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-muted/30 via-background/80 to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-muted/30 via-background/80 to-transparent z-10" />
+      {/* Edge Gradients for smooth fade - widened to 20% and made more opaque at edges */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-[15%] md:w-[20%] bg-gradient-to-r from-background via-background/80 to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-[15%] md:w-[20%] bg-gradient-to-l from-background via-background/80 to-transparent z-10" />
 
       {/* Row 1 (Forward) */}
       <div 
