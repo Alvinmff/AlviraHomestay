@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, MessageCircle } from "lucide-react";
+import { format, addDays } from "date-fns";
+import { Calendar as CalendarIcon, MessageCircle, Info } from "lucide-react";
 import { cn, generateWALink, WA_TEMPLATES } from "@/lib/utils";
+import { isWeekendOrHoliday } from "@/lib/holidays";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -21,9 +22,10 @@ interface RoomWhatsAppFormProps {
   propertyCity: string;
   propertyName: string;
   basePrice: number;
+  weekendPrice: number;
 }
 
-export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName, basePrice }: RoomWhatsAppFormProps) {
+export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName, basePrice, weekendPrice }: RoomWhatsAppFormProps) {
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -52,13 +54,36 @@ export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName,
     const checkOut = dateRange.to ? format(dateRange.to, "dd MMMM yyyy") : "Belum ditentukan";
 
     // Calculate nights for price estimation
-    let nightCount = 1;
+    let nightCount = 0;
+    let weekdayCount = 0;
+    let weekendCount = 0;
+    let estimatedTotalNum = 0;
+
     if (dateRange.from && dateRange.to) {
-      const diffTime = Math.abs(dateRange.to.getTime() - dateRange.from.getTime());
-      nightCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      let currentDate = dateRange.from;
+      // Loop until the day before check-out
+      while (currentDate < dateRange.to) {
+        nightCount++;
+        if (isWeekendOrHoliday(currentDate)) {
+          estimatedTotalNum += weekendPrice;
+          weekendCount++;
+        } else {
+          estimatedTotalNum += basePrice;
+          weekdayCount++;
+        }
+        currentDate = addDays(currentDate, 1);
+      }
+    } else {
+      nightCount = 1;
+      estimatedTotalNum = isWeekendOrHoliday(dateRange.from) ? weekendPrice : basePrice;
+      if (isWeekendOrHoliday(dateRange.from)) weekendCount = 1; else weekdayCount = 1;
     }
 
-    const estimatedTotal = (basePrice * nightCount).toLocaleString('id-ID');
+    const estimatedTotal = estimatedTotalNum.toLocaleString('id-ID');
+
+    let breakdownStr = "";
+    if (weekdayCount > 0) breakdownStr += `- Weekday: ${weekdayCount} malam\n`;
+    if (weekendCount > 0) breakdownStr += `- Weekend/Libur: ${weekendCount} malam\n`;
 
     const message = `Halo Admin Alvira Homestay, saya ingin menanyakan ketersediaan kamar:
 
@@ -70,7 +95,11 @@ Nama: ${guestName}
 Check-in: ${checkIn}
 Check-out: ${checkOut}
 Durasi: ${nightCount} Malam
+
+*Rincian Harga:*
+${breakdownStr.trim()}
 Estimasi Harga: Rp ${estimatedTotal}
+${nightCount >= 7 ? "\n_(Pesan: Mohon informasi untuk harga khusus mingguan)_" : ""}
 
 Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
 
@@ -138,19 +167,57 @@ Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
               </PopoverContent>
             </Popover>
           </div>
+          
+          {/* Price Details Information below calendar */}
+          <div className="mt-3 p-3 bg-muted/30 rounded-lg text-xs space-y-1.5 border border-border/50">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Harga Weekday (Sen-Kam):</span>
+              <span className="font-semibold text-foreground">{formatRupiah(basePrice)} / malam</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Harga Weekend/Libur (Jum-Min):</span>
+              <span className="font-semibold text-foreground">{formatRupiah(weekendPrice)} / malam</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="pt-4 border-t border-border/50">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-muted-foreground">Harga Estimasi:</span>
-          <span className="text-lg font-bold text-foreground">
-            {dateRange.from && dateRange.to
-              ? formatRupiah(basePrice * Math.max(1, Math.ceil(Math.abs(dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))))
-              : formatRupiah(basePrice)
-            }
+        {dateRange.from && dateRange.to && (
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-muted-foreground">Durasi Menginap:</span>
+            <span className="text-sm font-semibold text-foreground">
+              {Math.max(1, Math.ceil(Math.abs(dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)))} Malam
+            </span>
+          </div>
+        )}
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-semibold text-foreground">Total Estimasi:</span>
+          <span className="text-xl font-bold text-primary">
+            {(() => {
+              if (dateRange.from && dateRange.to) {
+                let total = 0;
+                let cur = dateRange.from;
+                while (cur < dateRange.to) {
+                  total += isWeekendOrHoliday(cur) ? weekendPrice : basePrice;
+                  cur = addDays(cur, 1);
+                }
+                // Handle same day selection edge case
+                if (total === 0) total = isWeekendOrHoliday(dateRange.from) ? weekendPrice : basePrice;
+                return formatRupiah(total);
+              }
+              return formatRupiah(dateRange.from && isWeekendOrHoliday(dateRange.from) ? weekendPrice : basePrice);
+            })()}
           </span>
         </div>
+
+        {dateRange.from && dateRange.to && Math.ceil(Math.abs(dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) >= 7 && (
+          <div className="flex items-start gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-md mb-4 border border-amber-200">
+            <Info className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>* Hubungi admin untuk mendapatkan harga khusus mingguan/bulanan.</p>
+          </div>
+        )}
+
         <Button
           onClick={handleWhatsAppBooking}
           className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white flex items-center justify-center gap-2"

@@ -152,6 +152,7 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
                 propertyName={room.property.name}
                 propertyCity={room.property.city}
                 basePrice={room.basePrice}
+                weekendPrice={room.weekendPrice ?? room.basePrice}
               />
             </div>
           </div>

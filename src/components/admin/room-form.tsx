@@ -138,7 +138,7 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
         basePrice: parseFloat(formData.basePrice) || 0,
         weekendPrice: formData.weekendPrice ? parseFloat(formData.weekendPrice) : null,
         monthlyPrice: formData.monthlyPrice ? parseFloat(formData.monthlyPrice) : null,
-        amenities: formData.amenities.split(",").map((s: string) => s.trim()).filter(Boolean),
+        amenities: formData.amenities.split(/,\s*(?![^()]*\))/g).map((s: string) => s.trim()).filter(Boolean),
         photos: formData.photos,
       };
 
