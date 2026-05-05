@@ -19,6 +19,7 @@ interface NearbyPlace {
   distance: string;
   type: string;
   imageUrl?: string;
+  mapsUrl?: string;
 }
 
 export function PropertyNearby({ places }: { places: any }) {
@@ -100,6 +101,16 @@ export function PropertyNearby({ places }: { places: any }) {
                   <span className="w-1 h-1 rounded-full bg-border mx-1"></span>
                   <span className="truncate">{place.type}</span>
                 </div>
+                <a 
+                  href={place.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-md transition-colors w-fit"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MapPin className="w-3.5 h-3.5" />
+                  Buka di Maps
+                </a>
               </div>
             </div>
           </motion.div>
@@ -113,7 +124,7 @@ export function PropertyNearby({ places }: { places: any }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 overflow-hidden"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 overflow-hidden"
             onClick={() => setSelectedImage(null)}
           >
             {/* Backdrop */}
@@ -144,7 +155,7 @@ export function PropertyNearby({ places }: { places: any }) {
                 alt={selectedImage.name}
                 className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
               />
-              <div className="mt-4 bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-4">
+              <div className="mt-4 bg-black/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
                 <div className="text-white">
                   <h4 className="font-semibold text-lg">{selectedImage.name}</h4>
                   <div className="flex items-center gap-2 text-white/70 text-sm mt-1">
@@ -154,6 +165,16 @@ export function PropertyNearby({ places }: { places: any }) {
                     <span>{selectedImage.type}</span>
                   </div>
                 </div>
+                <a 
+                  href={selectedImage.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedImage.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-black bg-white hover:bg-gray-200 px-4 py-2 rounded-full transition-colors whitespace-nowrap"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Buka di Maps
+                </a>
               </div>
             </motion.div>
           </motion.div>

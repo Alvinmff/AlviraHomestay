@@ -37,7 +37,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
     }
   });
 
-  const [nearbyPlaces, setNearbyPlaces] = useState<{ name: string; distance: string; type: string; imageUrl?: string }[]>(() => {
+  const [nearbyPlaces, setNearbyPlaces] = useState<{ name: string; distance: string; type: string; imageUrl?: string; mapsUrl?: string }[]>(() => {
     try {
       if (!initialData?.nearbyPlaces) return [];
       return typeof initialData.nearbyPlaces === 'string' ? JSON.parse(initialData.nearbyPlaces) : initialData.nearbyPlaces;
@@ -168,7 +168,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
   }
 
   function addNearbyPlace() {
-    setNearbyPlaces(prev => [...prev, { name: "", distance: "", type: "Wisata", imageUrl: "" }]);
+    setNearbyPlaces(prev => [...prev, { name: "", distance: "", type: "Wisata", imageUrl: "", mapsUrl: "" }]);
   }
 
   function updateNearbyPlace(index: number, field: keyof typeof nearbyPlaces[0], value: string) {
@@ -638,6 +638,14 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                                 value={place.distance}
                                 onChange={(e) => updateNearbyPlace(index, "distance", e.target.value)}
                                 required
+                              />
+                            </div>
+                            <div className="flex-[2] space-y-2">
+                              <Label>Link Google Maps (Opsional)</Label>
+                              <Input
+                                placeholder="https://www.google.com/maps/..."
+                                value={place.mapsUrl || ""}
+                                onChange={(e) => updateNearbyPlace(index, "mapsUrl", e.target.value)}
                               />
                             </div>
                             <Button 
