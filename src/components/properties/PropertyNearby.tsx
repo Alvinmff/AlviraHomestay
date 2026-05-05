@@ -11,7 +11,9 @@ import {
   Map as MapIcon, 
   Navigation,
   ZoomIn,
-  X
+  X,
+  Utensils,
+  Dumbbell
 } from "lucide-react";
 
 interface NearbyPlace {
@@ -42,6 +44,8 @@ export function PropertyNearby({ places }: { places: any }) {
     switch (type) {
       case "Wisata": return <MapIcon className="w-5 h-5" />;
       case "Belanja": return <ShoppingBag className="w-5 h-5" />;
+      case "Kuliner": return <Utensils className="w-5 h-5" />;
+      case "Olahraga": return <Dumbbell className="w-5 h-5" />;
       case "Pendidikan": return <GraduationCap className="w-5 h-5" />;
       case "Kesehatan": return <Stethoscope className="w-5 h-5" />;
       case "Transportasi": return <Train className="w-5 h-5" />;
@@ -53,6 +57,8 @@ export function PropertyNearby({ places }: { places: any }) {
     switch (type) {
       case "Wisata": return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
       case "Belanja": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+      case "Kuliner": return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+      case "Olahraga": return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400";
       case "Pendidikan": return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400";
       case "Kesehatan": return "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400";
       case "Transportasi": return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";

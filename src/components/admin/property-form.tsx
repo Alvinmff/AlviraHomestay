@@ -621,6 +621,8 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
                                 <SelectContent>
                                   <SelectItem value="Wisata">Wisata / Hiburan</SelectItem>
                                   <SelectItem value="Belanja">Pusat Perbelanjaan</SelectItem>
+                                  <SelectItem value="Kuliner">Tempat Makan / Kuliner</SelectItem>
+                                  <SelectItem value="Olahraga">Fasilitas Olahraga</SelectItem>
                                   <SelectItem value="Pendidikan">Kampus / Sekolah</SelectItem>
                                   <SelectItem value="Kesehatan">Rumah Sakit</SelectItem>
                                   <SelectItem value="Transportasi">Stasiun / Bandara</SelectItem>
