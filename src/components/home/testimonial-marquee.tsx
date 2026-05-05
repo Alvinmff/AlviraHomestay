@@ -29,15 +29,27 @@ function getRelativeTimeString(date: string | Date) {
 }
 
 export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
-  const [emblaRef1] = useEmblaCarousel(
+  const [emblaRef1, emblaApi1] = useEmblaCarousel(
     { loop: true, dragFree: true },
-    [AutoScroll({ playOnInit: true, speed: 1, stopOnInteraction: false, stopOnMouseEnter: true, direction: "forward" })]
+    [AutoScroll({ playOnInit: true, speed: 1, stopOnInteraction: false, direction: "forward" })]
   );
 
-  const [emblaRef2] = useEmblaCarousel(
+  const [emblaRef2, emblaApi2] = useEmblaCarousel(
     { loop: true, dragFree: true },
-    [AutoScroll({ playOnInit: true, speed: 1, stopOnInteraction: false, stopOnMouseEnter: true, direction: "backward" })]
+    [AutoScroll({ playOnInit: true, speed: 1, stopOnInteraction: false, direction: "backward" })]
   );
+
+  const onMouseEnter = (api: any) => () => {
+    if (api?.plugins()?.autoScroll) {
+      api.plugins().autoScroll.stop();
+    }
+  };
+
+  const onMouseLeave = (api: any) => () => {
+    if (api?.plugins()?.autoScroll) {
+      api.plugins().autoScroll.play();
+    }
+  };
 
   if (reviews.length === 0) return null;
 
@@ -96,9 +108,10 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
   );
 
   // We need to ensure we have enough slides for Embla to loop smoothly.
-  // Embla needs at least enough slides to fill the viewport width.
-  const row1Loops = [...row1, ...row1, ...row1, ...row1];
-  const row2Loops = [...row2, ...row2, ...row2, ...row2];
+  // Embla needs at least enough slides to fill the viewport width multiple times over.
+  // Using 15 duplicates guarantees that even if there is only 1 review, it will cover ultra-wide screens.
+  const row1Loops = Array(15).fill(row1).flat();
+  const row2Loops = Array(15).fill(row2).flat();
 
   return (
     <div className="relative flex flex-col gap-6 overflow-hidden w-full py-4 px-0">
@@ -107,7 +120,12 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
       <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-muted/30 via-background/80 to-transparent z-10" />
 
       {/* Row 1 (Forward) */}
-      <div className="overflow-hidden pb-2" ref={emblaRef1}>
+      <div 
+        className="overflow-hidden pb-2" 
+        ref={emblaRef1}
+        onMouseEnter={onMouseEnter(emblaApi1)}
+        onMouseLeave={onMouseLeave(emblaApi1)}
+      >
         <div className="flex -ml-6">
           {row1Loops.map((review, i) => (
             <ReviewCard key={`r1-${review.id}-${i}`} review={review} />
@@ -116,7 +134,12 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
       </div>
 
       {/* Row 2 (Backward) */}
-      <div className="overflow-hidden pt-2" ref={emblaRef2}>
+      <div 
+        className="overflow-hidden pt-2" 
+        ref={emblaRef2}
+        onMouseEnter={onMouseEnter(emblaApi2)}
+        onMouseLeave={onMouseLeave(emblaApi2)}
+      >
         <div className="flex -ml-6">
           {row2Loops.map((review, i) => (
              <ReviewCard key={`r2-${review.id}-${i}`} review={review} />
