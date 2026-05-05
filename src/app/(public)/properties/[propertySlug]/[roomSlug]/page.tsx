@@ -113,9 +113,9 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
             {/* Individual Amenities */}
             <section className="space-y-6">
               <h2 className="text-2xl font-serif font-bold text-foreground">Fasilitas</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
                 {amenities.map((amenity, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <div key={i} className="flex items-start gap-3 break-inside-avoid mb-4">
                     <Check className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                     <span className="text-foreground">{amenity}</span>
                   </div>
@@ -126,9 +126,9 @@ export default async function RoomDetailPage({ params }: { params: { propertySlu
             {/* Common Area Facilities */}
             <section className="space-y-6 pt-6 border-t border-border/50">
               <h2 className="text-xl font-serif font-bold text-foreground">Fasilitas Area Bersama ({room.property.name})</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
                 {commonFacilities.map((facility, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <div key={i} className="flex items-start gap-3 break-inside-avoid mb-4">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />
                     <span className="text-muted-foreground">{facility}</span>
                   </div>
