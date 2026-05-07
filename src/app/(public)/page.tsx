@@ -61,13 +61,14 @@ export default function Home() {
           className="absolute inset-0 z-0 w-full h-[120%]"
           style={{ y: yHero, opacity: opacityHero }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            /*src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2000&auto=format&fit=crop"*/
-            src="https://res.cloudinary.com/drq4p06mk/image/upload/v1777687111/alvira-static/Background.png"
-            alt="Hero Background Alvira"
-            className="w-full h-full object-cover origin-top"
-          />
+          <picture className="w-full h-full">
+            <source media="(max-width: 768px)" srcSet="/uploads/backgroundmobile.png" />
+            <img
+              src="/uploads/Background.png"
+              alt="Hero Background Alvira"
+              className="w-full h-full object-cover origin-top"
+            />
+          </picture>
         </motion.div>
 
         {/* Soft vignette overlay — not heavy black */}

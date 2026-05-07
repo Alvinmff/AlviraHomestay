@@ -61,8 +61,8 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
 
   // Function to render a single review card
   const ReviewCard = ({ review }: { review: any }) => (
-    <div className="flex-[0_0_auto] pl-6 w-[350px] md:w-[400px]">
-      <div className="bg-card rounded-2xl p-6 shadow-sm border border-border/50 hover:shadow-lg transition-shadow relative flex flex-col h-full cursor-grab active:cursor-grabbing select-none">
+    <div className="flex-[0_0_auto] pl-4 md:pl-6 w-[280px] sm:w-[350px] md:w-[400px]">
+      <div className="bg-card rounded-2xl p-5 md:p-6 shadow-sm border border-border/50 hover:shadow-lg transition-shadow relative flex flex-col h-full cursor-grab active:cursor-grabbing select-none">
         <div className="flex items-center gap-1 mb-4">
           {[...Array(5)].map((_, i) => (
             <Star 
@@ -127,7 +127,7 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
         onMouseEnter={onMouseEnter(emblaApi1)}
         onMouseLeave={onMouseLeave(emblaApi1)}
       >
-        <div className="flex -ml-6">
+        <div className="flex -ml-4 md:-ml-6">
           {row1Loops.map((review, i) => (
             <ReviewCard key={`r1-${review.id}-${i}`} review={review} />
           ))}
@@ -141,7 +141,7 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
         onMouseEnter={onMouseEnter(emblaApi2)}
         onMouseLeave={onMouseLeave(emblaApi2)}
       >
-        <div className="flex -ml-6">
+        <div className="flex -ml-4 md:-ml-6">
           {row2Loops.map((review, i) => (
              <ReviewCard key={`r2-${review.id}-${i}`} review={review} />
           ))}
