@@ -62,9 +62,10 @@ export default function Home() {
           style={{ y: yHero, opacity: opacityHero }}
         >
           <picture className="w-full h-full">
-            <source media="(max-width: 768px)" srcSet="/uploads/backgroundmobile.png" />
+            <source media="(max-width: 768px)" srcSet="https://res.cloudinary.com/drq4p06mk/image/upload/v1778138945/alvira-static/backgroundmobile.png" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/uploads/Background.png"
+              src="https://res.cloudinary.com/drq4p06mk/image/upload/v1778138941/alvira-static/Background.png"
               alt="Hero Background Alvira"
               className="w-full h-full object-cover origin-top"
             />

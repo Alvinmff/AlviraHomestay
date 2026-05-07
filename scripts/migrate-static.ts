@@ -13,7 +13,7 @@ cloudinary.config({
 });
 
 async function main() {
-  const assets = ["Background.png", "logo.png", "upload-1773135068512-112765190.jpg"];
+  const assets = ["Background.png", "backgroundmobile.png", "logo.png", "upload-1773135068512-112765190.jpg"];
   const results: Record<string, string> = {};
 
   for (const asset of assets) {
