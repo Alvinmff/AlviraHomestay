@@ -76,9 +76,9 @@ export async function POST(request: Request) {
 
     // Process dates and upsert records
     const operations = dates.map((dateStr: string) => {
-      const date = new Date(dateStr);
-      // Zero out time
-      date.setUTCHours(0, 0, 0, 0);
+      const d = new Date(dateStr);
+      // Use noon UTC to prevent timezone shifts
+      const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0));
 
       return prisma.roomAvailability.upsert({
         where: {

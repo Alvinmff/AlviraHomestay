@@ -45,7 +45,14 @@ export async function GET(request: Request) {
     // Hash map for O(1) lookups
     const availabilityMap = new Map();
     availabilities.forEach((avail) => {
-      const dateKey = format(avail.date, 'yyyy-MM-dd');
+      // Use Asia/Jakarta to get consistent date keys
+      const dateKey = new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Jakarta",
+      }).format(avail.date);
+
       availabilityMap.set(dateKey, {
         status: avail.status.toLowerCase(),
         bookingId: avail.bookingId,
@@ -69,7 +76,12 @@ export async function GET(request: Request) {
       const days = [];
       for (let i = 0; i < totalDays; i++) {
         const currentDate = addDays(monthStart, i);
-        const dateKey = format(currentDate, 'yyyy-MM-dd');
+        const dateKey = new Intl.DateTimeFormat("en-CA", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          timeZone: "Asia/Jakarta",
+        }).format(currentDate);
         
         // Lookup DB status or fallback to standard AVAILABLE
         const dbStatus = availabilityMap.get(dateKey);

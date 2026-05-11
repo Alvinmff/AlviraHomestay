@@ -41,7 +41,16 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
     // Find precise availability status for this date
     // Match the strict date YYYY-MM-DD instead of generic UTC toISOString which offsets the day
     const localDateStr = format(date, "yyyy-MM-dd");
-    const match = availabilities.find((a: { date: string, status: string }) => a.date.startsWith(localDateStr));
+    const match = availabilities.find((a: { date: string, status: string }) => {
+      const d = new Date(a.date);
+      const recordDateStr = new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Jakarta",
+      }).format(d);
+      return recordDateStr === localDateStr;
+    });
 
     if (match) return match.status; // BOOKED, MAINTENANCE, BLOCKED
     return "AVAILABLE";

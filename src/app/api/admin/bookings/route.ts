@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth"; // Make sure to use existing auth import
 
+// Normalize a date string to noon UTC to prevent timezone day-shift
+function toNoonUTC(dateStr: string): Date {
+    const d = new Date(dateStr);
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0));
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
@@ -33,8 +39,8 @@ export async function POST(req: Request) {
                 guestPhone,
                 propertyId,
                 roomId,
-                checkIn: new Date(checkIn),
-                checkOut: new Date(checkOut),
+                checkIn: toNoonUTC(checkIn),
+                checkOut: toNoonUTC(checkOut),
                 totalPrice: parseFloat(totalPrice),
                 status: status || "CONFIRMED",
                 notes,
@@ -45,8 +51,8 @@ export async function POST(req: Request) {
         // 2. Generate RoomAvailability records if status is active
         if (["CONFIRMED", "CHECKED_IN"].includes(booking.status)) {
             const dates = [];
-            let currentDate = new Date(checkIn);
-            const endDate = new Date(checkOut);
+            let currentDate = toNoonUTC(checkIn);
+            const endDate = toNoonUTC(checkOut);
 
             while (currentDate < endDate) {
                 dates.push(new Date(currentDate));

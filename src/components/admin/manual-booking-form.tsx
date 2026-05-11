@@ -14,6 +14,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { createManualBookingWithAvailability, updateBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
 
+// Normalize a local date to noon UTC so the calendar date is preserved
+// regardless of the server's timezone (prevents ±1 day shift).
+function toNoonUTC(date: Date): Date {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0));
+}
+
 interface ManualBookingFormProps {
     properties: any[];
     initialData?: {
@@ -75,8 +81,8 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     guestPhone: guestPhone || null,
                     propertyId,
                     roomId,
-                    checkIn: dateRange.from,
-                    checkOut: dateRange.to,
+                    checkIn: toNoonUTC(dateRange.from),
+                    checkOut: toNoonUTC(dateRange.to),
                     totalPrice: finalPrice,
                     notes: notes || null,
                 });
@@ -87,8 +93,8 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     guestPhone: guestPhone || null,
                     propertyId,
                     roomId,
-                    checkIn: dateRange.from,
-                    checkOut: dateRange.to,
+                    checkIn: toNoonUTC(dateRange.from),
+                    checkOut: toNoonUTC(dateRange.to),
                     totalPrice: finalPrice,
                     notes: notes || null,
                 });

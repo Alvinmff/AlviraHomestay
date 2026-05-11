@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { format } from "date-fns";
-import { Eye, Filter, CalendarPlus } from "lucide-react";
+import { Eye, CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,16 @@ const formatRupiah = (number: number) => {
     currency: "IDR",
     minimumFractionDigits: 0,
   }).format(number);
+};
+
+// Format a Date in Asia/Jakarta timezone to avoid UTC day-shift on the server
+const formatDateWIB = (date: Date) => {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(date));
 };
 
 export default async function AdminBookingsPage({
@@ -120,8 +129,8 @@ export default async function AdminBookingsPage({
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-xs font-medium text-foreground">In: {format(new Date(booking.checkIn), "dd MMM yyyy")}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Out: {format(new Date(booking.checkOut), "dd MMM yyyy")}</p>
+                      <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Out: {formatDateWIB(booking.checkOut)}</p>
                     </td>
                     <td className="px-6 py-4 text-foreground font-semibold">
                       {formatRupiah(booking.totalPrice)}

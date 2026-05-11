@@ -110,7 +110,18 @@ export default function AdminCalendarPage() {
 
   // Batu Virtual Computed Status Logic Helper
   const getComputedStatus = (roomId: string, dateStr: string, roomSlug: string) => {
-    const record = availabilities?.find(a => a.roomId === roomId && a.date.startsWith(dateStr));
+    // Robust date matching: convert availability date to YYYY-MM-DD in Asia/Jakarta
+    const record = availabilities?.find(a => {
+      if (a.roomId !== roomId) return false;
+      const d = new Date(a.date);
+      const recordDateStr = new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: "Asia/Jakarta",
+      }).format(d);
+      return recordDateStr === dateStr;
+    });
     let status = record?.status || "AVAILABLE";
 
     // Inject Batu Computed Logic
