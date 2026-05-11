@@ -33,6 +33,7 @@ export default async function EditBookingPage({ params }: { params: { id: string
         checkOut: booking.checkOut,
         totalPrice: booking.totalPrice,
         notes: booking.notes,
+        dpAmount: booking.dpAmount,
     };
 
     return (

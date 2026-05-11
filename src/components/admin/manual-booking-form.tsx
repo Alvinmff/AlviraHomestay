@@ -34,6 +34,7 @@ interface ManualBookingFormProps {
         checkOut: Date;
         totalPrice: number;
         notes: string | null;
+        dpAmount: number | null;
     };
 }
 
@@ -50,7 +51,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         to: initialData ? new Date(initialData.checkOut) : undefined,
     });
     const [notes, setNotes] = useState(initialData?.notes || "");
-    const [dpAmount, setDpAmount] = useState<string>("0");
+    const [dpAmount, setDpAmount] = useState<string>(initialData?.dpAmount?.toString() || "0");
 
     const selectedProperty = useMemo(() => properties.find(p => p.id === propertyId), [properties, propertyId]);
     const selectedRooms = useMemo(() => {
@@ -93,6 +94,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     checkOut: toNoonUTC(dateRange.to),
                     totalPrice: finalPrice,
                     notes: notes || null,
+                    dpAmount: parseInt(dpAmount) || 0,
                 });
                 toast.success("Data booking berhasil diperbarui!");
             } else {
