@@ -143,7 +143,11 @@ export default async function AdminBookingsPage({
                               booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
                                 "bg-amber-500/10 text-amber-500 border-amber-500/20"
                       }>
-                        {booking.status.replace("_", " ")}
+                        {booking.status === "CONFIRMED" ? "Booking" :
+                         booking.status === "CHECKED_IN" ? "Check-in" :
+                         booking.status === "COMPLETED" ? "Selesai" :
+                         booking.status === "CANCELLED" ? "Dibatalkan" :
+                         booking.status.replace("_", " ")}
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">

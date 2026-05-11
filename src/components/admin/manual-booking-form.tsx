@@ -200,28 +200,6 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="dpAmount">DP (Uang Muka)</Label>
-                        <div className="flex items-center gap-2">
-                            <Input
-                                id="dpAmount"
-                                type="number"
-                                value={dpAmount}
-                                onChange={(e) => setDpAmount(e.target.value)}
-                                className="h-10"
-                                placeholder="0"
-                            />
-                            <Button 
-                                type="button" 
-                                variant="outline" 
-                                className="h-10 shrink-0 bg-muted/30"
-                                onClick={() => toast.info(`Total saat ini: Rp ${calculatedPrice.toLocaleString('id-ID')}`)}
-                            >
-                                💾 Cek Harga
-                            </Button>
-                        </div>
-                    </div>
-
                     <div className="space-y-2 md:col-span-2">
                         <Label>Tanggal Check-in & Check-out <span className="text-red-500">*</span></Label>
                         <Popover>
@@ -263,7 +241,25 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted/50 px-3 py-2 text-sm font-semibold text-muted-foreground">
                             {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(calculatedPrice)}
                         </div>
-                        <p className="text-xs text-muted-foreground">Harga dasar kamar × jumlah malam.</p>
+                        {selectedRooms.length > 0 && dateRange.from && dateRange.to && (
+                            <p className="text-xs text-muted-foreground font-mono">
+                                {new Intl.NumberFormat("id-ID").format(selectedRooms.reduce((sum: number, r: any) => sum + r.basePrice, 0))} x {differenceInDays(dateRange.to, dateRange.from) || 1} malam = {new Intl.NumberFormat("id-ID").format(calculatedPrice)}
+                            </p>
+                        )}
+                        <p className="text-[10px] text-muted-foreground mt-1">Harga dasar kamar × jumlah malam.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="dpAmount">DP (Uang Muka)</Label>
+                        <Input
+                            id="dpAmount"
+                            type="number"
+                            value={dpAmount}
+                            onChange={(e) => setDpAmount(e.target.value)}
+                            className="h-10"
+                            placeholder="0"
+                        />
+                        <p className="text-xs text-muted-foreground">Masukkan jumlah pembayaran awal jika ada.</p>
                     </div>
 
                     <div className="space-y-2">
@@ -275,7 +271,17 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                             onChange={(e) => setTotalPriceOverride(e.target.value)}
                             placeholder={`Contoh: ${calculatedPrice || 500000}`}
                         />
-                        <p className="text-xs text-muted-foreground">Isi ini hanya jika harga akhir berbeda dari harga sistem (diskon, dll).</p>
+                        <p className="text-xs text-muted-foreground">Gunakan jika harga akhir berbeda dari sistem.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Info Sisa Pembayaran</Label>
+                        <div className="flex h-10 w-full items-center rounded-md border border-input bg-emerald-500/5 px-3 py-2 text-sm font-bold text-emerald-600">
+                            Sisa: {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(
+                                Math.max(0, (totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice) - (parseInt(dpAmount) || 0))
+                            )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1">Total dikurangi uang muka (DP).</p>
                     </div>
 
                     <div className="space-y-2 md:col-span-2">

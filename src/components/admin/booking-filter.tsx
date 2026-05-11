@@ -69,10 +69,10 @@ export function BookingFilter({ properties }: BookingFilterProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">Semua Status</SelectItem>
-                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                <SelectItem value="CHECKED_IN">Checked In</SelectItem>
-                <SelectItem value="COMPLETED">Completed</SelectItem>
-                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                <SelectItem value="CONFIRMED">Booking</SelectItem>
+                <SelectItem value="CHECKED_IN">Check-in</SelectItem>
+                <SelectItem value="COMPLETED">Selesai</SelectItem>
+                <SelectItem value="CANCELLED">Dibatalkan</SelectItem>
                 <SelectItem value="INQUIRY">Inquiry</SelectItem>
               </SelectContent>
             </Select>
