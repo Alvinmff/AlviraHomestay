@@ -163,10 +163,12 @@ export default async function AdminBookingsPage({
                       {formatRupiah(booking.totalPrice)}
                     </td>
                     <td className="px-6 py-4 text-emerald-600 font-medium">
-                       {formatRupiah(booking.dpAmount || 0)}
+                       {booking.dpAmount && booking.dpAmount > 0 ? formatRupiah(booking.dpAmount) : "-"}
                     </td>
                     <td className="px-6 py-4 text-orange-600 font-bold">
-                       {formatRupiah(Math.max(0, booking.totalPrice - (booking.dpAmount || 0)))}
+                       {booking.dpAmount && booking.dpAmount > 0 
+                         ? formatRupiah(Math.max(0, booking.totalPrice - booking.dpAmount)) 
+                         : "-"}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <Badge variant="outline" className={
