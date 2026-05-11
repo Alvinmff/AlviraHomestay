@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { createManualBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
 
 interface ManualBookingFormProps {
     properties: any[];
@@ -57,33 +58,23 @@ export function ManualBookingForm({ properties }: ManualBookingFormProps) {
 
         setLoading(true);
         try {
-            const res = await fetch("/api/admin/bookings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    guestName,
-                    guestPhone,
-                    propertyId,
-                    roomId,
-                    checkIn: dateRange.from.toISOString(),
-                    checkOut: dateRange.to.toISOString(),
-                    totalPrice: finalPrice,
-                    status: "CONFIRMED",
-                    notes,
-                }),
+            await createManualBookingWithAvailability({
+                guestName,
+                guestPhone: guestPhone || null,
+                propertyId,
+                roomId,
+                checkIn: dateRange.from,
+                checkOut: dateRange.to,
+                totalPrice: finalPrice,
+                notes: notes || null,
             });
-
-            if (!res.ok) {
-                const d = await res.json();
-                throw new Error(d.error || "Gagal membuat booking");
-            }
 
             toast.success("Booking manual berhasil dibuat!");
             router.push("/admin/bookings");
             router.refresh();
 
         } catch (err: any) {
-            toast.error(err.message);
+            toast.error(err.message || "Gagal membuat booking");
         } finally {
             setLoading(false);
         }
