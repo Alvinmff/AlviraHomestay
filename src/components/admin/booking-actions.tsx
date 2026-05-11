@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal, Trash2 } from "lucide-react";
+import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export function BookingActions({ bookingId, currentStatus }: { bookingId: string, currentStatus: string }) {
   const router = useRouter();
@@ -114,6 +115,12 @@ export function BookingActions({ bookingId, currentStatus }: { bookingId: string
             <DropdownMenuSeparator />
           </>
         )}
+
+        <DropdownMenuItem asChild>
+          <Link href={`/admin/bookings/${bookingId}/edit`} className="flex items-center cursor-pointer">
+            <Edit className="mr-2 h-4 w-4" /> Edit Data Booking
+          </Link>
+        </DropdownMenuItem>
 
         <DropdownMenuItem 
           onClick={deleteBooking} 

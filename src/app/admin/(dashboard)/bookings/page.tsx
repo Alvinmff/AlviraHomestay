@@ -6,8 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookingActions } from "@/components/admin/booking-actions";
-
-
+import { BookingFilter } from "@/components/admin/booking-filter";
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -17,24 +16,53 @@ const formatRupiah = (number: number) => {
   }).format(number);
 };
 
-export default async function AdminBookingsPage() {
-  const bookings = await prisma.booking.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      room: {
-        select: {
-          roomName: true,
-          roomNumber: true,
-        }
-      },
-      property: {
-        select: {
-          name: true,
-          city: true,
+export default async function AdminBookingsPage({
+  searchParams
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const status = searchParams.status as string | undefined;
+  const propertyId = searchParams.propertyId as string | undefined;
+  const sort = searchParams.sort as string | undefined;
+
+  const where: any = {};
+  if (status && status !== "ALL") {
+    where.status = status;
+  }
+  if (propertyId && propertyId !== "ALL") {
+    where.propertyId = propertyId;
+  }
+
+  let orderBy: any = { createdAt: 'desc' };
+  if (sort === 'date_asc') orderBy = { checkIn: 'asc' };
+  else if (sort === 'date_desc') orderBy = { checkIn: 'desc' };
+  else if (sort === 'price_asc') orderBy = { totalPrice: 'asc' };
+  else if (sort === 'price_desc') orderBy = { totalPrice: 'desc' };
+  else if (sort === 'created_desc') orderBy = { createdAt: 'desc' };
+
+  const [bookings, properties] = await Promise.all([
+    prisma.booking.findMany({
+      where,
+      orderBy,
+      include: {
+        room: {
+          select: {
+            roomName: true,
+            roomNumber: true,
+          }
+        },
+        property: {
+          select: {
+            name: true,
+            city: true,
+          }
         }
       }
-    }
-  });
+    }),
+    prisma.property.findMany({
+      select: { id: true, name: true }
+    })
+  ]);
 
   return (
     <div className="space-y-6">
@@ -56,9 +84,7 @@ export default async function AdminBookingsPage() {
               Data real-time dari {bookings.length} reservasi di sistem.
             </CardDescription>
           </div>
-          <Button variant="outline" className="flex items-center gap-2 text-muted-foreground self-start sm:self-auto">
-            <Filter className="w-4 h-4" /> Filter & Urutkan
-          </Button>
+          <BookingFilter properties={properties} />
         </CardHeader>
         <CardContent className="p-0">
 

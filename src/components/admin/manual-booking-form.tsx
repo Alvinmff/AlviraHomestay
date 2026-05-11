@@ -12,25 +12,36 @@ import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { createManualBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
+import { createManualBookingWithAvailability, updateBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
 
 interface ManualBookingFormProps {
     properties: any[];
+    initialData?: {
+        id: string;
+        guestName: string;
+        guestPhone: string | null;
+        propertyId: string;
+        roomId: string;
+        checkIn: Date;
+        checkOut: Date;
+        totalPrice: number;
+        notes: string | null;
+    };
 }
 
-export function ManualBookingForm({ properties }: ManualBookingFormProps) {
+export function ManualBookingForm({ properties, initialData }: ManualBookingFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-    const [guestName, setGuestName] = useState("");
-    const [guestPhone, setGuestPhone] = useState("");
-    const [propertyId, setPropertyId] = useState("");
-    const [roomId, setRoomId] = useState("");
+    const [guestName, setGuestName] = useState(initialData?.guestName || "");
+    const [guestPhone, setGuestPhone] = useState(initialData?.guestPhone || "");
+    const [propertyId, setPropertyId] = useState(initialData?.propertyId || "");
+    const [roomId, setRoomId] = useState(initialData?.roomId || "");
     const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
-        from: undefined,
-        to: undefined,
+        from: initialData ? new Date(initialData.checkIn) : undefined,
+        to: initialData ? new Date(initialData.checkOut) : undefined,
     });
-    const [notes, setNotes] = useState("");
+    const [notes, setNotes] = useState(initialData?.notes || "");
 
     const selectedProperty = useMemo(() => properties.find(p => p.id === propertyId), [properties, propertyId]);
     const selectedRoom = useMemo(() => selectedProperty?.rooms.find((r: any) => r.id === roomId), [selectedProperty, roomId]);
@@ -45,7 +56,7 @@ export function ManualBookingForm({ properties }: ManualBookingFormProps) {
         return 0;
     }, [selectedRoom, dateRange]);
 
-    const [totalPriceOverride, setTotalPriceOverride] = useState<string>("");
+    const [totalPriceOverride, setTotalPriceOverride] = useState<string>(initialData?.totalPrice?.toString() || "");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,23 +69,36 @@ export function ManualBookingForm({ properties }: ManualBookingFormProps) {
 
         setLoading(true);
         try {
-            await createManualBookingWithAvailability({
-                guestName,
-                guestPhone: guestPhone || null,
-                propertyId,
-                roomId,
-                checkIn: dateRange.from,
-                checkOut: dateRange.to,
-                totalPrice: finalPrice,
-                notes: notes || null,
-            });
-
-            toast.success("Booking manual berhasil dibuat!");
+            if (initialData) {
+                await updateBookingWithAvailability(initialData.id, {
+                    guestName,
+                    guestPhone: guestPhone || null,
+                    propertyId,
+                    roomId,
+                    checkIn: dateRange.from,
+                    checkOut: dateRange.to,
+                    totalPrice: finalPrice,
+                    notes: notes || null,
+                });
+                toast.success("Data booking berhasil diperbarui!");
+            } else {
+                await createManualBookingWithAvailability({
+                    guestName,
+                    guestPhone: guestPhone || null,
+                    propertyId,
+                    roomId,
+                    checkIn: dateRange.from,
+                    checkOut: dateRange.to,
+                    totalPrice: finalPrice,
+                    notes: notes || null,
+                });
+                toast.success("Booking manual berhasil dibuat!");
+            }
             router.push("/admin/bookings");
             router.refresh();
 
         } catch (err: any) {
-            toast.error(err.message || "Gagal membuat booking");
+            toast.error(err.message || "Gagal menyimpan booking");
         } finally {
             setLoading(false);
         }
@@ -230,12 +254,12 @@ export function ManualBookingForm({ properties }: ManualBookingFormProps) {
                     {loading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Menyimpan...
+                            {initialData ? "Memperbarui..." : "Menyimpan..."}
                         </>
                     ) : (
                         <>
                             <Save className="mr-2 h-4 w-4" />
-                            Simpan & Konfirmasi Booking
+                            {initialData ? "Simpan Perubahan" : "Simpan & Konfirmasi Booking"}
                         </>
                     )}
                 </Button>
