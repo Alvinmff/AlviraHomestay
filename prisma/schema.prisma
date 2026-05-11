@@ -81,6 +81,8 @@ model Booking {
   checkOut       DateTime
   status         String             @default("INQUIRY")
   totalPrice     Float
+  dpAmount       Float?             @default(0)
+  groupId        String?
   notes          String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt

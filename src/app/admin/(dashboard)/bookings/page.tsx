@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookingActions } from "@/components/admin/booking-actions";
 import { BookingFilter } from "@/components/admin/booking-filter";
+import { BookingInfoDialog } from "@/components/admin/booking-info-dialog";
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -73,6 +74,30 @@ export default async function AdminBookingsPage({
     })
   ]);
 
+  // Logic Grouping: Gabungkan booking yang memiliki groupId yang sama
+  const groupedBookings = bookings.reduce((acc: any[], current) => {
+    // Gunakan groupId jika ada, jika tidak gunakan id unik
+    const key = current.groupId || current.id;
+    
+    // Cari apakah sudah ada di accumulator
+    const existingIndex = acc.findIndex(b => (b.groupId && b.groupId === key) || b.id === key);
+
+    if (existingIndex > -1) {
+      // Jika sudah ada, tambahkan kamar dan jumlahkan harga
+      const existing = acc[existingIndex];
+      existing.roomNumbers = `${existing.roomNumbers}, ${current.room.roomNumber}`;
+      existing.totalPrice += current.totalPrice;
+      // Catatan: dpAmount biasanya sama untuk satu grup, jadi tidak perlu dijumlahkan
+    } else {
+      // Jika belum ada, buat entri baru
+      acc.push({
+        ...current,
+        roomNumbers: current.room.roomNumber,
+      });
+    }
+    return acc;
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -105,12 +130,14 @@ export default async function AdminBookingsPage({
                   <th scope="col" className="px-6 py-4 font-semibold">Properti & Kamar</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Jadwal Menginap</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Tagihan Total</th>
+                  <th scope="col" className="px-6 py-4 font-semibold">DP</th>
+                  <th scope="col" className="px-6 py-4 font-semibold">Sisa Bayar</th>
                   <th scope="col" className="px-6 py-4 font-semibold text-center">Status</th>
                   <th scope="col" className="px-6 py-4 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {bookings.map((booking) => (
+                {groupedBookings.map((booking) => (
                   <tr key={booking.id} className="bg-background border-b border-border/40 hover:bg-muted/20 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-semibold text-foreground">{booking.guestName}</p>
@@ -121,12 +148,12 @@ export default async function AdminBookingsPage({
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-xs text-muted-foreground">{booking.property.name}</p>
-                      <p className="font-medium text-foreground text-sm flex items-center gap-1.5 mt-0.5">
+                      <div className="font-medium text-foreground text-sm flex items-center flex-wrap gap-1.5 mt-0.5">
                         <span className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold text-[10px]">
-                          {booking.room.roomNumber}
+                           {booking.roomNumbers}
                         </span>
-                        {booking.room.roomName}
-                      </p>
+                        {booking.roomNumbers.split(',').length === 1 && booking.room.roomName}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
@@ -134,6 +161,12 @@ export default async function AdminBookingsPage({
                     </td>
                     <td className="px-6 py-4 text-foreground font-semibold">
                       {formatRupiah(booking.totalPrice)}
+                    </td>
+                    <td className="px-6 py-4 text-emerald-600 font-medium">
+                       {formatRupiah(booking.dpAmount || 0)}
+                    </td>
+                    <td className="px-6 py-4 text-orange-600 font-bold">
+                       {formatRupiah(Math.max(0, booking.totalPrice - (booking.dpAmount || 0)))}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <Badge variant="outline" className={
@@ -152,9 +185,14 @@ export default async function AdminBookingsPage({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <BookingInfoDialog booking={{
+                            guestName: booking.guestName,
+                            guestPhone: booking.guestPhone,
+                            notes: booking.notes,
+                            roomNumbers: booking.roomNumbers,
+                            checkIn: formatDateWIB(booking.checkIn),
+                            checkOut: formatDateWIB(booking.checkOut)
+                        }} />
                         <BookingActions bookingId={booking.id} currentStatus={booking.status} />
                       </div>
                     </td>
@@ -163,7 +201,7 @@ export default async function AdminBookingsPage({
               </tbody>
             </table>
 
-            {bookings.length === 0 && (
+            {groupedBookings.length === 0 && (
               <div className="text-center py-16 text-muted-foreground">
                 <div className="w-12 h-12 rounded-full border border-dashed flex items-center justify-center mx-auto mb-4 bg-muted/20">
                   <span className="text-xl">📋</span>

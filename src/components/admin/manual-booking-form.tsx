@@ -97,11 +97,11 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 toast.success("Data booking berhasil diperbarui!");
             } else {
                 // For new bookings, loop through all selected rooms
+                // Generate a groupId for multi-room bookings
+                const gid = roomIds.length > 1 ? `grp_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}` : undefined;
+                
                 for (const rId of roomIds) {
-                    const parsedDP = parseInt(dpAmount);
-                    const finalNotes = dpAmount && !isNaN(parsedDP) && parsedDP !== 0 
-                        ? `${notes}\n\n[DP: Rp ${parsedDP.toLocaleString('id-ID')}]`.trim()
-                        : notes;
+                    const parsedDP = parseInt(dpAmount) || 0;
 
                     await createManualBookingWithAvailability({
                         guestName,
@@ -111,7 +111,9 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         checkIn: toNoonUTC(dateRange.from),
                         checkOut: toNoonUTC(dateRange.to),
                         totalPrice: pricePerRoom,
-                        notes: finalNotes || null,
+                        notes: notes || null,
+                        dpAmount: parsedDP,
+                        groupId: gid,
                     });
                 }
                 toast.success(`Berhasil membuat ${roomIds.length} booking untuk ${guestName}`);
