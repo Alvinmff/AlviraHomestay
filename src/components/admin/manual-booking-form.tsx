@@ -241,12 +241,26 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted/50 px-3 py-2 text-sm font-semibold text-muted-foreground">
                             {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(calculatedPrice)}
                         </div>
+                        
                         {selectedRooms.length > 0 && dateRange.from && dateRange.to && (
-                            <p className="text-xs text-muted-foreground font-mono">
-                                {new Intl.NumberFormat("id-ID").format(selectedRooms.reduce((sum: number, r: any) => sum + r.basePrice, 0))} x {differenceInDays(dateRange.to, dateRange.from) || 1} malam = {new Intl.NumberFormat("id-ID").format(calculatedPrice)}
-                            </p>
+                            <div className="mt-2 space-y-1.5 border border-dashed rounded-md p-2 bg-muted/10">
+                                {selectedRooms.map((room: any) => (
+                                    <div key={room.id} className="text-[11px] flex justify-between text-muted-foreground">
+                                        <span>{room.roomNumber} ({room.roomName})</span>
+                                        <span className="font-mono">
+                                            {new Intl.NumberFormat("id-ID").format(room.basePrice)} x {differenceInDays(dateRange.to!, dateRange.from!) || 1} malam
+                                        </span>
+                                    </div>
+                                ))}
+                                {selectedRooms.length > 1 && (
+                                    <div className="border-t border-dashed pt-1 flex justify-between text-xs font-bold text-foreground">
+                                        <span>Total</span>
+                                        <span>{new Intl.NumberFormat("id-ID").format(calculatedPrice)}</span>
+                                    </div>
+                                )}
+                            </div>
                         )}
-                        <p className="text-[10px] text-muted-foreground mt-1">Harga dasar kamar × jumlah malam.</p>
+                        <p className="text-[10px] text-muted-foreground mt-1 italic">Harga sistem berdasarkan harga dasar kamar × jumlah malam.</p>
                     </div>
 
                     <div className="space-y-2">
