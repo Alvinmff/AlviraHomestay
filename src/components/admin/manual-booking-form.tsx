@@ -11,8 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { createManualBookingWithAvailability, updateBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Normalize a local date to noon UTC so the calendar date is preserved
 // regardless of the server's timezone (prevents ±1 day shift).
@@ -42,45 +44,51 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
     const [guestName, setGuestName] = useState(initialData?.guestName || "");
     const [guestPhone, setGuestPhone] = useState(initialData?.guestPhone || "");
     const [propertyId, setPropertyId] = useState(initialData?.propertyId || "");
-    const [roomId, setRoomId] = useState(initialData?.roomId || "");
+    const [roomIds, setRoomIds] = useState<string[]>(initialData?.roomId ? [initialData.roomId] : []);
     const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
         from: initialData ? new Date(initialData.checkIn) : undefined,
         to: initialData ? new Date(initialData.checkOut) : undefined,
     });
     const [notes, setNotes] = useState(initialData?.notes || "");
+    const [dpAmount, setDpAmount] = useState<string>("0");
 
     const selectedProperty = useMemo(() => properties.find(p => p.id === propertyId), [properties, propertyId]);
-    const selectedRoom = useMemo(() => selectedProperty?.rooms.find((r: any) => r.id === roomId), [selectedProperty, roomId]);
+    const selectedRooms = useMemo(() => {
+        if (!selectedProperty) return [];
+        return selectedProperty.rooms.filter((r: any) => roomIds.includes(r.id));
+    }, [selectedProperty, roomIds]);
 
-    // Calculate generic price (basePrice * nights)
+    // Calculate generic price (sum of basePrice * nights for all rooms)
     const calculatedPrice = useMemo(() => {
-        if (selectedRoom && dateRange.from && dateRange.to) {
-            // differenceInDays counts nights accurately
-            const nights = differenceInDays(dateRange.to, dateRange.from);
-            return nights > 0 ? (nights * selectedRoom.basePrice) : selectedRoom.basePrice;
+        if (selectedRooms.length > 0 && dateRange.from && dateRange.to) {
+            const nights = differenceInDays(dateRange.to, dateRange.from) || 1;
+            const total = selectedRooms.reduce((sum: number, room: any) => sum + (nights * room.basePrice), 0);
+            return total;
         }
         return 0;
-    }, [selectedRoom, dateRange]);
+    }, [selectedRooms, dateRange]);
 
     const [totalPriceOverride, setTotalPriceOverride] = useState<string>(initialData?.totalPrice?.toString() || "");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!guestName || !propertyId || !roomId || !dateRange.from || !dateRange.to) {
+        if (!guestName || !propertyId || roomIds.length === 0 || !dateRange.from || !dateRange.to) {
             toast.error("Harap isi semua kolom wajib yang ditandai *");
             return;
         }
 
         const finalPrice = totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice;
+        const pricePerRoom = finalPrice / (roomIds.length || 1);
 
         setLoading(true);
         try {
             if (initialData) {
+                // If editing, we currently only support editing one booking at a time
                 await updateBookingWithAvailability(initialData.id, {
                     guestName,
                     guestPhone: guestPhone || null,
                     propertyId,
-                    roomId,
+                    roomId: roomIds[0],
                     checkIn: toNoonUTC(dateRange.from),
                     checkOut: toNoonUTC(dateRange.to),
                     totalPrice: finalPrice,
@@ -88,17 +96,25 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 });
                 toast.success("Data booking berhasil diperbarui!");
             } else {
-                await createManualBookingWithAvailability({
-                    guestName,
-                    guestPhone: guestPhone || null,
-                    propertyId,
-                    roomId,
-                    checkIn: toNoonUTC(dateRange.from),
-                    checkOut: toNoonUTC(dateRange.to),
-                    totalPrice: finalPrice,
-                    notes: notes || null,
-                });
-                toast.success("Booking manual berhasil dibuat!");
+                // For new bookings, loop through all selected rooms
+                for (const rId of roomIds) {
+                    const parsedDP = parseInt(dpAmount);
+                    const finalNotes = dpAmount && !isNaN(parsedDP) && parsedDP !== 0 
+                        ? `${notes}\n\n[DP: Rp ${parsedDP.toLocaleString('id-ID')}]`.trim()
+                        : notes;
+
+                    await createManualBookingWithAvailability({
+                        guestName,
+                        guestPhone: guestPhone || null,
+                        propertyId,
+                        roomId: rId,
+                        checkIn: toNoonUTC(dateRange.from),
+                        checkOut: toNoonUTC(dateRange.to),
+                        totalPrice: pricePerRoom,
+                        notes: finalNotes || null,
+                    });
+                }
+                toast.success(`Berhasil membuat ${roomIds.length} booking untuk ${guestName}`);
             }
             router.push("/admin/bookings");
             router.refresh();
@@ -147,7 +163,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         <Label>Properti <span className="text-red-500">*</span></Label>
                         <select
                             value={propertyId}
-                            onChange={(e) => { setPropertyId(e.target.value); setRoomId(""); }}
+                            onChange={(e) => { setPropertyId(e.target.value); setRoomIds([]); }}
                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             required
                         >
@@ -160,18 +176,50 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
 
                     <div className="space-y-2">
                         <Label>Kamar <span className="text-red-500">*</span></Label>
-                        <select
-                            value={roomId}
-                            onChange={(e) => setRoomId(e.target.value)}
-                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            required
-                            disabled={!propertyId}
-                        >
-                            <option value="" disabled>-- Pilih Kamar --</option>
-                            {selectedProperty?.rooms.map((r: any) => (
-                                <option key={r.id} value={r.id}>{r.roomNumber} - {r.roomName}</option>
-                            ))}
-                        </select>
+                        {propertyId ? (
+                            <MultiSelect
+                                options={selectedProperty?.rooms.map((r: any) => ({
+                                    label: `${r.roomNumber} - ${r.roomName}`,
+                                    value: r.id
+                                })) || []}
+                                selected={roomIds}
+                                onChange={setRoomIds}
+                                placeholder="Pilih satu atau lebih kamar..."
+                            />
+                        ) : (
+                            <div className="h-10 w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground flex items-center">
+                                Pilih properti terlebih dahulu
+                            </div>
+                        )}
+                        {roomIds.length > 0 && (
+                            <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                                    Jumlah Kamar: {roomIds.length}
+                                </Badge>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="dpAmount">DP (Uang Muka)</Label>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                id="dpAmount"
+                                type="number"
+                                value={dpAmount}
+                                onChange={(e) => setDpAmount(e.target.value)}
+                                className="h-10"
+                                placeholder="0"
+                            />
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="h-10 shrink-0 bg-muted/30"
+                                onClick={() => toast.info(`Total saat ini: Rp ${calculatedPrice.toLocaleString('id-ID')}`)}
+                            >
+                                💾 Cek Harga
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
@@ -255,7 +303,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 </Button>
                 <Button
                     type="submit"
-                    disabled={loading || !guestName || !propertyId || !roomId || !dateRange.from || !dateRange.to}
+                    disabled={loading || !guestName || !propertyId || roomIds.length === 0 || !dateRange.from || !dateRange.to}
                 >
                     {loading ? (
                         <>
