@@ -94,7 +94,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     checkOut: toNoonUTC(dateRange.to),
                     totalPrice: finalPrice,
                     notes: notes || null,
-                    dpAmount: parseInt(dpAmount) || 0,
+                    dpAmount: Math.round(Number(dpAmount)) || 0,
                 });
                 toast.success("Data booking berhasil diperbarui!");
             } else {
@@ -103,8 +103,6 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 const gid = roomIds.length > 1 ? `grp_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}` : undefined;
                 
                 for (const rId of roomIds) {
-                    const parsedDP = parseInt(dpAmount) || 0;
-
                     await createManualBookingWithAvailability({
                         guestName,
                         guestPhone: guestPhone || null,
@@ -112,9 +110,9 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         roomId: rId,
                         checkIn: toNoonUTC(dateRange.from),
                         checkOut: toNoonUTC(dateRange.to),
-                        totalPrice: pricePerRoom,
+                        totalPrice: Math.round(pricePerRoom),
                         notes: notes || null,
-                        dpAmount: parsedDP,
+                        dpAmount: Math.round(Number(dpAmount)) || 0,
                         groupId: gid,
                     });
                 }
@@ -296,7 +294,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         <Label>Info Sisa Pembayaran</Label>
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-emerald-500/5 px-3 py-2 text-sm font-bold text-emerald-600">
                             Sisa: {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(
-                                Math.max(0, (totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice) - (parseInt(dpAmount) || 0))
+                                Math.max(0, (totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice) - (Number(dpAmount) || 0))
                             )}
                         </div>
                         <p className="text-[10px] text-muted-foreground mt-1">Total dikurangi uang muka (DP).</p>
