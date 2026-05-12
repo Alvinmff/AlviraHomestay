@@ -15,6 +15,7 @@ export async function createManualBookingWithAvailability(data: {
   propertyId: string;
   notes?: string | null;
   dpAmount?: number;
+  guestCount?: number;
   groupId?: string;
 }) {
   const session = await auth();
@@ -42,6 +43,7 @@ export async function createManualBookingWithAvailability(data: {
       status: "CONFIRMED",
       notes: data.notes,
       dpAmount: data.dpAmount || 0,
+      guestCount: data.guestCount || 1,
       groupId: data.groupId,
       createdById: userId,
     },
@@ -127,6 +129,7 @@ export async function updateBookingWithAvailability(id: string, data: {
   propertyId: string;
   notes?: string | null;
   dpAmount?: number;
+  guestCount?: number;
   groupId?: string;
 }) {
   const session = await auth();
@@ -159,6 +162,7 @@ export async function updateBookingWithAvailability(id: string, data: {
       propertyId: data.propertyId,
       notes: data.notes,
       dpAmount: data.dpAmount || 0,
+      guestCount: data.guestCount || 1,
       groupId: data.groupId,
     },
     include: {

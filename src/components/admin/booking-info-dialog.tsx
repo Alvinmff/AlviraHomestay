@@ -20,6 +20,7 @@ interface BookingInfoDialogProps {
     roomNumbers: string;
     checkIn: string;
     checkOut: string;
+    guestCount: number;
   };
 }
 
@@ -52,6 +53,10 @@ export function BookingInfoDialog({ booking }: BookingInfoDialogProps) {
           <div className="space-y-1">
             <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Jadwal</h4>
             <p className="text-sm">{booking.checkIn} - {booking.checkOut}</p>
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Jumlah Tamu</h4>
+            <p className="text-sm">{booking.guestCount} Orang</p>
           </div>
           {booking.guestPhone && (
              <div className="space-y-1">

@@ -36,20 +36,24 @@ export default async function AdminOverviewPage() {
     where: { isActive: true }
   });
 
-  // 4. Estimasi Total Tamu Bulan Ini (Booking Confirmed * 2 asumsi per kamar)
-  const confirmedBookingsCount = await prisma.booking.count({
+  // 4. Estimasi Total Tamu Bulan Ini (Sum of guestCount)
+  const guestsResult = await prisma.booking.aggregate({
     where: {
       createdAt: { gte: startOfMonth },
       status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] }
-    }
+    },
+    _sum: { guestCount: true }
   });
-  const estGuestsThisMonth = confirmedBookingsCount * 2;
+  const estGuestsThisMonth = guestsResult._sum.guestCount || 0;
 
   // 5. Booking Terbaru (5 data terakhir)
   const recentBookings = await prisma.booking.findMany({
     take: 5,
     orderBy: { createdAt: 'desc' },
-    include: { property: { select: { name: true } } }
+    include: { 
+      property: { select: { name: true } },
+      room: { select: { roomNumber: true, roomName: true } }
+    }
   });
 
   // 6. Data Performa Properti
@@ -241,7 +245,12 @@ export default async function AdminOverviewPage() {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-foreground">{b.guestName}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{b.property.name}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {b.room.roomNumber} - {b.room.roomName}
+                      </p>
+                      <p className="text-[10px] font-medium text-primary mt-0.5">
+                        {format(b.checkIn, "dd MMM")} - {format(b.checkOut, "dd MMM yyyy")}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">

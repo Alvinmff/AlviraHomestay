@@ -87,6 +87,7 @@ export default async function AdminBookingsPage({
       const existing = acc[existingIndex];
       existing.roomNumbers = `${existing.roomNumbers}, ${current.room.roomNumber}`;
       existing.totalPrice += current.totalPrice;
+      existing.guestCount += current.guestCount;
       // Catatan: dpAmount biasanya sama untuk satu grup, jadi tidak perlu dijumlahkan
     } else {
       // Jika belum ada, buat entri baru
@@ -127,6 +128,7 @@ export default async function AdminBookingsPage({
               <thead className="text-xs text-foreground uppercase bg-muted/50 border-b">
                 <tr>
                   <th scope="col" className="px-6 py-4 font-semibold">Tamu & Order Info</th>
+                  <th scope="col" className="px-6 py-4 font-semibold">Tamu</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Properti & Kamar</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Jadwal Menginap</th>
                   <th scope="col" className="px-6 py-4 font-semibold">Tagihan Total</th>
@@ -145,6 +147,12 @@ export default async function AdminBookingsPage({
                       {booking.guestPhone && (
                         <p className="text-[10px] bg-muted inline-block px-1.5 py-0.5 rounded mt-1">{booking.guestPhone}</p>
                       )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium text-foreground">{booking.guestCount}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Orang</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-xs text-muted-foreground">{booking.property.name}</p>
@@ -193,7 +201,8 @@ export default async function AdminBookingsPage({
                             notes: booking.notes,
                             roomNumbers: booking.roomNumbers,
                             checkIn: formatDateWIB(booking.checkIn),
-                            checkOut: formatDateWIB(booking.checkOut)
+                            checkOut: formatDateWIB(booking.checkOut),
+                            guestCount: booking.guestCount
                         }} />
                         <BookingActions bookingId={booking.id} currentStatus={booking.status} />
                       </div>

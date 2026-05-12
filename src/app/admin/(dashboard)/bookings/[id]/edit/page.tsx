@@ -34,6 +34,7 @@ export default async function EditBookingPage({ params }: { params: { id: string
         totalPrice: booking.totalPrice,
         notes: booking.notes,
         dpAmount: booking.dpAmount,
+        guestCount: booking.guestCount,
     };
 
     return (

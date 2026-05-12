@@ -35,6 +35,7 @@ interface ManualBookingFormProps {
         totalPrice: number;
         notes: string | null;
         dpAmount: number | null;
+        guestCount: number;
     };
 }
 
@@ -52,6 +53,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
     });
     const [notes, setNotes] = useState(initialData?.notes || "");
     const [dpAmount, setDpAmount] = useState<string>(initialData?.dpAmount?.toString() || "0");
+    const [guestCount, setGuestCount] = useState<string>(initialData?.guestCount?.toString() || "1");
 
     const selectedProperty = useMemo(() => properties.find(p => p.id === propertyId), [properties, propertyId]);
     const selectedRooms = useMemo(() => {
@@ -95,6 +97,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     totalPrice: finalPrice,
                     notes: notes || null,
                     dpAmount: Math.round(Number(dpAmount)) || 0,
+                    guestCount: parseInt(guestCount) || 1,
                 });
                 toast.success("Data booking berhasil diperbarui!");
             } else {
@@ -113,6 +116,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         totalPrice: Math.round(pricePerRoom),
                         notes: notes || null,
                         dpAmount: Math.round(Number(dpAmount)) || 0,
+                        guestCount: parseInt(guestCount) || 1,
                         groupId: gid,
                     });
                 }
@@ -152,6 +156,18 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                             value={guestPhone}
                             onChange={(e) => setGuestPhone(e.target.value)}
                             placeholder="Contoh: 08123456789"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="guestCount">Jumlah Tamu <span className="text-red-500">*</span></Label>
+                        <Input
+                            id="guestCount"
+                            type="number"
+                            min="1"
+                            value={guestCount}
+                            onChange={(e) => setGuestCount(e.target.value)}
+                            placeholder="1"
+                            required
                         />
                     </div>
                 </div>

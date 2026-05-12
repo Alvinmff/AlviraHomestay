@@ -82,6 +82,7 @@ model Booking {
   status         String             @default("INQUIRY")
   totalPrice     Float
   dpAmount       Float?             @default(0)
+  guestCount     Int                @default(1)
   groupId        String?
   notes          String?
   createdAt      DateTime           @default(now())
