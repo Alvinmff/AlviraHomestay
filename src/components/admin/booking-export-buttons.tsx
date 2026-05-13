@@ -139,12 +139,12 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
     const isPublic = type === 'public';
 
     // Watermark
-    doc.saveGraphicsState();
+    (doc as any).saveGraphicsState();
     doc.setTextColor(220, 220, 220);
     doc.setFontSize(45);
     doc.setFont('helvetica', 'bold');
     doc.text('HOMESTAY ALVIRA', pageW / 2, pageH / 2, { align: 'center', angle: 45 });
-    doc.restoreGraphicsState();
+    (doc as any).restoreGraphicsState();
 
     // Logo
     if (logo) {
@@ -272,7 +272,7 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
 
     // Watermark LUNAS
     if (isLunas) {
-      doc.saveGraphicsState();
+      (doc as any).saveGraphicsState();
       doc.setTextColor(255, 200, 200);
       doc.setFontSize(55);
       doc.setFont('helvetica', 'bold');
@@ -281,7 +281,7 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
       doc.setTextColor(200, 100, 100);
       doc.text(`Paid on ${formatDate(new Date())}`, pageW / 2, pageH / 2 + 25, { align: 'center' });
       doc.text('Terima Kasih', pageW / 2, pageH / 2 + 32, { align: 'center' });
-      doc.restoreGraphicsState();
+      (doc as any).restoreGraphicsState();
     }
 
     // Logo
