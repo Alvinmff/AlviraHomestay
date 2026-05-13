@@ -13,6 +13,15 @@ export default async function EditBookingPage({ params }: { params: { id: string
         notFound();
     }
 
+    // Jika booking punya groupId, ambil semua booking dalam grup
+    let allGroupBookings = [booking];
+    if (booking.groupId) {
+        allGroupBookings = await prisma.booking.findMany({
+            where: { groupId: booking.groupId },
+            orderBy: { createdAt: 'asc' },
+        });
+    }
+
     const properties = await prisma.property.findMany({
         where: { isActive: true },
         include: {
@@ -23,18 +32,25 @@ export default async function EditBookingPage({ params }: { params: { id: string
         }
     });
 
+    // Aggregate data dari semua booking dalam grup
+    const totalGroupPrice = allGroupBookings.reduce((sum, b) => sum + b.totalPrice, 0);
+    const allRoomIds = allGroupBookings.map(b => b.roomId);
+
     const initialData = {
         id: booking.id,
         guestName: booking.guestName,
         guestPhone: booking.guestPhone,
         propertyId: booking.propertyId,
+        roomIds: allRoomIds,
         roomId: booking.roomId,
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
-        totalPrice: booking.totalPrice,
+        totalPrice: totalGroupPrice,
         notes: booking.notes,
         dpAmount: booking.dpAmount,
         guestCount: booking.guestCount,
+        groupId: booking.groupId,
+        allBookingIds: allGroupBookings.map(b => b.id),
     };
 
     return (

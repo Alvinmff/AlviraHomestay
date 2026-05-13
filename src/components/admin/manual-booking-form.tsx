@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { createManualBookingWithAvailability, updateBookingWithAvailability } from "@/app/admin/(dashboard)/bookings/actions";
+import { createManualBookingWithAvailability, updateBookingWithAvailability, updateGroupedBooking } from "@/app/admin/(dashboard)/bookings/actions";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -30,12 +30,15 @@ interface ManualBookingFormProps {
         guestPhone: string | null;
         propertyId: string;
         roomId: string;
+        roomIds?: string[];
         checkIn: Date;
         checkOut: Date;
         totalPrice: number;
         notes: string | null;
         dpAmount: number | null;
         guestCount: number;
+        groupId?: string | null;
+        allBookingIds?: string[];
     };
 }
 
@@ -46,7 +49,12 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
     const [guestName, setGuestName] = useState(initialData?.guestName || "");
     const [guestPhone, setGuestPhone] = useState(initialData?.guestPhone || "");
     const [propertyId, setPropertyId] = useState(initialData?.propertyId || "");
-    const [roomIds, setRoomIds] = useState<string[]>(initialData?.roomId ? [initialData.roomId] : []);
+    // Saat edit, gunakan roomIds dari grup (semua kamar), fallback ke roomId tunggal
+    const [roomIds, setRoomIds] = useState<string[]>(
+        initialData?.roomIds && initialData.roomIds.length > 0
+            ? initialData.roomIds
+            : initialData?.roomId ? [initialData.roomId] : []
+    );
     const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
         from: initialData ? new Date(initialData.checkIn) : undefined,
         to: initialData ? new Date(initialData.checkOut) : undefined,
@@ -71,7 +79,10 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         return 0;
     }, [selectedRooms, dateRange]);
 
-    const [totalPriceOverride, setTotalPriceOverride] = useState<string>(initialData?.totalPrice?.toString() || "");
+    // Saat edit, selalu inisialisasi totalPriceOverride dari harga total grup
+    const [totalPriceOverride, setTotalPriceOverride] = useState<string>(
+        initialData?.totalPrice?.toString() || ""
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,19 +97,33 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         setLoading(true);
         try {
             if (initialData) {
-                // If editing, we currently only support editing one booking at a time
-                await updateBookingWithAvailability(initialData.id, {
+                const commonData = {
                     guestName,
                     guestPhone: guestPhone || null,
                     propertyId,
-                    roomId: roomIds[0],
                     checkIn: toNoonUTC(dateRange.from),
                     checkOut: toNoonUTC(dateRange.to),
-                    totalPrice: finalPrice,
                     notes: notes || null,
                     dpAmount: Math.round(Number(dpAmount)) || 0,
                     guestCount: parseInt(guestCount) || 1,
-                });
+                };
+
+                // Jika ada multiple booking IDs (grouped booking), gunakan updateGroupedBooking
+                if (initialData.allBookingIds && initialData.allBookingIds.length > 1) {
+                    await updateGroupedBooking(initialData.allBookingIds, {
+                        ...commonData,
+                        totalPrice: Math.round(finalPrice),
+                        roomIds: roomIds,
+                        groupId: initialData.groupId || undefined,
+                    });
+                } else {
+                    // Single booking edit
+                    await updateBookingWithAvailability(initialData.id, {
+                        ...commonData,
+                        roomId: roomIds[0],
+                        totalPrice: Math.round(finalPrice),
+                    });
+                }
                 toast.success("Data booking berhasil diperbarui!");
             } else {
                 // For new bookings, loop through all selected rooms

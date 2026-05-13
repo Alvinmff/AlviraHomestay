@@ -85,15 +85,16 @@ export default async function AdminBookingsPage({
     if (existingIndex > -1) {
       // Jika sudah ada, tambahkan kamar dan jumlahkan harga
       const existing = acc[existingIndex];
-      existing.roomNumbers = `${existing.roomNumbers}, ${current.room.roomNumber}`;
+      existing.roomNames = `${existing.roomNames}, ${current.room.roomName}`;
       existing.totalPrice += current.totalPrice;
-      existing.guestCount += current.guestCount;
-      // Catatan: dpAmount biasanya sama untuk satu grup, jadi tidak perlu dijumlahkan
+      existing.allRoomIds.push(current.roomId);
+      // guestCount & dpAmount sama untuk satu grup, jadi tidak perlu dijumlahkan
     } else {
       // Jika belum ada, buat entri baru
       acc.push({
         ...current,
-        roomNumbers: current.room.roomNumber,
+        roomNames: current.room.roomName,
+        allRoomIds: [current.roomId],
       });
     }
     return acc;
@@ -156,11 +157,8 @@ export default async function AdminBookingsPage({
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-xs text-muted-foreground">{booking.property.name}</p>
-                      <div className="font-medium text-foreground text-sm flex items-center flex-wrap gap-1.5 mt-0.5">
-                        <span className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold text-[10px]">
-                           {booking.roomNumbers}
-                        </span>
-                        {booking.roomNumbers.split(',').length === 1 && booking.room.roomName}
+                      <div className="font-medium text-foreground text-sm mt-0.5">
+                         {booking.roomNames}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -199,7 +197,7 @@ export default async function AdminBookingsPage({
                             guestName: booking.guestName,
                             guestPhone: booking.guestPhone,
                             notes: booking.notes,
-                            roomNumbers: booking.roomNumbers,
+                            roomNumbers: booking.roomNames,
                             checkIn: formatDateWIB(booking.checkIn),
                             checkOut: formatDateWIB(booking.checkOut),
                             guestCount: booking.guestCount
