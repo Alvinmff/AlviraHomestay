@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { Eye, CalendarPlus } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookingActions } from "@/components/admin/booking-actions";
 import { BookingFilter } from "@/components/admin/booking-filter";
 import { BookingInfoDialog } from "@/components/admin/booking-info-dialog";
+import { BookingExportButtons } from "@/components/admin/booking-export-buttons";
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -88,13 +88,28 @@ export default async function AdminBookingsPage({
       existing.roomNames = `${existing.roomNames}, ${current.room.roomName}`;
       existing.totalPrice += current.totalPrice;
       existing.allRoomIds.push(current.roomId);
-      // guestCount & dpAmount sama untuk satu grup, jadi tidak perlu dijumlahkan
+      // 🔥 TAMBAHAN: simpan detail per kamar untuk invoice
+      if (!existing.rooms) existing.rooms = [];
+      existing.rooms.push({
+        roomName: current.room.roomName,
+        roomNumber: current.room.roomNumber,
+        roomId: current.roomId,
+        totalPrice: current.totalPrice,
+      });
     } else {
       // Jika belum ada, buat entri baru
       acc.push({
         ...current,
         roomNames: current.room.roomName,
         allRoomIds: [current.roomId],
+        rooms: [
+          {
+            roomName: current.room.roomName,
+            roomNumber: current.room.roomNumber,
+            roomId: current.roomId,
+            totalPrice: current.totalPrice,
+          },
+        ],
       });
     }
     return acc;
@@ -120,7 +135,10 @@ export default async function AdminBookingsPage({
               Data real-time dari {bookings.length} reservasi di sistem.
             </CardDescription>
           </div>
-          <BookingFilter properties={properties} />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <BookingFilter properties={properties} />
+            <BookingExportButtons bookings={groupedBookings} />
+          </div>
         </CardHeader>
         <CardContent className="p-0">
 
