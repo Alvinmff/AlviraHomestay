@@ -141,7 +141,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!guestName || !propertyId || roomIds.length === 0 || !dateRange.from || !dateRange.to) {
+        if (!guestName || !propertyId || roomIds.length === 0) {
             toast.error("Harap isi semua kolom wajib yang ditandai *");
             return;
         }
@@ -149,16 +149,18 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         const finalPrice = totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice;
         const pricePerRoom = Math.round(finalPrice / (roomIds.length || 1));
 
-        // Validasi tanggal jika berbeda per kamar
+        // Validasi tanggal
         if (differentDatesPerRoom) {
             const allSet = roomIds.every(id => roomDates[id]?.from && roomDates[id]?.to);
             if (!allSet) {
                 toast.error("Harap tentukan tanggal untuk semua kamar");
                 return;
             }
-        } else if (!dateRange.from || !dateRange.to) {
-            toast.error("Harap tentukan rentang tanggal menginap");
-            return;
+        } else {
+            if (!dateRange.from || !dateRange.to) {
+                toast.error("Harap tentukan rentang tanggal menginap");
+                return;
+            }
         }
 
         setLoading(true);

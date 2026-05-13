@@ -95,6 +95,8 @@ export default async function AdminBookingsPage({
         roomNumber: current.room.roomNumber,
         roomId: current.roomId,
         totalPrice: current.totalPrice,
+        checkIn: current.checkIn,
+        checkOut: current.checkOut,
       });
     } else {
       // Jika belum ada, buat entri baru
@@ -108,6 +110,8 @@ export default async function AdminBookingsPage({
             roomNumber: current.room.roomNumber,
             roomId: current.roomId,
             totalPrice: current.totalPrice,
+            checkIn: current.checkIn,
+            checkOut: current.checkOut,
           },
         ],
       });
@@ -179,9 +183,27 @@ export default async function AdminBookingsPage({
                          {booking.roomNames}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Out: {formatDateWIB(booking.checkOut)}</p>
+                    <td className="px-6 py-4">
+                      {booking.rooms && booking.rooms.length > 1 && booking.rooms.some((r: any) => 
+                        new Date(r.checkIn).getTime() !== new Date(booking.rooms[0].checkIn).getTime() ||
+                        new Date(r.checkOut).getTime() !== new Date(booking.rooms[0].checkOut).getTime()
+                      ) ? (
+                        <div className="space-y-1.5">
+                          {booking.rooms.map((room: any, idx: number) => (
+                            <div key={idx} className="text-[11px] border-b border-border/30 last:border-0 pb-1 last:pb-0">
+                              <p className="font-semibold text-foreground">{room.roomNumber}</p>
+                              <p className="text-muted-foreground whitespace-nowrap">
+                                {formatDateWIB(room.checkIn)} — {formatDateWIB(room.checkOut)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="whitespace-nowrap">
+                          <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Out: {formatDateWIB(booking.checkOut)}</p>
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-foreground font-semibold">
                       {formatRupiah(booking.totalPrice)}
