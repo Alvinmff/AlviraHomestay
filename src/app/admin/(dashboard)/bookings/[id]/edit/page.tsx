@@ -51,6 +51,11 @@ export default async function EditBookingPage({ params }: { params: { id: string
         guestCount: booking.guestCount,
         groupId: booking.groupId,
         allBookingIds: allGroupBookings.map(b => b.id),
+        roomDetails: allGroupBookings.map(b => ({
+            roomId: b.roomId,
+            checkIn: b.checkIn,
+            checkOut: b.checkOut,
+        })),
     };
 
     return (

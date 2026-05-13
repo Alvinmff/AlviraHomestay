@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format, differenceInDays } from "date-fns";
 import { Calendar as CalendarIcon, Save, Loader2 } from "lucide-react";
@@ -39,6 +39,7 @@ interface ManualBookingFormProps {
         guestCount: number;
         groupId?: string | null;
         allBookingIds?: string[];
+        roomDetails?: { roomId: string; checkIn: Date; checkOut: Date }[];
     };
 }
 
@@ -62,6 +63,46 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
     const [notes, setNotes] = useState(initialData?.notes || "");
     const [dpAmount, setDpAmount] = useState<string>(initialData?.dpAmount?.toString() || "0");
     const [guestCount, setGuestCount] = useState<string>(initialData?.guestCount?.toString() || "1");
+    
+    // 🔥 TAMBAHAN: State untuk tanggal berbeda per kamar
+    const [differentDatesPerRoom, setDifferentDatesPerRoom] = useState(false);
+    const [roomDates, setRoomDates] = useState<Record<string, { from: Date | undefined; to: Date | undefined }>>({});
+
+    // Inisialisasi roomDates dari initialData jika ada (untuk edit)
+    useEffect(() => {
+        if (initialData?.roomDetails && initialData.roomDetails.length > 1) {
+            const initialRoomDates: Record<string, { from: Date; to: Date }> = {};
+            let isDifferent = false;
+            const firstIn = initialData.roomDetails[0].checkIn.getTime();
+            const firstOut = initialData.roomDetails[0].checkOut.getTime();
+
+            initialData.roomDetails.forEach(detail => {
+                initialRoomDates[detail.roomId] = { from: new Date(detail.checkIn), to: new Date(detail.checkOut) };
+                if (detail.checkIn.getTime() !== firstIn || detail.checkOut.getTime() !== firstOut) {
+                    isDifferent = true;
+                }
+            });
+            setRoomDates(initialRoomDates);
+            setDifferentDatesPerRoom(isDifferent);
+        }
+    }, [initialData]);
+
+    // Sinkronisasi roomDates saat roomIds berubah
+    useEffect(() => {
+        setRoomDates(prev => {
+            const next = { ...prev };
+            roomIds.forEach(id => {
+                if (!next[id]) {
+                    next[id] = { from: dateRange.from, to: dateRange.to };
+                }
+            });
+            return next;
+        });
+    }, [roomIds, dateRange.from, dateRange.to]);
+
+    const handleRoomDateChange = (roomId: string, range: { from: Date | undefined; to: Date | undefined }) => {
+        setRoomDates(prev => ({ ...prev, [roomId]: range }));
+    };
 
     const selectedProperty = useMemo(() => properties.find(p => p.id === propertyId), [properties, propertyId]);
     const selectedRooms = useMemo(() => {
@@ -69,15 +110,29 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         return selectedProperty.rooms.filter((r: any) => roomIds.includes(r.id));
     }, [selectedProperty, roomIds]);
 
-    // Calculate generic price (sum of basePrice * nights for all rooms)
+    // Calculate generic price
     const calculatedPrice = useMemo(() => {
-        if (selectedRooms.length > 0 && dateRange.from && dateRange.to) {
-            const nights = differenceInDays(dateRange.to, dateRange.from) || 1;
-            const total = selectedRooms.reduce((sum: number, room: any) => sum + (nights * room.basePrice), 0);
+        if (roomIds.length === 0) return 0;
+
+        if (differentDatesPerRoom) {
+            let total = 0;
+            roomIds.forEach(id => {
+                const range = roomDates[id] || dateRange;
+                const room = selectedProperty?.rooms.find((r: any) => r.id === id);
+                if (range.from && range.to && room) {
+                    const nights = differenceInDays(range.to, range.from) || 1;
+                    total += (nights * room.basePrice);
+                }
+            });
             return total;
+        } else {
+            if (selectedRooms.length > 0 && dateRange.from && dateRange.to) {
+                const nights = differenceInDays(dateRange.to, dateRange.from) || 1;
+                return selectedRooms.reduce((sum: number, room: any) => sum + (nights * room.basePrice), 0);
+            }
         }
         return 0;
-    }, [selectedRooms, dateRange]);
+    }, [selectedRooms, dateRange, differentDatesPerRoom, roomDates, roomIds, selectedProperty]);
 
     // Saat edit, selalu inisialisasi totalPriceOverride dari harga total grup
     const [totalPriceOverride, setTotalPriceOverride] = useState<string>(
@@ -92,7 +147,19 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
         }
 
         const finalPrice = totalPriceOverride ? parseFloat(totalPriceOverride) : calculatedPrice;
-        const pricePerRoom = finalPrice / (roomIds.length || 1);
+        const pricePerRoom = Math.round(finalPrice / (roomIds.length || 1));
+
+        // Validasi tanggal jika berbeda per kamar
+        if (differentDatesPerRoom) {
+            const allSet = roomIds.every(id => roomDates[id]?.from && roomDates[id]?.to);
+            if (!allSet) {
+                toast.error("Harap tentukan tanggal untuk semua kamar");
+                return;
+            }
+        } else if (!dateRange.from || !dateRange.to) {
+            toast.error("Harap tentukan rentang tanggal menginap");
+            return;
+        }
 
         setLoading(true);
         try {
@@ -101,8 +168,6 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     guestName,
                     guestPhone: guestPhone || null,
                     propertyId,
-                    checkIn: toNoonUTC(dateRange.from),
-                    checkOut: toNoonUTC(dateRange.to),
                     notes: notes || null,
                     dpAmount: Math.round(Number(dpAmount)) || 0,
                     guestCount: parseInt(guestCount) || 1,
@@ -110,16 +175,28 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
 
                 // Jika ada multiple booking IDs (grouped booking), gunakan updateGroupedBooking
                 if (initialData.allBookingIds && initialData.allBookingIds.length > 1) {
+                    const roomDetails = differentDatesPerRoom ? roomIds.map(id => ({
+                        roomId: id,
+                        checkIn: toNoonUTC(roomDates[id].from!),
+                        checkOut: toNoonUTC(roomDates[id].to!),
+                    })) : undefined;
+
                     await updateGroupedBooking(initialData.allBookingIds, {
                         ...commonData,
+                        checkIn: toNoonUTC(dateRange.from!),
+                        checkOut: toNoonUTC(dateRange.to!),
                         totalPrice: Math.round(finalPrice),
                         roomIds: roomIds,
                         groupId: initialData.groupId || undefined,
+                        roomDetails,
                     });
                 } else {
                     // Single booking edit
+                    const range = differentDatesPerRoom ? roomDates[roomIds[0]] : dateRange;
                     await updateBookingWithAvailability(initialData.id, {
                         ...commonData,
+                        checkIn: toNoonUTC(range.from!),
+                        checkOut: toNoonUTC(range.to!),
                         roomId: roomIds[0],
                         totalPrice: Math.round(finalPrice),
                     });
@@ -131,13 +208,14 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 const gid = roomIds.length > 1 ? `grp_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}` : undefined;
                 
                 for (const rId of roomIds) {
+                    const range = differentDatesPerRoom ? roomDates[rId] : dateRange;
                     await createManualBookingWithAvailability({
                         guestName,
                         guestPhone: guestPhone || null,
                         propertyId,
                         roomId: rId,
-                        checkIn: toNoonUTC(dateRange.from),
-                        checkOut: toNoonUTC(dateRange.to),
+                        checkIn: toNoonUTC(range.from!),
+                        checkOut: toNoonUTC(range.to!),
                         totalPrice: Math.round(pricePerRoom),
                         notes: notes || null,
                         dpAmount: Math.round(Number(dpAmount)) || 0,
@@ -237,42 +315,99 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         {roomIds.length > 0 && (
                             <div className="flex items-center gap-2 mt-2">
                                 <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
-                                    Jumlah Kamar: {roomIds.length}
-                                </Badge>
+                                    Jumlah Kamar: {roomIds.length}                                </Badge>
+                            </div>
+                        )}
+                        
+                        {roomIds.length > 1 && (
+                            <div className="flex items-center space-x-2 mt-4 p-3 bg-primary/5 rounded-lg border border-dashed border-primary/20">
+                                <input
+                                    type="checkbox"
+                                    id="diffDates"
+                                    checked={differentDatesPerRoom}
+                                    onChange={(e) => setDifferentDatesPerRoom(e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                                />
+                                <Label htmlFor="diffDates" className="text-xs font-semibold cursor-pointer text-primary">
+                                    Atur tanggal berbeda untuk setiap kamar (Rombongan)
+                                </Label>
                             </div>
                         )}
                     </div>
 
-                    <div className="space-y-2 md:col-span-2">
-                        <Label>Tanggal Check-in & Check-out <span className="text-red-500">*</span></Label>
-                        <Popover>
-                            <PopoverTrigger className={cn("inline-flex w-full items-center justify-start rounded-md border border-input bg-transparent px-4 py-2 text-sm font-normal shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50", !dateRange.from && "text-muted-foreground", "h-10 text-left")}>
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange.from ? (
-                                    dateRange.to ? (
-                                        <>
-                                            {format(dateRange.from, "dd MMM yyyy")} - {format(dateRange.to, "dd MMM yyyy")}
-                                        </>
+                    {!differentDatesPerRoom ? (
+                        <div className="space-y-2 md:col-span-2">
+                            <Label>Tanggal Check-in & Check-out <span className="text-red-500">*</span></Label>
+                            <Popover>
+                                <PopoverTrigger className={cn("inline-flex w-full items-center justify-start rounded-md border border-input bg-transparent px-4 py-2 text-sm font-normal shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50", !dateRange.from && "text-muted-foreground", "h-10 text-left")}>
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateRange.from ? (
+                                        dateRange.to ? (
+                                            <>
+                                                {format(dateRange.from, "dd MMM yyyy")} - {format(dateRange.to, "dd MMM yyyy")}
+                                            </>
+                                        ) : (
+                                            format(dateRange.from, "dd MMM yyyy")
+                                        )
                                     ) : (
-                                        format(dateRange.from, "dd MMM yyyy")
-                                    )
-                                ) : (
-                                    <span>Pilih rentang tanggal</span>
-                                )}
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="range"
-                                    selected={dateRange}
-                                    onSelect={(r: any) => setDateRange(r || { from: undefined, to: undefined })}
-                                    numberOfMonths={2}
-                                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
+                                        <span>Pilih rentang tanggal</span>
+                                    )}
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="range"
+                                        selected={dateRange}
+                                        onSelect={(r: any) => setDateRange(r || { from: undefined, to: undefined })}
+                                        numberOfMonths={2}
+                                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    ) : (
+                        <div className="md:col-span-2 space-y-3">
+                            <Label className="text-primary font-bold">Pengaturan Tanggal Per Kamar <span className="text-red-500">*</span></Label>
+                            <div className="grid grid-cols-1 gap-3">
+                                {selectedRooms.map((room: any) => (
+                                    <div key={room.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-xl bg-background gap-3 shadow-sm">
+                                        <div className="font-semibold text-sm">
+                                            {room.roomNumber} - {room.roomName}
+                                        </div>
+                                        <div className="w-full sm:w-auto">
+                                            <Popover>
+                                                <PopoverTrigger className={cn("inline-flex w-full sm:w-[260px] items-center justify-start rounded-md border border-input bg-transparent px-3 py-2 text-xs font-normal shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50", !roomDates[room.id]?.from && "text-muted-foreground", "h-9 text-left")}>
+                                                    <CalendarIcon className="mr-2 h-3 w-3" />
+                                                    {roomDates[room.id]?.from ? (
+                                                        roomDates[room.id]?.to ? (
+                                                            <>
+                                                                {format(roomDates[room.id]!.from!, "dd MMM")} - {format(roomDates[room.id]!.to!, "dd MMM yyyy")}
+                                                            </>
+                                                        ) : (
+                                                            format(roomDates[room.id]!.from!, "dd MMM yyyy")
+                                                        )
+                                                    ) : (
+                                                        <span>Pilih tanggal</span>
+                                                    )}
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="range"
+                                                        selected={roomDates[room.id]}
+                                                        onSelect={(r: any) => handleRoomDateChange(room.id, r || { from: undefined, to: undefined })}
+                                                        numberOfMonths={1}
+                                                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+
 
             {/* 3. Pembayaran & Catatan */}
             <div className="space-y-4">
@@ -285,16 +420,27 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                             {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(calculatedPrice)}
                         </div>
                         
-                        {selectedRooms.length > 0 && dateRange.from && dateRange.to && (
+                        {selectedRooms.length > 0 && (
                             <div className="mt-2 space-y-1.5 border border-dashed rounded-md p-2 bg-muted/10">
-                                {selectedRooms.map((room: any) => (
-                                    <div key={room.id} className="text-[11px] flex justify-between text-muted-foreground">
-                                        <span>{room.roomNumber} ({room.roomName})</span>
-                                        <span className="font-mono">
-                                            {new Intl.NumberFormat("id-ID").format(room.basePrice)} x {differenceInDays(dateRange.to!, dateRange.from!) || 1} malam
-                                        </span>
-                                    </div>
-                                ))}
+                                {selectedRooms.map((room: any) => {
+                                    const range = differentDatesPerRoom ? roomDates[room.id] : dateRange;
+                                    const nights = range?.from && range?.to ? differenceInDays(range.to, range.from) || 1 : 1;
+                                    return (
+                                        <div key={room.id} className="text-[11px] flex flex-col text-muted-foreground border-b border-muted last:border-0 pb-1 mb-1 last:mb-0 last:pb-0">
+                                            <div className="flex justify-between">
+                                                <span className="font-semibold text-foreground">{room.roomNumber} ({room.roomName})</span>
+                                                <span className="font-mono">
+                                                    {new Intl.NumberFormat("id-ID").format(room.basePrice)} x {nights} malam
+                                                </span>
+                                            </div>
+                                            {differentDatesPerRoom && range?.from && range?.to && (
+                                                <div className="text-[9px] italic">
+                                                    {format(range.from, "dd MMM")} - {format(range.to, "dd MMM yyyy")}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                                 {selectedRooms.length > 1 && (
                                     <div className="border-t border-dashed pt-1 flex justify-between text-xs font-bold text-foreground">
                                         <span>Total</span>
@@ -366,7 +512,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 </Button>
                 <Button
                     type="submit"
-                    disabled={loading || !guestName || !propertyId || roomIds.length === 0 || !dateRange.from || !dateRange.to}
+                    disabled={loading || !guestName || !propertyId || roomIds.length === 0 || (!differentDatesPerRoom && (!dateRange.from || !dateRange.to))}
                 >
                     {loading ? (
                         <>

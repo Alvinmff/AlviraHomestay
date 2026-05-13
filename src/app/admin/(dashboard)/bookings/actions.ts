@@ -249,6 +249,7 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
   dpAmount?: number;
   guestCount?: number;
   groupId?: string;
+  roomDetails?: { roomId: string; checkIn: Date; checkOut: Date }[];
 }) {
   const session = await auth();
   if (!session || !session.user) {
@@ -278,12 +279,16 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
     : undefined;
 
   for (const roomId of data.roomIds) {
+    const details = data.roomDetails?.find(d => d.roomId === roomId);
+    const checkIn = details?.checkIn || data.checkIn;
+    const checkOut = details?.checkOut || data.checkOut;
+
     const booking = await prisma.booking.create({
       data: {
         guestName: data.guestName,
         guestPhone: data.guestPhone,
-        checkIn: data.checkIn,
-        checkOut: data.checkOut,
+        checkIn: checkIn,
+        checkOut: checkOut,
         totalPrice: pricePerRoom,
         roomId: roomId,
         propertyId: data.propertyId,
@@ -299,9 +304,9 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
 
     // Generate ketersediaan
     const dates = eachDayOfInterval({
-      start: data.checkIn,
-      end: data.checkOut,
-    }).filter(d => !isSameDay(d, data.checkOut));
+      start: checkIn,
+      end: checkOut,
+    }).filter(d => !isSameDay(d, checkOut));
 
     if (dates.length > 0) {
       await prisma.$transaction(
