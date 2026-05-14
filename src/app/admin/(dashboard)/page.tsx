@@ -106,18 +106,24 @@ export default async function AdminOverviewPage() {
     const dayStart = startOfDay(date);
     const dayEnd = endOfDay(date);
     
-    // Revenue for this day (based on transaction creation date)
-    const dayRevenue = recentConfirmedBookings
-      .filter(b => b.createdAt >= dayStart && b.createdAt <= dayEnd)
-      .reduce((sum, b) => sum + b.totalPrice, 0);
+    // Find bookings that occupy a room on this specific date
+    const overlappingBookings = recentConfirmedBookings.filter(b => 
+      b.checkIn <= dayEnd && b.checkOut > dayStart
+    );
+
+    // Revenue for this day (Distributing totalPrice across the stay duration)
+    const dayRevenue = overlappingBookings.reduce((sum, b) => {
+      // Hitung durasi menginap dalam malam (minimal 1 malam)
+      const nights = Math.max(1, Math.round((b.checkOut.getTime() - b.checkIn.getTime()) / (1000 * 60 * 60 * 24)));
+      const pricePerNight = b.totalPrice / nights;
+      return sum + pricePerNight;
+    }, 0);
 
     // Occupancy for this day
     // A room is considered occupied for the night if checkIn is on or before the end of the day, 
     // and checkOut is STRICTLY AFTER the start of the day.
     const occupiedRoomIds = new Set(
-      recentConfirmedBookings
-        .filter(b => b.checkIn <= dayEnd && b.checkOut > dayStart)
-        .map(b => b.roomId)
+      overlappingBookings.map(b => b.roomId)
     );
     
     const occupancyPercentage = totalRooms > 0 
