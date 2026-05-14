@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { format, subDays, startOfDay, endOfDay, isSameMonth } from "date-fns";
+import { format, subDays, addDays, startOfDay, endOfDay, isSameMonth } from "date-fns";
 import { 
   Building2, 
   CalendarCheck, 
@@ -76,25 +76,35 @@ export default async function AdminOverviewPage() {
   const pendingCount = pendingPaymentsRes._count || 0;
 
 
-  // --- CHARTS DATA (30 DAYS) ---
-  const last30Days = Array.from({ length: 30 }).map((_, i) => subDays(today, 29 - i));
+  // --- DYNAMIC CHARTS DATA (30 DAYS) ---
+  
+  // Find the earliest relevant booking to start the chart from (active or recently completed)
+  const earliestBooking = await prisma.booking.findFirst({
+    where: { 
+      status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] },
+      checkOut: { gte: subDays(today, 7) } 
+    },
+    orderBy: { checkIn: 'asc' },
+    select: { checkIn: true }
+  });
+
+  // Start the chart from the earliest booking found, or from today if no bookings
+  const chartStartDate = earliestBooking ? startOfDay(earliestBooking.checkIn) : startOfDay(today);
+  const chartDays = Array.from({ length: 30 }).map((_, i) => addDays(chartStartDate, i));
+  const chartEndDate = endOfDay(chartDays[29]);
   
   // Fetch total rooms for occupancy percentage
   const totalRooms = await prisma.room.count();
 
-  // Fetch all relevant bookings for the last 30 days for revenue & occupancy
-  const thirtyDaysAgo = subDays(today, 30);
-  const recentConfirmedBookings = await prisma.booking.findMany({
+  // Fetch all relevant bookings for the chart window
+  const relevantBookings = await prisma.booking.findMany({
     where: { 
       status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] },
       OR: [
-        // For revenue (createdAt based)
-        { createdAt: { gte: startOfDay(thirtyDaysAgo) } },
-        // For occupancy (stay covers any day in the last 30 days)
         { 
           AND: [
-             { checkIn: { lte: endOfDay(today) } },
-             { checkOut: { gt: startOfDay(thirtyDaysAgo) } }
+             { checkIn: { lte: chartEndDate } },
+             { checkOut: { gt: chartStartDate } }
           ]
         }
       ]
@@ -102,26 +112,23 @@ export default async function AdminOverviewPage() {
     select: { createdAt: true, totalPrice: true, checkIn: true, checkOut: true, roomId: true }
   });
 
-  const chartData = last30Days.map(date => {
+  const chartData = chartDays.map(date => {
     const dayStart = startOfDay(date);
     const dayEnd = endOfDay(date);
     
     // Find bookings that occupy a room on this specific date
-    const overlappingBookings = recentConfirmedBookings.filter(b => 
+    const overlappingBookings = relevantBookings.filter(b => 
       b.checkIn <= dayEnd && b.checkOut > dayStart
     );
 
     // Revenue for this day (Distributing totalPrice across the stay duration)
     const dayRevenue = overlappingBookings.reduce((sum, b) => {
-      // Hitung durasi menginap dalam malam (minimal 1 malam)
       const nights = Math.max(1, Math.round((b.checkOut.getTime() - b.checkIn.getTime()) / (1000 * 60 * 60 * 24)));
       const pricePerNight = b.totalPrice / nights;
       return sum + pricePerNight;
     }, 0);
 
     // Occupancy for this day
-    // A room is considered occupied for the night if checkIn is on or before the end of the day, 
-    // and checkOut is STRICTLY AFTER the start of the day.
     const occupiedRoomIds = new Set(
       overlappingBookings.map(b => b.roomId)
     );
