@@ -79,29 +79,55 @@ export default async function AdminOverviewPage() {
   // --- CHARTS DATA (30 DAYS) ---
   const last30Days = Array.from({ length: 30 }).map((_, i) => subDays(today, 29 - i));
   
-  // Fetch all relevant bookings for the last 30 days for revenue
+  // Fetch total rooms for occupancy percentage
+  const totalRooms = await prisma.room.count();
+
+  // Fetch all relevant bookings for the last 30 days for revenue & occupancy
   const thirtyDaysAgo = subDays(today, 30);
   const recentConfirmedBookings = await prisma.booking.findMany({
     where: { 
-      createdAt: { gte: startOfDay(thirtyDaysAgo) },
-      status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] }
+      status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] },
+      OR: [
+        // For revenue (createdAt based)
+        { createdAt: { gte: startOfDay(thirtyDaysAgo) } },
+        // For occupancy (stay covers any day in the last 30 days)
+        { 
+          AND: [
+             { checkIn: { lte: endOfDay(today) } },
+             { checkOut: { gt: startOfDay(thirtyDaysAgo) } }
+          ]
+        }
+      ]
     },
-    select: { createdAt: true, totalPrice: true }
+    select: { createdAt: true, totalPrice: true, checkIn: true, checkOut: true, roomId: true }
   });
 
   const chartData = last30Days.map(date => {
     const dayStart = startOfDay(date);
     const dayEnd = endOfDay(date);
     
-    // Revenue for this day
+    // Revenue for this day (based on transaction creation date)
     const dayRevenue = recentConfirmedBookings
       .filter(b => b.createdAt >= dayStart && b.createdAt <= dayEnd)
       .reduce((sum, b) => sum + b.totalPrice, 0);
 
+    // Occupancy for this day
+    // A room is considered occupied for the night if checkIn is on or before the end of the day, 
+    // and checkOut is STRICTLY AFTER the start of the day.
+    const occupiedRoomIds = new Set(
+      recentConfirmedBookings
+        .filter(b => b.checkIn <= dayEnd && b.checkOut > dayStart)
+        .map(b => b.roomId)
+    );
+    
+    const occupancyPercentage = totalRooms > 0 
+      ? Math.round((occupiedRoomIds.size / totalRooms) * 100) 
+      : 0;
+
     return {
       date: format(date, "dd MMM"),
       revenue: dayRevenue,
-      occupancy: Math.floor(Math.random() * 60) + 20 // TODO: Replace with real occupancy calculation if needed. For now, simulating to show visualization.
+      occupancy: occupancyPercentage
     };
   });
 
