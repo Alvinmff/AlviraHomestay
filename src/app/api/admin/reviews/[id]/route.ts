@@ -5,7 +5,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   try {
     const { id } = params;
     const body = await req.json();
-    const { isVisible, authorName, authorPhoto, rating, text, propertyId, roomId, reviewDate } = body;
+    const { isVisible, authorName, authorPhoto, rating, text, propertyId, roomId, reviewDate, replyText, replyDate, sentiment } = body;
 
     const existingReview = await prisma.review.findUnique({
       where: { id }
@@ -27,6 +27,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         propertyId: propertyId !== undefined ? propertyId : existingReview.propertyId,
         roomId: roomId !== undefined ? roomId : existingReview.roomId,
         reviewDate: reviewDate ? new Date(reviewDate) : existingReview.reviewDate,
+        replyText: replyText !== undefined ? replyText : existingReview.replyText,
+        replyDate: replyDate ? new Date(replyDate) : existingReview.replyDate,
+        sentiment: sentiment !== undefined ? sentiment : existingReview.sentiment,
       }
     });
 

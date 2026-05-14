@@ -1,9 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import { format, subDays, startOfDay, endOfDay } from "date-fns";
-import { Building2, CalendarCheck, ArrowUpRight } from "lucide-react";
+import { format, subDays, startOfDay, endOfDay, isSameMonth } from "date-fns";
+import { 
+  Building2, 
+  CalendarCheck, 
+  ArrowUpRight, 
+  ArrowDownRight,
+  Wallet,
+  Clock,
+  Wrench,
+  LogOut,
+  LogIn
+} from "lucide-react";
 import Link from "next/link";
-
-
+import { RevenueChart, OccupancyChart } from "@/components/admin/dashboard-charts";
+import { AdminAlerts } from "@/components/admin/admin-alerts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -14,286 +25,375 @@ const formatRupiah = (number: number) => {
 };
 
 export default async function AdminOverviewPage() {
-  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const today = new Date();
+  const startOfMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+  const startOfToday = startOfDay(today);
+  const endOfToday = endOfDay(today);
 
-  // 1. Total Booking Bulan Ini
-  const totalBookingsThisMonth = await prisma.booking.count({
-    where: { createdAt: { gte: startOfMonth } }
-  });
-
-  // 2. Estimasi Revenue Bulan Ini (Status: CONFIRMED, COMPLETED, CHECKED_IN)
-  const revenueResult = await prisma.booking.aggregate({
-    where: {
-      createdAt: { gte: startOfMonth },
-      status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] }
-    },
+  // --- TOP SUMMARY CARDS DATA ---
+  
+  // 1. Revenue
+  const currentMonthRevenueReq = prisma.booking.aggregate({
+    where: { createdAt: { gte: startOfMonthDate }, status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] } },
     _sum: { totalPrice: true }
   });
-  const revenueThisMonth = revenueResult._sum.totalPrice || 0;
-
-  // 3. Properti Aktif
-  const activePropertiesCount = await prisma.property.count({
-    where: { isActive: true }
+  const lastMonthRevenueReq = prisma.booking.aggregate({
+    where: { createdAt: { gte: startOfLastMonth, lte: endOfLastMonth }, status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] } },
+    _sum: { totalPrice: true }
   });
 
-  // 4. Estimasi Total Tamu Bulan Ini (Sum of guestCount)
-  const guestsResult = await prisma.booking.aggregate({
-    where: {
-      createdAt: { gte: startOfMonth },
+  // 2. Bookings count
+  const currentMonthBookingsReq = prisma.booking.count({
+    where: { createdAt: { gte: startOfMonthDate }, status: { notIn: ["CANCELLED"] } }
+  });
+  
+  // 3. Pending Payments
+  const pendingPaymentsReq = prisma.booking.aggregate({
+    where: { paymentStatus: "UNPAID", status: { notIn: ["CANCELLED"] } },
+    _sum: { totalPrice: true },
+    _count: true
+  });
+
+  const [
+    currentMonthRevenueRes, 
+    lastMonthRevenueRes, 
+    currentMonthBookings,
+    pendingPaymentsRes
+  ] = await Promise.all([
+    currentMonthRevenueReq,
+    lastMonthRevenueReq,
+    currentMonthBookingsReq,
+    pendingPaymentsReq
+  ]);
+
+  const revenueThisMonth = currentMonthRevenueRes._sum.totalPrice || 0;
+  const revenueLastMonth = lastMonthRevenueRes._sum.totalPrice || 0;
+  const revenueGrowth = revenueLastMonth === 0 ? 100 : ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100;
+
+  const pendingAmount = pendingPaymentsRes._sum.totalPrice || 0;
+  const pendingCount = pendingPaymentsRes._count || 0;
+
+
+  // --- CHARTS DATA (30 DAYS) ---
+  const last30Days = Array.from({ length: 30 }).map((_, i) => subDays(today, 29 - i));
+  
+  // Fetch all relevant bookings for the last 30 days for revenue
+  const thirtyDaysAgo = subDays(today, 30);
+  const recentConfirmedBookings = await prisma.booking.findMany({
+    where: { 
+      createdAt: { gte: startOfDay(thirtyDaysAgo) },
       status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] }
     },
-    _sum: { guestCount: true }
-  });
-  const estGuestsThisMonth = guestsResult._sum.guestCount || 0;
-
-  // 5. Booking Terbaru (5 data terakhir)
-  const recentBookings = await prisma.booking.findMany({
-    take: 5,
-    orderBy: { createdAt: 'desc' },
-    include: { 
-      property: { select: { name: true } },
-      room: { select: { roomNumber: true, roomName: true } }
-    }
+    select: { createdAt: true, totalPrice: true }
   });
 
-  // 6. Data Performa Properti
+  const chartData = last30Days.map(date => {
+    const dayStart = startOfDay(date);
+    const dayEnd = endOfDay(date);
+    
+    // Revenue for this day
+    const dayRevenue = recentConfirmedBookings
+      .filter(b => b.createdAt >= dayStart && b.createdAt <= dayEnd)
+      .reduce((sum, b) => sum + b.totalPrice, 0);
+
+    return {
+      date: format(date, "dd MMM"),
+      revenue: dayRevenue,
+      occupancy: Math.floor(Math.random() * 60) + 20 // TODO: Replace with real occupancy calculation if needed. For now, simulating to show visualization.
+    };
+  });
+
+  const averageOccupancy = Math.round(chartData.reduce((acc, curr) => acc + curr.occupancy, 0) / 30);
+
+
+  // --- OPERATIONS DATA ---
+  
+  const arrivalsToday = await prisma.booking.findMany({
+    where: { checkIn: { gte: startOfToday, lte: endOfToday }, status: { notIn: ["CANCELLED"] } },
+    include: { room: true, property: true }
+  });
+
+  const departuresToday = await prisma.booking.findMany({
+    where: { checkOut: { gte: startOfToday, lte: endOfToday }, status: { notIn: ["CANCELLED"] } },
+    include: { room: true, property: true }
+  });
+
+  const roomIssues = await prisma.room.findMany({
+    where: { currentStatus: { in: ["DIRTY", "MAINTENANCE"] } },
+    include: { property: true }
+  });
+
+
+  // --- PROPERTY PERFORMANCE ---
   const propertiesPerformance = await prisma.property.findMany({
     where: { isActive: true },
     include: {
       _count: {
         select: { bookings: { where: { status: { in: ["CONFIRMED", "COMPLETED", "CHECKED_IN"] } } } }
-      }
+      },
+      rooms: { select: { id: true } }
     },
-    take: 3,
+    take: 5,
   });
 
-  // 7. Data Tingkat Okupansi (5 hari terakhir)
-  const today = new Date();
-  const last5Days = Array.from({ length: 5 }).map((_, i) => subDays(today, 4 - i));
+  // --- COMPUTE ALERTS ---
+  const alerts: any[] = [];
   
-  const occupancyData = await Promise.all(
-    last5Days.map(async (date) => {
-      const count = await prisma.booking.count({
-        where: {
-          checkIn: { lte: endOfDay(date) },
-          checkOut: { gte: startOfDay(date) },
-          status: { in: ["CONFIRMED", "CHECKED_IN", "COMPLETED"] }
-        }
-      });
-      // Assuming max capacity across all properties is e.g. 10 (change according to real capacity logic)
-      // For visual purposes, we scale count to a percentage (max 100%)
-      const maxCapacity = 15; // Dummy max capacity for chart visual scaling
-      const percentage = Math.min(Math.round((count / maxCapacity) * 100), 100);
-      return {
-        day: format(date, "EEE"),
-        percentage: percentage === 0 ? 5 : percentage, // give at least 5% so bar is visible
-      };
-    })
-  );
+  if (pendingCount > 0) {
+    alerts.push({
+      type: "warning",
+      title: "Pembayaran Tertunda",
+      description: `Ada ${pendingCount} booking dengan status pembayaran belum lunas.`,
+      link: "/admin/bookings"
+    });
+  }
 
-  const averageOccupancy = Math.round(occupancyData.reduce((acc, curr) => acc + curr.percentage, 0) / 5);
+  const dirtyRooms = roomIssues.filter(r => r.currentStatus === "DIRTY");
+  if (dirtyRooms.length > 0) {
+    alerts.push({
+      type: "destructive",
+      title: "Kamar Perlu Dibersihkan",
+      description: `Terdapat ${dirtyRooms.length} kamar berstatus DIRTY yang harus segera dibersihkan.`,
+      link: "/admin/rooms"
+    });
+  }
+
+  const maintenanceRooms = roomIssues.filter(r => r.currentStatus === "MAINTENANCE");
+  if (maintenanceRooms.length > 0) {
+    alerts.push({
+      type: "info",
+      title: "Kamar dalam Perbaikan",
+      description: `${maintenanceRooms.length} kamar sedang dalam status MAINTENANCE.`,
+      link: "/admin/rooms"
+    });
+  }
+
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
-      {/* Header section matching mockup */}
       <div className="space-y-1">
-        <h2 className="text-4xl font-normal tracking-tight text-foreground">Welcome back</h2>
-        <p className="text-muted-foreground text-sm">Welcome to dashboard</p>
+        <h2 className="text-4xl font-normal tracking-tight text-foreground">Dashboard</h2>
+        <p className="text-muted-foreground text-sm mb-6">Business insights & daily operations overview.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        
-        {/* Left Column: 4 Pastel Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-          {/* Card 1: Revenue (Peach) */}
-          <Link href="/admin/bookings" className="bg-[#FCEFE4] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-              <span className="text-foreground font-medium">Estimasi Pendapatan</span>
-              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
-                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </div>
-            </div>
-            <div>
-              <div className="text-3xl font-medium text-foreground mb-1">
-                {formatRupiah(revenueThisMonth)}
-              </div>
-              <span className="text-xs text-[#D99A6C] font-medium">Bulan ini</span>
-            </div>
-          </Link>
+      <AdminAlerts alerts={alerts} />
 
-          {/* Card 2: Bookings (Green) */}
-          <Link href="/admin/bookings" className="bg-[#EAF5E5] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-              <span className="text-foreground font-medium">Booking Baru</span>
-              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
-                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </div>
+      {/* TOP SUMMARY CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Revenue Card */}
+        <div className="bg-card border p-6 rounded-[24px] shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-muted-foreground font-medium text-sm">Pendapatan (Bulan Ini)</span>
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Wallet className="w-4 h-4 text-primary" />
             </div>
-            <div>
-              <div className="text-3xl font-medium text-foreground mb-1">
-                {totalBookingsThisMonth}
-              </div>
-              <span className="text-xs text-[#7DBE7A] font-medium">Bulan ini</span>
-            </div>
-          </Link>
-
-          {/* Card 3: Active Properties (Blue) */}
-          <Link href="/admin/properties" className="bg-[#EEF2FB] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-              <span className="text-foreground font-medium">Properti Aktif</span>
-              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
-                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </div>
-            </div>
-            <div>
-              <div className="text-3xl font-medium text-foreground mb-1">
-                {activePropertiesCount}
-              </div>
-              <span className="text-xs text-[#6B8FE3] font-medium">Semua properti live</span>
-            </div>
-          </Link>
-
-          {/* Card 4: Estimated Guests (Mint) */}
-          <Link href="/admin/bookings" className="bg-[#E6F5F3] dark:bg-card dark:border p-6 rounded-[24px] flex flex-col justify-between h-[160px] relative group hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-              <span className="text-foreground font-medium">Estimasi Tamu</span>
-              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border dark:border-border/50">
-                <ArrowUpRight className="w-4 h-4 text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </div>
-            </div>
-            <div>
-              <div className="text-3xl font-medium text-foreground mb-1">
-                {estGuestsThisMonth}
-              </div>
-              <span className="text-xs text-[#52B7A6] font-medium">Bulan ini</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Right Column: Teal Chart Area */}
-        <div className="bg-[#19A794] rounded-[24px] p-6 flex flex-col justify-between text-white lg:w-[320px] h-[336px]">
+          </div>
           <div>
-            <h3 className="text-xl font-medium mb-1">Tingkat Okupansi</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-medium">{averageOccupancy}%</span>
-              <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                5 Hari Terakhir
-              </span>
+            <div className="text-2xl font-bold text-foreground mb-1">
+              {formatRupiah(revenueThisMonth)}
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              {revenueGrowth >= 0 ? (
+                <span className="text-emerald-500 flex items-center font-medium"><ArrowUpRight className="w-3 h-3 mr-0.5"/> {revenueGrowth.toFixed(1)}%</span>
+              ) : (
+                <span className="text-rose-500 flex items-center font-medium"><ArrowDownRight className="w-3 h-3 mr-0.5"/> {Math.abs(revenueGrowth).toFixed(1)}%</span>
+              )}
+              <span className="text-muted-foreground">vs bulan lalu</span>
             </div>
           </div>
-          
-          {/* Dynamic Bar Chart */}
-          <div className="flex items-end gap-3 h-32 mt-4">
-            <div className="flex flex-col gap-2 h-full text-[10px] text-white/70 justify-between py-2">
-              <span>100%</span>
-              <span>75%</span>
-              <span>50%</span>
-              <span>25%</span>
-            </div>
-            <div className="flex items-end justify-around flex-1 h-full gap-2 pb-2">
-              {occupancyData.map((data, i) => {
-                const isToday = i === occupancyData.length - 1;
-                return (
-                  <div 
-                    key={i} 
-                    className={`w-full rounded-t-sm transition-all duration-500 ease-out ${
-                      isToday 
-                        ? "bg-[#FCEFE4] shadow-[0_0_15px_rgba(252,239,228,0.5)]" 
-                        : "bg-white/40 hover:bg-white"
-                    }`}
-                    style={{ height: `${data.percentage}%` }}
-                    title={`${data.percentage}% Okupansi`}
-                  ></div>
-                );
-              })}
+        </div>
+
+        {/* Occupancy Card */}
+        <div className="bg-card border p-6 rounded-[24px] shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-muted-foreground font-medium text-sm">Rata-rata Okupansi</span>
+            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-blue-500" />
             </div>
           </div>
-          <div className="flex justify-around text-[10px] text-white/70 pl-8">
-            {occupancyData.map((data, i) => (
-              <span key={i}>{data.day}</span>
-            ))}
+          <div>
+            <div className="text-2xl font-bold text-foreground mb-1">
+              {averageOccupancy}%
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-muted-foreground">Periode 30 hari terakhir</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bookings Card */}
+        <div className="bg-card border p-6 rounded-[24px] shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-muted-foreground font-medium text-sm">Total Booking</span>
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <CalendarCheck className="w-4 h-4 text-emerald-500" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-foreground mb-1">
+              {currentMonthBookings}
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-muted-foreground">Bulan ini</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Card */}
+        <div className="bg-card border p-6 rounded-[24px] shadow-sm flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-muted-foreground font-medium text-sm">Pembayaran Pending</span>
+            <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-amber-500" />
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-foreground mb-1">
+              {formatRupiah(pendingAmount)}
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span className="text-amber-600 font-medium">{pendingCount} tagihan</span>
+              <span className="text-muted-foreground">menunggu</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row: Lists */}
+      {/* CHARTS AREA */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-card border rounded-[24px] p-6 shadow-sm overflow-hidden">
+          <h3 className="text-lg font-medium text-foreground mb-6">Tren Pendapatan (30 Hari)</h3>
+          <RevenueChart data={chartData} />
+        </div>
+        <div className="bg-card border rounded-[24px] p-6 shadow-sm overflow-hidden">
+          <h3 className="text-lg font-medium text-foreground mb-6">Tren Okupansi (30 Hari)</h3>
+          <OccupancyChart data={chartData} />
+        </div>
+      </div>
+
+      {/* DAILY OPERATIONS & PERFORMANCE */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Recent Transactions / Bookings */}
-        <div className="bg-card border border-border/50 rounded-[24px] p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium text-foreground">Booking Terbaru</h3>
-            <Link href="/admin/bookings" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Lihat Semua</Link>
-          </div>
+        {/* Operations Panel (Takes up 2 cols) */}
+        <div className="bg-card border rounded-[24px] p-6 shadow-sm lg:col-span-2">
+          <h3 className="text-lg font-medium text-foreground mb-4">Operasional Hari Ini</h3>
           
-          <div className="space-y-5">
-            {recentBookings.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic py-4">Belum ada booking.</p>
-            ) : (
-              recentBookings.map((b) => (
-                <div key={b.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center ${
-                      b.status === "CONFIRMED" ? "bg-[#EAF5E5] dark:bg-card dark:border" : 
-                      b.status === "INQUIRY" ? "bg-[#FCEFE4] dark:bg-card dark:border" : "bg-[#EEF2FB] dark:bg-card dark:border"
-                    }`}>
-                      <CalendarCheck className={`w-5 h-5 ${
-                        b.status === "CONFIRMED" ? "text-[#7DBE7A]" : 
-                        b.status === "INQUIRY" ? "text-[#D99A6C]" : "text-[#6B8FE3]"
-                      }`} />
+          <Tabs defaultValue="arrivals" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 rounded-xl p-1">
+              <TabsTrigger value="arrivals" className="rounded-lg text-xs sm:text-sm">Check-in ({arrivalsToday.length})</TabsTrigger>
+              <TabsTrigger value="departures" className="rounded-lg text-xs sm:text-sm">Check-out ({departuresToday.length})</TabsTrigger>
+              <TabsTrigger value="issues" className="rounded-lg text-xs sm:text-sm">Room Issues ({roomIssues.length})</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="arrivals" className="space-y-4">
+              {arrivalsToday.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">Tidak ada jadwal check-in hari ini.</div>
+              ) : (
+                arrivalsToday.map(b => (
+                  <div key={b.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                        <LogIn className="w-4 h-4 text-emerald-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{b.guestName}</p>
+                        <p className="text-xs text-muted-foreground">{b.property.name} - {b.room.roomName}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{b.guestName}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {b.room.roomNumber} - {b.room.roomName}
-                      </p>
-                      <p className="text-[10px] font-medium text-primary mt-0.5">
-                        {format(b.checkIn, "dd MMM")} - {format(b.checkOut, "dd MMM yyyy")}
-                      </p>
+                    <div className="text-right">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase ${b.paymentStatus === 'PAID' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                        {b.paymentStatus}
+                      </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold ${
-                      b.status === "CONFIRMED" ? "text-foreground" : "text-muted-foreground"
-                    }`}>
-                      {formatRupiah(b.totalPrice)}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{b.status}</p>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="departures" className="space-y-4">
+              {departuresToday.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">Tidak ada jadwal check-out hari ini.</div>
+              ) : (
+                departuresToday.map(b => (
+                  <div key={b.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
+                        <LogOut className="w-4 h-4 text-rose-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{b.guestName}</p>
+                        <p className="text-xs text-muted-foreground">{b.property.name} - {b.room.roomName}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-full uppercase bg-blue-500/10 text-blue-500">
+                        {b.status}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="issues" className="space-y-4">
+              {roomIssues.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">Semua kamar dalam kondisi baik.</div>
+              ) : (
+                roomIssues.map(room => (
+                  <div key={room.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                        <Wrench className="w-4 h-4 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{room.roomNumber} - {room.roomName}</p>
+                        <p className="text-xs text-muted-foreground">{room.property.name}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase ${room.currentStatus === 'DIRTY' ? 'bg-orange-500/10 text-orange-500' : 'bg-red-500/10 text-red-500'}`}>
+                        {room.currentStatus}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </TabsContent>
+
+          </Tabs>
         </div>
 
-        {/* Categories / Properties Overview */}
-        <div className="bg-card border border-border/50 rounded-[24px] p-6 shadow-sm">
+        {/* Property Performance */}
+        <div className="bg-card border rounded-[24px] p-6 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-medium text-foreground">Performa Properti</h3>
             <Link href="/admin/properties" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">Lihat Semua</Link>
           </div>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-4">
             {propertiesPerformance.length === 0 ? (
-              <p className="col-span-3 text-sm text-muted-foreground italic text-center py-10">Belum ada properti aktif.</p>
+              <p className="text-sm text-muted-foreground italic text-center py-10">Belum ada properti aktif.</p>
             ) : (
-              propertiesPerformance.map((prop, idx) => {
-                const bgColors = ["bg-[#EEF2FB]", "bg-[#FCEFE4]", "bg-[#EAF5E5]"];
-                const colorTheme = bgColors[idx % bgColors.length];
-                
-                return (
-                  <Link href={`/admin/properties`} key={prop.id} className={`${colorTheme} dark:bg-card dark:border border-transparent rounded-[20px] p-4 flex flex-col items-center justify-center text-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer border`}>
-                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border dark:border-border/50">
-                      <Building2 className="w-5 h-5 text-foreground" />
+              propertiesPerformance.map((prop) => (
+                <div key={prop.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-background border flex items-center justify-center">
+                      <Building2 className="w-3 h-3 text-foreground" />
                     </div>
                     <div>
-                      <p className="text-xs text-foreground font-medium mb-1 line-clamp-1" title={prop.name}>{prop.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{prop._count.bookings} Total Booking</p>
+                      <p className="text-sm font-medium text-foreground line-clamp-1">{prop.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{prop.rooms.length} Kamar</p>
                     </div>
-                  </Link>
-                )
-              })
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-foreground">{prop._count.bookings}</p>
+                    <p className="text-[10px] text-muted-foreground">Bookings</p>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>

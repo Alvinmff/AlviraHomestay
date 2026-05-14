@@ -217,19 +217,31 @@ export default async function AdminBookingsPage({
                          : "-"}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <Badge variant="outline" className={
-                        booking.status === "CONFIRMED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-                          booking.status === "CHECKED_IN" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
-                            booking.status === "COMPLETED" ? "bg-slate-500/10 text-slate-500 border-slate-500/20" :
-                              booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
-                                "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                      }>
-                        {booking.status === "CONFIRMED" ? "Booking" :
-                         booking.status === "CHECKED_IN" ? "Check-in" :
-                         booking.status === "COMPLETED" ? "Selesai" :
-                         booking.status === "CANCELLED" ? "Dibatalkan" :
-                         booking.status.replace("_", " ")}
-                      </Badge>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <Badge variant="outline" className={
+                          booking.status === "CONFIRMED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                            booking.status === "CHECKED_IN" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                              booking.status === "COMPLETED" ? "bg-slate-500/10 text-slate-500 border-slate-500/20" :
+                                booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                                  "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                        }>
+                          {booking.status === "CONFIRMED" ? "Booking" :
+                           booking.status === "CHECKED_IN" ? "Check-in" :
+                           booking.status === "COMPLETED" ? "Selesai" :
+                           booking.status === "CANCELLED" ? "Dibatalkan" :
+                           booking.status.replace("_", " ")}
+                        </Badge>
+                        {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) <= 0 && (
+                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 text-[10px] font-bold">
+                            ✓ LUNAS
+                          </Badge>
+                        )}
+                        {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) > 0 && (
+                          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-[10px] font-bold">
+                            Belum Lunas
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">

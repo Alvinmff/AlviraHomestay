@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ReviewTable } from "@/components/admin/reviews/review-table";
 import { ReviewFormModal } from "@/components/admin/reviews/review-form-modal";
+import { ReviewReplyModal } from "@/components/admin/reviews/review-reply-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, RefreshCcw, Star, Calendar } from "lucide-react";
@@ -13,7 +14,9 @@ export default function AdminReviewsPage() {
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState<any | null>(null);
+  const [replyingReview, setReplyingReview] = useState<any | null>(null);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -126,6 +129,7 @@ export default function AdminReviewsPage() {
           loading={loading} 
           onRefresh={fetchReviews} 
           onEdit={(r: any) => { setEditingReview(r); setIsModalOpen(true); }}
+          onReply={(r: any) => { setReplyingReview(r); setIsReplyModalOpen(true); }}
         />
       </div>
 
@@ -134,6 +138,13 @@ export default function AdminReviewsPage() {
         onClose={() => { setIsModalOpen(false); setEditingReview(null); }} 
         onSuccess={fetchReviews}
         initialData={editingReview}
+      />
+
+      <ReviewReplyModal
+        isOpen={isReplyModalOpen}
+        onClose={() => { setIsReplyModalOpen(false); setReplyingReview(null); }}
+        onSuccess={fetchReviews}
+        initialData={replyingReview}
       />
     </div>
   );

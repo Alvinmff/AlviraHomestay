@@ -20,9 +20,8 @@ function getRelativeTimeString(date: string | Date) {
     return `${months} bulan yang lalu`;
   }
   const years = Math.floor(days / 365);
-  return `${years} tahun yang lalu`;
 }
-import { MapPin, Search, MoreVertical, Eye, EyeOff, Edit, Trash2, Filter } from "lucide-react";
+import { MapPin, Search, MoreVertical, Eye, EyeOff, Edit, Trash2, Filter, MessageCircle, MessageSquareReply, Smile, Meh, Frown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +35,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ReviewTable({ data, loading, onRefresh, onEdit }: any) {
+function getSentiment(rating: number) {
+  if (rating >= 4) return { label: "Positif", icon: Smile, color: "text-emerald-500 bg-emerald-500/10 border-emerald-200" };
+  if (rating === 3) return { label: "Netral", icon: Meh, color: "text-amber-500 bg-amber-500/10 border-amber-200" };
+  return { label: "Negatif", icon: Frown, color: "text-rose-500 bg-rose-500/10 border-rose-200" };
+}
+
+export function ReviewTable({ data, loading, onRefresh, onEdit, onReply }: any) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSource, setFilterSource] = useState("ALL");
 
@@ -144,16 +149,35 @@ export function ReviewTable({ data, loading, onRefresh, onEdit }: any) {
                   <td className="p-4 align-top">
                     <p className="line-clamp-2 md:line-clamp-3 leading-relaxed text-muted-foreground">{review.text}</p>
                     {review.propertyId && review.property?.name && (
-                      <span className="inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full mt-2">
+                      <span className="inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full mt-2 mr-2">
                         <MapPin className="w-3 h-3" /> {review.property.name}
                       </span>
                     )}
+                    {review.replyText && (
+                      <div className="mt-3 p-3 bg-muted/50 rounded-lg border border-border/50 text-xs">
+                        <div className="flex items-center gap-2 font-medium text-foreground mb-1">
+                          <MessageSquareReply className="w-3 h-3 text-primary" /> Admin Reply:
+                        </div>
+                        <p className="text-muted-foreground line-clamp-2">{review.replyText}</p>
+                      </div>
+                    )}
                   </td>
                   <td className="p-4 align-top">
-                    <div className="space-y-1">
-                      <Badge variant={review.source === "GOOGLE" ? "outline" : "secondary"} className="text-[10px]">
-                        {review.source}
-                      </Badge>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={review.source === "GOOGLE" ? "outline" : "secondary"} className="text-[10px]">
+                          {review.source}
+                        </Badge>
+                        {(() => {
+                          const sentiment = getSentiment(review.rating);
+                          const Icon = sentiment.icon;
+                          return (
+                            <Badge variant="outline" className={`text-[10px] flex items-center gap-1 ${sentiment.color}`}>
+                              <Icon className="w-3 h-3" /> {sentiment.label}
+                            </Badge>
+                          );
+                        })()}
+                      </div>
                       <p className="text-sm font-medium text-foreground">
                         {getRelativeTimeString(review.reviewDate)}
                       </p>
@@ -183,6 +207,9 @@ export function ReviewTable({ data, loading, onRefresh, onEdit }: any) {
                         <DropdownMenuItem onClick={() => toggleVisibility(review)}>
                           {review.isVisible ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                           {review.isVisible ? "Sembunyikan" : "Tampilkan Publik"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onReply(review)}>
+                          <MessageCircle className="w-4 h-4 mr-2" /> Balas Ulasan
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onEdit(review)}>
                           <Edit className="w-4 h-4 mr-2" /> Edit Ulasan
