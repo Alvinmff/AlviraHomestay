@@ -9,6 +9,7 @@ import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface RoomGalleryModalProps {
   photos: string[];
@@ -38,7 +39,10 @@ export function RoomGalleryModal({ photos, thumbnail, roomName }: RoomGalleryMod
         
         {/* Main Hero Shot */}
         <div 
-          className="col-span-4 md:col-span-3 h-full relative cursor-pointer overflow-hidden"
+          className={cn(
+            "col-span-4 md:col-span-3 relative cursor-pointer overflow-hidden",
+            galleryPhotos.length > 1 ? "h-[280px] md:h-full" : "h-full"
+          )}
           onClick={() => openLightbox(0)}
         >
            <Image 
@@ -52,11 +56,11 @@ export function RoomGalleryModal({ photos, thumbnail, roomName }: RoomGalleryMod
         </div>
 
         {/* Side Stack Thumbnail Previews */}
-        <div className="hidden md:flex flex-col gap-2 h-full">
+        <div className="col-span-4 md:col-span-1 h-[112px] md:h-full grid grid-cols-2 md:grid-cols-1 md:flex md:flex-col gap-2">
            {galleryPhotos.slice(1, 3).map((photo, i) => (
              <div 
                 key={i} 
-                className="relative h-1/2 w-full overflow-hidden cursor-pointer"
+                className="relative h-full md:h-1/2 w-full overflow-hidden cursor-pointer"
                 onClick={() => openLightbox(i + 1)}
              >
                 <Image 
@@ -71,7 +75,7 @@ export function RoomGalleryModal({ photos, thumbnail, roomName }: RoomGalleryMod
 
            {/* Empty Block Handle if < 3 Photos */}
            {galleryPhotos.length <= 1 && (
-             <div className="relative h-full w-full bg-muted flex items-center justify-center">
+             <div className="hidden md:flex relative h-full w-full bg-muted flex items-center justify-center">
                <span className="text-muted-foreground text-sm flex flex-col items-center">
                  <Grid2X2 className="w-6 h-6 mb-2 opacity-50" />
                  1 Foto

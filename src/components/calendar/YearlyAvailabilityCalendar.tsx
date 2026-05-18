@@ -149,15 +149,15 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                 <div className="p-4">
                   <div className="grid grid-cols-7 gap-1 mb-2">
                     {WEEKDAYS.map((day, idx) => (
-                      <div key={idx} className="text-center text-[10px] font-bold text-muted-foreground w-8 2xl:w-9">
+                      <div key={idx} className="text-center text-[10px] font-bold text-muted-foreground py-1">
                         {day}
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-1.5">
                     {paddingCells.map((_, idx) => (
-                      <div key={`pad-${idx}`} className="w-8 h-8 2xl:w-9 2xl:h-9" />
+                      <div key={`pad-${idx}`} className="w-full aspect-square" />
                     ))}
                     
                     {month.days.map((day) => {
@@ -173,7 +173,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                         <div 
                           key={day.date} 
                           className={cn(
-                            "w-8 h-8 2xl:w-9 2xl:h-9 flex items-center justify-center text-xs font-medium rounded-md border transition-all cursor-pointer group relative", 
+                            "w-full aspect-square flex items-center justify-center text-xs font-semibold rounded-full border transition-all cursor-pointer group relative", 
                             colorClass
                           )}
                         >

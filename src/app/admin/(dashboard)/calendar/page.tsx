@@ -155,9 +155,9 @@ export default function AdminCalendarPage() {
 
       <Card className="border-border/50 shadow-sm">
         <CardHeader className="flex flex-col md:flex-row md:items-center justify-between bg-muted/20 border-b py-4 gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
             <Select value={propertyFilter} onValueChange={(v) => v && setPropertyFilter(v)}>
-              <SelectTrigger className="w-[200px] bg-background">
+              <SelectTrigger className="w-full sm:w-[200px] bg-background">
                 <SelectValue placeholder="Semua Properti" />
               </SelectTrigger>
               <SelectContent>
@@ -167,15 +167,15 @@ export default function AdminCalendarPage() {
                 <SelectItem value="batu">Villa Batu</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center bg-background rounded-md border shadow-sm ml-4">
-              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <div className="flex items-center justify-between sm:justify-start bg-background rounded-md border shadow-sm w-full sm:w-auto">
+              <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <h3 className="font-semibold text-sm w-36 text-center flex items-center justify-center">
+              <h3 className="font-semibold text-sm flex-1 sm:w-36 text-center flex items-center justify-center px-2">
                 <CalendarIcon className="w-4 h-4 mr-2 text-primary" />
                 {format(currentMonth, "MMMM yyyy")}
               </h3>
-              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+              <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
