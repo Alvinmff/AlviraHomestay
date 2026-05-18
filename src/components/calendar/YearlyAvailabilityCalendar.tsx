@@ -32,10 +32,10 @@ interface Props {
 const WEEKDAYS = ["M", "S", "S", "R", "K", "J", "S"];
 
 const STATUS_COLORS = {
-  available: "bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30",
-  booked: "bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/30 cursor-not-allowed",
-  maintenance: "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 cursor-not-allowed hidden-strips",
-  blocked: "bg-muted text-muted-foreground border-border cursor-not-allowed",
+  available: "bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30",
+  booked: "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/30 cursor-not-allowed",
+  maintenance: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 cursor-not-allowed hidden-strips",
+  blocked: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 cursor-not-allowed",
 };
 
 export function YearlyAvailabilityCalendar({ roomId }: Props) {
@@ -43,6 +43,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
   const [data, setData] = useState<YearlyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeDate, setActiveDate] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -71,12 +72,13 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  const getDayTooltip = (day: DayData, isPast: boolean) => {
-    if (isPast) return `Sudah berlalu (${day.date})`;
-    if (day.status === "available") return `Tersedia pada ${day.date}`;
-    if (day.status === "booked") return `Sudah dibooking ${day.guestName ? "oleh " + day.guestName : ""}`;
-    if (day.status === "maintenance") return `Maintenance: ${day.notes || ""}`;
-    return `Tidak Tersedia`;
+  const formatIndonesianDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-');
+    const months = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
   };
 
   return (
@@ -111,10 +113,10 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 px-6 py-4 text-xs font-medium border-b bg-muted/10">
-        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /> Tersedia</span>
-        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-400" /> Booked</span>
-        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /> Maintenance</span>
-        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-muted" /> Tutup</span>
+        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-emerald-50 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-800/50" /> Tersedia</span>
+        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-800/50" /> Booked</span>
+        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-amber-50 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-800/50" /> Maintenance</span>
+        <span className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" /> Tutup</span>
       </div>
 
       {/* Calendar Matrix Viewport */}
@@ -172,16 +174,37 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                       return (
                         <div 
                           key={day.date} 
-                          className={cn(
-                            "w-full aspect-square flex items-center justify-center text-xs font-semibold rounded-full border transition-all cursor-pointer group relative", 
-                            colorClass
-                          )}
+                          className="relative w-full aspect-square"
+                          onMouseEnter={() => setActiveDate(day.date)}
+                          onMouseLeave={() => setActiveDate(null)}
+                          onClick={() => setActiveDate(activeDate === day.date ? null : day.date)}
                         >
-                          {dayNum}
+                          <div 
+                            className={cn(
+                              "absolute inset-0 flex items-center justify-center text-xs font-semibold rounded-lg border transition-all cursor-pointer select-none", 
+                              colorClass
+                            )}
+                          >
+                            {dayNum}
+                          </div>
                           
-                          {/* CSS Native Tooltip completely disconnected from heavy Radix Tooltips */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none scale-95 group-hover:scale-100 origin-bottom">
-                            {getDayTooltip(day, isPast)}
+                          {/* Lightweight Responsive Tooltip */}
+                          <div className={cn(
+                            "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded-lg shadow-xl transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
+                            activeDate === day.date ? "opacity-100 visible scale-100" : "opacity-0 invisible"
+                          )}>
+                            <span className="font-semibold text-white/90">{formatIndonesianDate(day.date)}</span>
+                            <span className={cn(
+                              "text-[10px] font-bold",
+                              isPast ? "text-slate-400" :
+                              day.status === "available" ? "text-green-400" :
+                              day.status === "booked" ? "text-red-400" : "text-amber-400"
+                            )}>
+                              {isPast ? "Tanggal Berlalu" :
+                               day.status === "available" ? "✅ Tersedia untuk dipesan" :
+                               day.status === "booked" ? "❌ Telah Dipesan" :
+                               day.status === "maintenance" ? "⚠️ Dalam Perawatan" : "🔒 Ditutup Sementara"}
+                            </span>
                             <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
                           </div>
                         </div>

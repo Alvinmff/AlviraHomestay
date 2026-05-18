@@ -1,14 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isBefore, startOfDay } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 
 interface AvailabilityViewerProps {
   roomId: string;
@@ -25,6 +21,8 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
     // Refresh every 5 minutes automatically
     refetchInterval: 5 * 60 * 1000,
   });
+
+  const [activeDate, setActiveDate] = useState<string | null>(null);
 
   const today = startOfDay(new Date());
   const currentMonthStart = startOfMonth(today);
@@ -58,11 +56,11 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "AVAILABLE": return "bg-green-100 dark:bg-green-500/10 hover:bg-green-200 dark:hover:bg-green-500/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900/30 cursor-help";
-      case "BOOKED": return "bg-red-100/50 dark:bg-red-500/10 text-red-500 dark:text-red-400 border-red-200/50 dark:border-red-900/30 cursor-not-allowed line-through opacity-70";
-      case "MAINTENANCE": return "bg-yellow-100/50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200/50 dark:border-yellow-900/30 cursor-not-allowed opacity-70";
-      case "BLOCKED": return "bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50";
-      case "PAST": return "bg-muted/30 text-muted-foreground/30 border-border/30 cursor-not-allowed";
+      case "AVAILABLE": return "bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/30";
+      case "BOOKED": return "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/30 opacity-80 cursor-not-allowed line-through";
+      case "MAINTENANCE": return "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30 opacity-80 cursor-not-allowed";
+      case "BLOCKED": return "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 cursor-not-allowed";
+      case "PAST": return "bg-slate-50/50 dark:bg-slate-900/30 text-slate-400/40 dark:text-slate-600/30 border-slate-100 dark:border-slate-800/30 cursor-not-allowed";
       default: return "bg-card";
     }
   };
@@ -103,38 +101,57 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
         {days.map((day) => {
           const status = getDailyStatus(day);
+          const dayKey = day.toISOString();
 
           return (
-            <HoverCard key={day.toISOString()}>
-              <HoverCardTrigger>
-                <div
-                  className={cn(
-                    "p-2 text-xs rounded-md border text-center transition-colors min-w-[36px]",
-                    getStatusColor(status),
-                    // Current day highlight indicator
-                    day.getTime() === today.getTime() ? "ring-2 ring-primary ring-offset-1 font-bold" : ""
-                  )}
-                >
-                  {format(day, 'd')}
-                </div>
-              </HoverCardTrigger>
-              <HoverCardContent side="top" className="w-auto p-2">
-                <p className="text-sm font-medium">{format(day, 'dd MMMM yyyy')}</p>
-                <p className={cn("text-xs font-semibold mt-1",
-                  status === 'AVAILABLE' ? "text-green-600" :
-                    status === 'BOOKED' ? "text-red-500" : "text-muted-foreground"
+            <div 
+              key={dayKey}
+              className="relative w-full aspect-square"
+              onMouseEnter={() => setActiveDate(dayKey)}
+              onMouseLeave={() => setActiveDate(null)}
+              onClick={() => setActiveDate(activeDate === dayKey ? null : dayKey)}
+            >
+              <div
+                className={cn(
+                  "absolute inset-0 flex items-center justify-center text-xs font-semibold rounded-lg border transition-colors select-none cursor-pointer",
+                  getStatusColor(status),
+                  // Current day highlight indicator
+                  day.getTime() === today.getTime() ? "ring-2 ring-primary ring-offset-1 font-bold" : ""
+                )}
+              >
+                {format(day, 'd')}
+              </div>
+
+              {/* Lightweight Responsive Tooltip */}
+              <div className={cn(
+                "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded-lg shadow-xl transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
+                activeDate === dayKey ? "opacity-100 visible scale-100" : "opacity-0 invisible"
+              )}>
+                <span className="font-semibold text-white/90">
+                  {new Intl.DateTimeFormat("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "Asia/Jakarta"
+                  }).format(day)}
+                </span>
+                <span className={cn(
+                  "text-[10px] font-bold",
+                  status === 'AVAILABLE' ? "text-green-400" :
+                  status === 'BOOKED' ? "text-red-400" : "text-amber-400"
                 )}>
                   {getStatusText(status)}
-                </p>
-              </HoverCardContent>
-            </HoverCard>
+                </span>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+              </div>
+            </div>
           );
         })}
       </div>
 
       <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-green-100 dark:bg-green-500/20 border border-green-200 dark:border-green-800/50"></div> Tersedia</div>
-        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-100/50 dark:bg-red-500/20 border border-red-200/50 dark:border-red-800/50"></div> Penuh</div>
+        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-emerald-50 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-800/50"></div> Tersedia</div>
+        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-rose-50 dark:bg-rose-500/20 border border-rose-200 dark:border-rose-800/50"></div> Penuh</div>
       </div>
     </div>
   );
