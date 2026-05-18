@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Fragment } from "react";
 import { CalendarPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +44,7 @@ export default async function AdminBookingsPage({
     where.propertyId = propertyId;
   }
 
-  let orderBy: any = { createdAt: 'desc' };
+  let orderBy: any = { checkIn: 'asc' };
   if (sort === 'date_asc') orderBy = { checkIn: 'asc' };
   else if (sort === 'date_desc') orderBy = { checkIn: 'desc' };
   else if (sort === 'price_asc') orderBy = { totalPrice: 'asc' };
@@ -162,103 +163,130 @@ export default async function AdminBookingsPage({
                 </tr>
               </thead>
               <tbody>
-                {groupedBookings.map((booking) => (
-                  <tr key={booking.id} className="bg-background border-b border-border/40 hover:bg-muted/20 transition-colors">
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-foreground">{booking.guestName}</p>
-                      <p className="text-xs font-mono text-muted-foreground mt-1">ID: ...{booking.id.slice(-6)}</p>
-                      {booking.guestPhone && (
-                        <p className="text-[10px] bg-muted inline-block px-1.5 py-0.5 rounded mt-1">{booking.guestPhone}</p>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-medium text-foreground">{booking.guestCount}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase">Orang</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-xs text-muted-foreground">{booking.property.name}</p>
-                      <div className="font-medium text-foreground text-sm mt-0.5">
-                         {booking.roomNames}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {booking.rooms && booking.rooms.length > 1 && booking.rooms.some((r: any) => 
-                        new Date(r.checkIn).getTime() !== new Date(booking.rooms[0].checkIn).getTime() ||
-                        new Date(r.checkOut).getTime() !== new Date(booking.rooms[0].checkOut).getTime()
-                      ) ? (
-                        <div className="space-y-1.5">
-                          {booking.rooms.map((room: any, idx: number) => (
-                            <div key={idx} className="text-[11px] border-b border-border/30 last:border-0 pb-1 last:pb-0">
-                              <p className="font-semibold text-foreground">{room.roomNumber}</p>
-                              <p className="text-muted-foreground whitespace-nowrap">
-                                {formatDateWIB(room.checkIn)} — {formatDateWIB(room.checkOut)}
-                              </p>
+                {(() => {
+                  let lastMonth = "";
+                  return groupedBookings.map((booking) => {
+                    const monthHeader = new Intl.DateTimeFormat("id-ID", {
+                      month: "long",
+                      year: "numeric",
+                      timeZone: "Asia/Jakarta",
+                    }).format(new Date(booking.checkIn));
+
+                    const isNewMonth = monthHeader !== lastMonth;
+                    lastMonth = monthHeader;
+
+                    return (
+                      <Fragment key={booking.id}>
+                        {isNewMonth && (
+                          <tr className="bg-muted/30 border-b border-border/40">
+                            <td colSpan={9} className="px-6 py-3 font-serif font-bold text-foreground text-sm uppercase tracking-wider bg-muted/40">
+                              📅 {monthHeader}
+                            </td>
+                          </tr>
+                        )}
+                        <tr className="bg-background border-b border-border/40 hover:bg-muted/20 transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="font-semibold text-foreground">{booking.guestName}</p>
+                            <p className="text-xs font-mono text-muted-foreground mt-1">ID: ...{booking.id.slice(-6)}</p>
+                            {booking.guestPhone && (
+                              <p className="text-[10px] bg-muted inline-block px-1.5 py-0.5 rounded mt-1">{booking.guestPhone}</p>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-medium text-foreground">{booking.guestCount}</span>
+                              <span className="text-[10px] text-muted-foreground uppercase">Orang</span>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="whitespace-nowrap">
-                          <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
-                          <p className="text-xs text-muted-foreground mt-1">Out: {formatDateWIB(booking.checkOut)}</p>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-foreground font-semibold">
-                      {formatRupiah(booking.totalPrice)}
-                    </td>
-                    <td className="px-6 py-4 text-emerald-600 font-medium">
-                       {booking.dpAmount && booking.dpAmount > 0 ? formatRupiah(booking.dpAmount) : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-orange-600 font-bold">
-                       {booking.dpAmount && booking.dpAmount > 0 
-                         ? formatRupiah(Math.max(0, booking.totalPrice - booking.dpAmount)) 
-                         : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <Badge variant="outline" className={
-                          booking.status === "CONFIRMED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-                            booking.status === "CHECKED_IN" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
-                              booking.status === "COMPLETED" ? "bg-slate-500/10 text-slate-500 border-slate-500/20" :
-                                booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
-                                  "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                        }>
-                          {booking.status === "CONFIRMED" ? "Booking" :
-                           booking.status === "CHECKED_IN" ? "Check-in" :
-                           booking.status === "COMPLETED" ? "Selesai" :
-                           booking.status === "CANCELLED" ? "Dibatalkan" :
-                           booking.status.replace("_", " ")}
-                        </Badge>
-                        {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) <= 0 && (
-                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 text-[10px] font-bold">
-                            ✓ LUNAS
-                          </Badge>
-                        )}
-                        {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) > 0 && (
-                          <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-[10px] font-bold">
-                            Belum Lunas
-                          </Badge>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <BookingInfoDialog booking={{
-                            guestName: booking.guestName,
-                            guestPhone: booking.guestPhone,
-                            notes: booking.notes,
-                            roomNumbers: booking.roomNames,
-                            checkIn: formatDateWIB(booking.checkIn),
-                            checkOut: formatDateWIB(booking.checkOut),
-                            guestCount: booking.guestCount
-                        }} />
-                        <BookingActions bookingId={booking.id} currentStatus={booking.status} />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-xs text-muted-foreground">{booking.property.name}</p>
+                            <div className="font-medium text-foreground text-sm mt-0.5">
+                               {booking.roomNames}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {booking.rooms && booking.rooms.length > 1 && booking.rooms.some((r: any) => 
+                              new Date(r.checkIn).getTime() !== new Date(booking.rooms[0].checkIn).getTime() ||
+                              new Date(r.checkOut).getTime() !== new Date(booking.rooms[0].checkOut).getTime()
+                            ) ? (
+                              <div className="space-y-1.5">
+                                {booking.rooms.map((room: any, idx: number) => (
+                                  <div key={idx} className="text-[11px] border-b border-border/30 last:border-0 pb-1 last:pb-0">
+                                    <p className="font-semibold text-foreground">{room.roomName}</p>
+                                    <p className="text-muted-foreground whitespace-nowrap">
+                                      {formatDateWIB(room.checkIn)} — {formatDateWIB(room.checkOut)}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="whitespace-nowrap">
+                                <p className="text-xs font-medium text-foreground">In: {formatDateWIB(booking.checkIn)}</p>
+                                <p className="text-xs text-muted-foreground mt-1">Out: {formatDateWIB(booking.checkOut)}</p>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-foreground font-semibold">
+                            {formatRupiah(booking.totalPrice)}
+                          </td>
+                          <td className="px-6 py-4 text-emerald-600 font-medium">
+                             {booking.dpAmount && booking.dpAmount > 0 ? formatRupiah(booking.dpAmount) : "-"}
+                          </td>
+                          <td className="px-6 py-4 text-orange-600 font-bold">
+                             {booking.dpAmount && booking.dpAmount > 0 
+                               ? formatRupiah(Math.max(0, booking.totalPrice - booking.dpAmount)) 
+                               : "-"}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <div className="flex flex-col items-center gap-1.5">
+                              <Badge variant="outline" className={
+                                booking.status === "CONFIRMED" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                                  booking.status === "CHECKED_IN" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                                    booking.status === "COMPLETED" ? "bg-slate-500/10 text-slate-500 border-slate-500/20" :
+                                      booking.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                                        "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                              }>
+                                {booking.status === "CONFIRMED" ? "Booking" :
+                                 booking.status === "CHECKED_IN" ? "Check-in" :
+                                 booking.status === "COMPLETED" ? "Selesai" :
+                                 booking.status === "CANCELLED" ? "Dibatalkan" :
+                                 booking.status.replace("_", " ")}
+                              </Badge>
+                              {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) <= 0 && (
+                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 text-[10px] font-bold">
+                                  ✓ LUNAS
+                                </Badge>
+                              )}
+                              {booking.status !== "CANCELLED" && booking.dpAmount && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) > 0 && (
+                                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-[10px] font-bold">
+                                  Belum Lunas
+                                </Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <BookingInfoDialog booking={{
+                                  guestName: booking.guestName,
+                                  guestPhone: booking.guestPhone,
+                                  notes: booking.notes,
+                                  roomNumbers: booking.roomNames,
+                                  checkIn: formatDateWIB(booking.checkIn),
+                                  checkOut: formatDateWIB(booking.checkOut),
+                                  guestCount: booking.guestCount
+                              }} />
+                              <BookingActions 
+                                bookingId={booking.id} 
+                                currentStatus={booking.status} 
+                                isLunas={booking.status !== "CANCELLED" && booking.dpAmount !== null && booking.dpAmount > 0 && (booking.totalPrice - booking.dpAmount) <= 0}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      </Fragment>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
 

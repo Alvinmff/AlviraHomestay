@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal, Trash2, Edit } from "lucide-react";
+import { CheckCircle2, XCircle, LogIn, CheckSquare, MoreHorizontal, Trash2, Edit, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export function BookingActions({ bookingId, currentStatus }: { bookingId: string, currentStatus: string }) {
+export function BookingActions({ bookingId, currentStatus, isLunas = false }: { bookingId: string, currentStatus: string, isLunas?: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -59,6 +59,27 @@ export function BookingActions({ bookingId, currentStatus }: { bookingId: string
       }
       
       toast.success(`Status berhasil diubah ke ${newStatus.replace("_", " ")}`);
+      router.refresh();
+    } catch (e: unknown) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function markAsLunas() {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/admin/bookings/${bookingId}/lunas`, {
+        method: "PATCH",
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Gagal mengubah status pelunasan");
+      }
+      
+      toast.success("Pembayaran berhasil dilunasi");
       router.refresh();
     } catch (e: unknown) {
       toast.error((e as Error).message);
@@ -114,6 +135,12 @@ export function BookingActions({ bookingId, currentStatus }: { bookingId: string
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
+        )}
+
+        {currentStatus !== "CANCELLED" && !isLunas && (
+          <DropdownMenuItem onClick={markAsLunas} className="text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50 font-medium">
+            <Check className="mr-2 h-4 w-4" /> Lunasi Pembayaran
+          </DropdownMenuItem>
         )}
 
         <DropdownMenuItem asChild>
