@@ -124,10 +124,10 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
 
               {/* Lightweight Responsive Tooltip */}
               <div className={cn(
-                "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded-lg shadow-xl transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
+                "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-[11px] rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
                 activeDate === dayKey ? "opacity-100 visible scale-100" : "opacity-0 invisible"
               )}>
-                <span className="font-semibold text-white/90">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   {new Intl.DateTimeFormat("id-ID", {
                     day: "numeric",
                     month: "long",
@@ -137,12 +137,12 @@ export function AvailabilityViewer({ roomId }: AvailabilityViewerProps) {
                 </span>
                 <span className={cn(
                   "text-[10px] font-bold",
-                  status === 'AVAILABLE' ? "text-green-400" :
-                  status === 'BOOKED' ? "text-red-400" : "text-amber-400"
+                  status === 'AVAILABLE' ? "text-emerald-600 dark:text-emerald-400" :
+                  status === 'BOOKED' ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"
                 )}>
                   {getStatusText(status)}
                 </span>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white dark:border-t-slate-800" />
               </div>
             </div>
           );

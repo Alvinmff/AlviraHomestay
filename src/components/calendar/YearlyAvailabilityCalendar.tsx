@@ -120,7 +120,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
       </div>
 
       {/* Calendar Matrix Viewport */}
-      <div className="p-6 relative">
+      <div className="p-3 sm:p-6 relative">
         {loading && (
           <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-sm flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -143,13 +143,13 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
             const paddingCells = Array.from({ length: startDayIndex });
 
             return (
-              <div key={month.month} className="min-w-[280px] w-[85vw] md:w-auto shrink-0 border rounded-xl overflow-hidden bg-card snap-center">
+              <div key={month.month} className="min-w-[260px] w-[82vw] sm:min-w-[280px] sm:w-auto shrink-0 border rounded-xl overflow-hidden bg-card snap-center">
                 <div className="bg-primary text-primary-foreground py-2 text-center font-bold text-sm tracking-wider uppercase">
                   {month.name}
                 </div>
                 
-                <div className="p-4">
-                  <div className="grid grid-cols-7 gap-1 mb-2">
+                <div className="p-3 sm:p-4">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-2">
                     {WEEKDAYS.map((day, idx) => (
                       <div key={idx} className="text-center text-[10px] font-bold text-muted-foreground py-1">
                         {day}
@@ -157,7 +157,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-7 gap-1.5">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                     {paddingCells.map((_, idx) => (
                       <div key={`pad-${idx}`} className="w-full aspect-square" />
                     ))}
@@ -190,22 +190,22 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
                           
                           {/* Lightweight Responsive Tooltip */}
                           <div className={cn(
-                            "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-slate-800 text-white text-[11px] rounded-lg shadow-xl transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
+                            "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] p-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-[11px] rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 transition-all z-50 pointer-events-none scale-95 origin-bottom flex flex-col items-center text-center gap-0.5",
                             activeDate === day.date ? "opacity-100 visible scale-100" : "opacity-0 invisible"
                           )}>
-                            <span className="font-semibold text-white/90">{formatIndonesianDate(day.date)}</span>
+                            <span className="font-semibold text-slate-900 dark:text-white">{formatIndonesianDate(day.date)}</span>
                             <span className={cn(
                               "text-[10px] font-bold",
-                              isPast ? "text-slate-400" :
-                              day.status === "available" ? "text-green-400" :
-                              day.status === "booked" ? "text-red-400" : "text-amber-400"
+                              isPast ? "text-slate-400 dark:text-slate-500" :
+                              day.status === "available" ? "text-emerald-600 dark:text-emerald-400" :
+                              day.status === "booked" ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400"
                             )}>
                               {isPast ? "Tanggal Berlalu" :
                                day.status === "available" ? "✅ Tersedia untuk dipesan" :
                                day.status === "booked" ? "❌ Telah Dipesan" :
                                day.status === "maintenance" ? "⚠️ Dalam Perawatan" : "🔒 Ditutup Sementara"}
                             </span>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800" />
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white dark:border-t-slate-800" />
                           </div>
                         </div>
                       );
