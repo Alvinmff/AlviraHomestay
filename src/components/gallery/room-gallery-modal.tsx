@@ -83,7 +83,7 @@ export function RoomGalleryModal({ photos, thumbnail, roomName }: RoomGalleryMod
         {/* Floating "Lihat Lebih Detail" Trigger */}
         <Button 
           variant="secondary"
-          className="absolute bottom-4 right-4 z-10 shadow-lg font-semibold bg-white/95 hover:bg-white text-foreground hidden sm:flex"
+          className="absolute bottom-4 right-4 z-10 shadow-lg font-semibold bg-white/95 hover:bg-white text-foreground flex text-xs sm:text-sm"
           onClick={() => openLightbox(0)}
         >
           <Grid2X2 className="w-4 h-4 mr-2" />

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,13 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Homestay Alvira | Tiga Kota, Satu Kenyamanan",
   description: "Pengalaman menginap premium dengan pilihan akomodasi beragam di Sidoarjo, Surabaya, dan Batu.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

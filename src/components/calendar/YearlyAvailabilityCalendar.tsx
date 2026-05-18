@@ -132,8 +132,8 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
           </div>
         )}
 
-        {/* Scrollable Container Container: Horizontal on Desktop, Vertical stack on Mobile */}
-        <div className="flex flex-col xl:flex-row gap-8 xl:overflow-x-auto pb-4 custom-scrollbar lg:justify-between xl:justify-start">
+        {/* Scrollable Container Container: Horizontal scrollable on ALL devices */}
+        <div className="flex flex-row gap-6 overflow-x-auto pb-4 custom-scrollbar snap-x snap-mandatory lg:justify-between xl:justify-start">
           {data?.months.map((month) => {
             // Calculate starting offset based on the first day
             const firstDateObj = new Date(`${currentYear}-${month.month.toString().padStart(2, '0')}-01`);
@@ -141,7 +141,7 @@ export function YearlyAvailabilityCalendar({ roomId }: Props) {
             const paddingCells = Array.from({ length: startDayIndex });
 
             return (
-              <div key={month.month} className="min-w-[280px] shrink-0 border rounded-xl overflow-hidden bg-card">
+              <div key={month.month} className="min-w-[280px] w-[85vw] md:w-auto shrink-0 border rounded-xl overflow-hidden bg-card snap-center">
                 <div className="bg-primary text-primary-foreground py-2 text-center font-bold text-sm tracking-wider uppercase">
                   {month.name}
                 </div>

@@ -93,7 +93,8 @@ export default async function AdminRoomsPage() {
               </div>
 
               <div className="rounded-xl border border-border/50 overflow-hidden shadow-sm bg-card">
-                <table className="w-full text-sm text-left">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
                   <thead className="text-[11px] text-muted-foreground uppercase bg-muted/30 border-b font-bold tracking-wider">
                     <tr>
                       <th scope="col" className="px-6 py-4">Info Kamar</th>
@@ -155,6 +156,7 @@ export default async function AdminRoomsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           ))}
