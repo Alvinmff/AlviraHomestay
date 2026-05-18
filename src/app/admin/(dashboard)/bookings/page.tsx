@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Fragment } from "react";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -178,9 +178,14 @@ export default async function AdminBookingsPage({
                     return (
                       <Fragment key={booking.id}>
                         {isNewMonth && (
-                          <tr className="bg-muted/30 border-b border-border/40">
-                            <td colSpan={9} className="px-6 py-3 font-serif font-bold text-foreground text-sm uppercase tracking-wider bg-muted/40">
-                              📅 {monthHeader}
+                          <tr className="bg-transparent border-0">
+                            <td colSpan={9} className="pt-8 pb-4 px-6">
+                              <div className="flex items-center gap-4">
+                                <h3 className="text-sm font-bold tracking-widest uppercase text-primary px-4 py-1.5 rounded-lg bg-primary/5 border border-primary/10 flex items-center gap-2">
+                                  <CalendarDays className="w-4 h-4" /> {monthHeader}
+                                </h3>
+                                <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
+                              </div>
                             </td>
                           </tr>
                         )}
