@@ -13,6 +13,7 @@ export function WhatsAppButton() {
     const [showPopup, setShowPopup] = useState(false);
     const [autoShown, setAutoShown] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
+    const [isClosedByUser, setIsClosedByUser] = useState(false);
 
     // Delay entrance animation for the button
     useEffect(() => {
@@ -49,8 +50,12 @@ export function WhatsAppButton() {
     };
 
     const handleMouseEnter = () => {
-        setIsHovering(true);
-        setShowPopup(true);
+        // Prevent hover actions on mobile/touch devices and if user closed it
+        if (isClosedByUser) return;
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+            setIsHovering(true);
+            setShowPopup(true);
+        }
     };
 
     const handleMouseLeave = () => {
@@ -61,9 +66,12 @@ export function WhatsAppButton() {
         }, 300);
     };
 
-    const handleClosePopup = (e: React.MouseEvent) => {
+    const handleClosePopup = (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault();
         e.stopPropagation();
         setShowPopup(false);
+        setIsHovering(false);
+        setIsClosedByUser(true);
     };
 
     if (!isVisible) return null;
@@ -190,10 +198,11 @@ export function WhatsAppButton() {
                             </div>
                             <button
                                 onClick={handleClosePopup}
-                                className="text-white/60 hover:text-white transition-colors duration-200 p-1 rounded-lg hover:bg-white/10"
+                                onTouchEnd={handleClosePopup}
+                                className="text-white/60 hover:text-white transition-colors duration-200 p-2 md:p-1 rounded-lg hover:bg-white/10"
                                 aria-label="Tutup popup"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="w-5 h-5 md:w-4 md:h-4" />
                             </button>
                         </div>
 

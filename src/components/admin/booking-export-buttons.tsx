@@ -7,6 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { FileSpreadsheet, FileText, Receipt } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -103,6 +107,9 @@ const groupByMonth = (bookings: ExportBooking[]) => {
 
 export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }) {
   const logo = useLogo();
+  
+  // Get unique properties for filtering
+  const uniqueProperties = Array.from(new Set(bookings.map((b) => b.property.name))).sort();
 
   // ═══════════════════════════════════════════
   // EXCEL
@@ -132,7 +139,13 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
   // ═══════════════════════════════════════════
   // PDF (Full & Public)
   // ═══════════════════════════════════════════
-  const generatePDF = (type: 'full' | 'public') => {
+  const generatePDF = (type: 'full' | 'public', propertyFilter?: string) => {
+    const filteredBookings = propertyFilter 
+      ? bookings.filter((b) => b.property.name === propertyFilter)
+      : bookings;
+
+    if (filteredBookings.length === 0) return;
+
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
@@ -157,7 +170,9 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
     doc.setTextColor(27, 94, 32);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('HOMESTAY ALVIRA SIDOARJO', pageW / 2, 16, { align: 'center' });
+    
+    const headerTitle = propertyFilter ? propertyFilter.toUpperCase() : 'HOMESTAY ALVIRA';
+    doc.text(headerTitle, pageW / 2, 16, { align: 'center' });
 
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(10);
@@ -175,7 +190,7 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
     doc.setLineWidth(0.5);
     doc.line(10, 32, pageW - 10, 32);
 
-    const months = groupByMonth(bookings);
+    const months = groupByMonth(filteredBookings);
     let startY = 38;
 
     Object.entries(months).forEach(([monthName, group]) => {
@@ -391,12 +406,37 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => generatePDF('full')}>
-            📄 Laporan Lengkap
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => generatePDF('public')}>
-            📅 Jadwal (Tanpa Harga)
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>📄 Laporan Lengkap</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => generatePDF('full')}>
+                  Semua Properti
+                </DropdownMenuItem>
+                {uniqueProperties.map((prop) => (
+                  <DropdownMenuItem key={prop} onClick={() => generatePDF('full', prop)}>
+                    {prop}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+          
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>📅 Jadwal (Tanpa Harga)</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => generatePDF('public')}>
+                  Semua Properti
+                </DropdownMenuItem>
+                {uniqueProperties.map((prop) => (
+                  <DropdownMenuItem key={prop} onClick={() => generatePDF('public', prop)}>
+                    {prop}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
 
