@@ -156,13 +156,13 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
     doc.setTextColor(220, 220, 220);
     doc.setFontSize(45);
     doc.setFont('helvetica', 'bold');
-    doc.text('HOMESTAY ALVIRA', pageW / 2, pageH / 2, { align: 'center', angle: 45 });
+    doc.text('HOMESTAY ALVIRA', pageW / 2, pageH / 2, { align: 'center', baseline: 'middle', angle: 45 });
     (doc as any).restoreGraphicsState();
 
-    // Logo
+    // Logo (Sebelah kiri judul)
     if (logo) {
       try {
-        doc.addImage(logo, 'PNG', 10, 8, 22, 22);
+        doc.addImage(logo, 'PNG', (pageW / 2) - 75, 8, 22, 22);
       } catch { /* ignore */ }
     }
 
@@ -198,7 +198,7 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`📅 ${monthName.toUpperCase()}`, 10, startY);
+      doc.text(`${monthName.toUpperCase()}`, 10, startY);
       startY += 6;
 
       const headers = isPublic
@@ -291,11 +291,11 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
       doc.setTextColor(255, 200, 200);
       doc.setFontSize(55);
       doc.setFont('helvetica', 'bold');
-      doc.text('LUNAS', pageW / 2, pageH / 2 + 10, { align: 'center', angle: 30 });
+      doc.text('LUNAS', pageW / 2, pageH / 2, { align: 'center', baseline: 'middle', angle: 30 });
       doc.setFontSize(10);
       doc.setTextColor(200, 100, 100);
-      doc.text(`Paid on ${formatDate(new Date())}`, pageW / 2, pageH / 2 + 25, { align: 'center' });
-      doc.text('Terima Kasih', pageW / 2, pageH / 2 + 32, { align: 'center' });
+      doc.text(`Paid on ${formatDate(new Date())}`, pageW / 2, (pageH / 2) + 15, { align: 'center' });
+      doc.text('Terima Kasih', pageW / 2, (pageH / 2) + 22, { align: 'center' });
       (doc as any).restoreGraphicsState();
     }
 
