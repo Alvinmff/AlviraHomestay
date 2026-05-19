@@ -20,7 +20,7 @@ async function main() {
       data: {
         email: adminEmail,
         passwordHash: hashedPassword,
-        name: 'Super Administrator',
+        name: 'Administrator',
         role: 'SUPER_ADMIN'
       }
     })
