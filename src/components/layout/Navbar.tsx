@@ -23,11 +23,21 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const isHome = pathname === "/";
-  const useWhiteText = isHome && !scrolled;
+  const useWhiteText = isHome && !scrolled && !mobileMenuOpen;
 
   const getLinkClassName = (href: string) => {
-    const isActive = pathname === href;
     return `relative transition-colors duration-300 py-2 group ${useWhiteText ? "text-white/90 hover:text-white" : "text-foreground/70 hover:text-primary"
       }`;
   };
@@ -42,7 +52,9 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ease-out ${
-        scrolled || !isHome 
+        mobileMenuOpen
+          ? "h-screen bg-background dark:bg-zinc-950/95"
+          : scrolled || !isHome 
           ? "bg-background/95 dark:bg-zinc-950/90 backdrop-blur-md border-b border-border/50 shadow-sm" 
           : "bg-transparent border-transparent"
       }`}
@@ -118,7 +130,7 @@ export function Navbar() {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-0 bg-background backdrop-blur-2xl animate-in fade-in slide-in-from-right duration-500 z-[90] overflow-y-auto">
+        <div className="md:hidden absolute inset-0 top-0 bg-background dark:bg-zinc-950/95 animate-in fade-in slide-in-from-right duration-500 z-[90] overflow-y-auto">
           <div className="container mx-auto px-6 pt-32 pb-12 flex flex-col space-y-2">
             <Link
               href="/"
