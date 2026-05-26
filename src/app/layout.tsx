@@ -15,11 +15,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Homestay Alvira",
+  title: "Homestay Alvira | Tiga Kota, Satu Kenyamanan",
   description: "Pengalaman menginap premium dengan pilihan akomodasi beragam di Sidoarjo, Surabaya, dan Batu.",
-  icons: {
-    icon: "/uploads/logo.png",
-  },
 };
 
 export const viewport: Viewport = {
