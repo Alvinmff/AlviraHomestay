@@ -13,17 +13,22 @@ interface TikTokVideo {
 const tiktokVideos: TikTokVideo[] = [
   {
     id: "1",
+    videoId: "7609626709859585298",
+    username: "@alvirahomestay",
+    caption: "Panduan Resmi Rute Menuju Alvira Homestay | Akses Mudah & Lokasi Strategis",
+  },
+  {
+    id: "2",
     videoId: "7609710883404565767",
     username: "@alvirahomestay",
     caption: "HOMESTAY MURAH & NYAMAN DI SIDOARJO 🏡 ALVIRA HOMESTAY",
   },
-  // Tambahkan video lain di sini:
-  // {
-  //   id: "2",
-  //   videoId: "VIDEO_ID_LAIN",
-  //   username: "@alvirahomestay",
-  //   caption: "Judul video lain...",
-  // },
+  {
+    id: "3",
+    videoId: "7644086126700973328",
+    username: "@alvirahomestay",
+    caption: "🏡 Alvira 2 Homestay Sidoarjo Murah, nyaman, & full house siap huni!",
+  },
 ];
 
 const containerVariants = {
