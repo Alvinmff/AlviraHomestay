@@ -19,15 +19,27 @@ const tiktokVideos: TikTokVideo[] = [
   },
   {
     id: "2",
-    videoId: "7609710883404565767",
+    videoId: "7645850506874621205",
     username: "@alvirahomestay",
-    caption: "HOMESTAY MURAH & NYAMAN DI SIDOARJO 🏡 ALVIRA HOMESTAY",
+    caption: "🏡 ALVIRA HOMESTAY 1 – Sidoarjo, Jawa Timur Full House Nyaman untuk Keluarga & Rombongan",
   },
   {
     id: "3",
-    videoId: "7644086126700973328",
+    videoId: "7645852439085665556",
     username: "@alvirahomestay",
-    caption: "🏡 Alvira 2 Homestay Sidoarjo Murah, nyaman, & full house siap huni!",
+    caption: "🏡 ALVIRA HOMESTAY 2 – Sidoarjo, Jawa Timur Full House Nyaman untuk Keluarga & Rombongan",
+  },
+  {
+    id: "4",
+    videoId: "7645854997179075860",
+    username: "@alvirahomestay",
+    caption: "🏡 ALVIRA HOMESTAY 3 – Sidoarjo, Jawa Timur Nyaman untuk Keluarga & Rombongan",
+  },
+  {
+    id: "5",
+    videoId: "7645855685195992341",
+    username: "@alvirahomestay",
+    caption: "🏡 ALVIRA HOMESTAY 4 – Sidoarjo, Jawa Timur Nyaman untuk Keluarga & Rombongan",
   },
 ];
 
