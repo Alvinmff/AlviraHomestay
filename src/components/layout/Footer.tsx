@@ -14,7 +14,7 @@ export function Footer() {
         <div className="flex flex-col space-y-5 lg:col-span-2">
           <Link href="/" className="flex items-center gap-3 w-fit group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://res.cloudinary.com/drq4p06mk/image/upload/v1777687112/alvira-static/logo.png" alt="Homestay Alvira" className="h-11 w-auto object-contain" />
+            <img src="https://res.cloudinary.com/drq4p06mk/image/upload/w_100,c_scale,f_auto,q_auto/v1777687112/alvira-static/logo.png" alt="Homestay Alvira" className="h-11 w-auto object-contain" />
             <span className="font-serif text-xl font-bold text-primary">Homestay Alvira</span>
           </Link>
           <p className="text-muted-foreground leading-relaxed max-w-sm text-sm">

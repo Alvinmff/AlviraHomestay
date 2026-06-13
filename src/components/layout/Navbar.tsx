@@ -62,7 +62,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 sm:px-3 flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-3 relative z-[110] group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://res.cloudinary.com/drq4p06mk/image/upload/v1777687112/alvira-static/logo.png" alt="Homestay Alvira" className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+          <img src="https://res.cloudinary.com/drq4p06mk/image/upload/w_100,c_scale,f_auto,q_auto/v1777687112/alvira-static/logo.png" alt="Homestay Alvira" className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
           <span className={`font-serif text-xl sm:text-2xl font-bold tracking-tight transition-colors duration-500 ${useWhiteText ? "text-white" : "text-primary"
             }`}>
             Homestay Alvira
