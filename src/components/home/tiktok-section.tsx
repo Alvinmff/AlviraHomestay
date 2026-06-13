@@ -63,22 +63,32 @@ const itemVariants = {
 export function TikTokSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Load TikTok embed script
+  // Load TikTok embed script when section is near viewport
   useEffect(() => {
-    // Remove existing script to force re-processing of blockquotes
-    const existingScript = document.getElementById("tiktok-embed-script");
-    if (existingScript) {
-      existingScript.remove();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          const existingScript = document.getElementById("tiktok-embed-script");
+          if (!existingScript) {
+            const script = document.createElement("script");
+            script.id = "tiktok-embed-script";
+            script.src = "https://www.tiktok.com/embed.js";
+            script.async = true;
+            document.body.appendChild(script);
+          }
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
 
-    const script = document.createElement("script");
-    script.id = "tiktok-embed-script";
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
     return () => {
-      // Cleanup on unmount
+      observer.disconnect();
       const s = document.getElementById("tiktok-embed-script");
       if (s) s.remove();
     };

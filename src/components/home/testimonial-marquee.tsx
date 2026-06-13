@@ -79,7 +79,13 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
               {review.authorPhoto ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={review.authorPhoto} alt={review.authorName} className="w-full h-full object-cover" />
+                <img
+                  src={review.authorPhoto}
+                  alt={review.authorName}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <span className="font-bold text-primary text-sm">{review.authorName.charAt(0)}</span>
               )}
@@ -109,9 +115,9 @@ export function TestimonialMarquee({ reviews }: { reviews: any[] }) {
 
   // We need to ensure we have enough slides for Embla to loop smoothly.
   // Embla needs at least enough slides to fill the viewport width multiple times over.
-  // Using 15 duplicates guarantees that even if there is only 1 review, it will cover ultra-wide screens.
-  const row1Loops = Array(15).fill(row1).flat();
-  const row2Loops = Array(15).fill(row2).flat();
+  // Using 4 duplicates is more than enough for modern screen sizes and reduces DOM bloat.
+  const row1Loops = Array(4).fill(row1).flat();
+  const row2Loops = Array(4).fill(row2).flat();
 
   return (
     <div className="relative flex flex-col gap-6 overflow-hidden w-screen left-1/2 -translate-x-1/2 py-4 px-0">

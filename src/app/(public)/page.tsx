@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { GoogleReviewsSection } from "@/components/home/google-reviews-section";
@@ -32,21 +33,21 @@ export default function Home() {
     {
       name: "Homestay Sidoarjo",
       slug: "sidoarjo",
-      image: "https://res.cloudinary.com/drq4p06mk/image/upload/v1777687149/alvira-static/upload-1773135068512-112765190.jpg",
+      image: "https://res.cloudinary.com/drq4p06mk/image/upload/f_auto,q_auto/v1777687149/alvira-static/upload-1773135068512-112765190.jpg",
       description: "Penginapan nyaman dan strategis untuk keluarga, cocok untuk transit atau kunjungan bisnis.",
       type: "Homestay"
     },
     {
       name: "Kost Eksklusif Surabaya",
       slug: "surabaya",
-      image: "https://res.cloudinary.com/drq4p06mk/image/upload/v1777689605/alvira-static/po0j83tr2qcjv70c6y2v.jpg",
+      image: "https://res.cloudinary.com/drq4p06mk/image/upload/f_auto,q_auto/v1777689605/alvira-static/po0j83tr2qcjv70c6y2v.jpg",
       description: "Fasilitas premium di pusat kota pahlawan, memberikan kenyamanan maksimal untuk mahasiswa dan pekerja.",
       type: "Kost"
     },
     {
       name: "Villa Premium Batu",
       slug: "batu",
-      image: "https://res.cloudinary.com/drq4p06mk/image/upload/v1777689612/alvira-static/axlsrjylabvqtxclbcdi.jpg",
+      image: "https://res.cloudinary.com/drq4p06mk/image/upload/f_auto,q_auto/v1777689612/alvira-static/axlsrjylabvqtxclbcdi.jpg",
       description: "Liburan tak terlupakan dengan nuansa alam pegunungan, udara sejuk, dan privasi penuh.",
       type: "Villa"
     },
@@ -61,15 +62,30 @@ export default function Home() {
           className="absolute inset-0 z-0 w-full h-[120%]"
           style={{ y: yHero, opacity: opacityHero }}
         >
-          <picture className="w-full h-full">
-            <source media="(max-width: 768px)" srcSet="https://res.cloudinary.com/drq4p06mk/image/upload/v1778138945/alvira-static/backgroundmobile.png" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://res.cloudinary.com/drq4p06mk/image/upload/v1778138941/alvira-static/Background.png"
-              alt="Hero Background Alvira"
-              className="w-full h-full object-cover origin-top"
-            />
-          </picture>
+          <div className="w-full h-full relative">
+            {/* Mobile Hero Background */}
+            <div className="block md:hidden absolute inset-0 w-full h-[120%]">
+              <Image
+                src="https://res.cloudinary.com/drq4p06mk/image/upload/f_auto,q_auto/v1778138945/alvira-static/backgroundmobile.png"
+                alt="Hero Background Alvira Mobile"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover origin-top"
+              />
+            </div>
+            {/* Desktop Hero Background */}
+            <div className="hidden md:block absolute inset-0 w-full h-[120%]">
+              <Image
+                src="https://res.cloudinary.com/drq4p06mk/image/upload/f_auto,q_auto/v1778138941/alvira-static/Background.png"
+                alt="Hero Background Alvira"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover origin-top"
+              />
+            </div>
+          </div>
         </motion.div>
 
         {/* Soft vignette overlay — not heavy black */}
@@ -185,10 +201,11 @@ export default function Home() {
               >
                 <Link href={`/properties/${prop.slug}`} className="block">
                   <div className="h-64 relative overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={prop.image}
                       alt={prop.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                     {/* Soft bottom gradient */}
