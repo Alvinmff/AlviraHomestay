@@ -47,6 +47,10 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'geolocation=(), microphone=(), camera=()',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://res.cloudinary.com https://*.googleusercontent.com; font-src 'self' data:; connect-src 'self' https://res.cloudinary.com; frame-src 'self' https://www.tiktok.com https://www.google.com https://www.youtube.com; object-src 'none'; base-uri 'self';",
+          },
         ],
       },
       {
