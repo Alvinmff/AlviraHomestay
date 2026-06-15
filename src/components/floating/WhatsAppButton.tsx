@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { generateWALink, WA_TEMPLATES } from "@/lib/utils";
 import { X } from "lucide-react";
 
-const LOGO_URL = "/uploads/logo.png";
+const LOGO_URL = "/logo.png";
 
 export function WhatsAppButton() {
     const pathname = usePathname();
