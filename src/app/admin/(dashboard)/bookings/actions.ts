@@ -274,6 +274,7 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
 
   // 3. Buat ulang booking baru untuk setiap kamar
   const pricePerRoom = Math.round(data.totalPrice / (data.roomIds.length || 1));
+  const dpPerRoom = Math.round((data.dpAmount || 0) / (data.roomIds.length || 1));
   const gid = data.roomIds.length > 1
     ? (data.groupId || `grp_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}`)
     : undefined;
@@ -294,7 +295,7 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
         propertyId: data.propertyId,
         status: "CONFIRMED",
         notes: data.notes,
-        dpAmount: data.dpAmount || 0,
+        dpAmount: dpPerRoom,
         guestCount: data.guestCount || 1,
         groupId: gid,
         createdById: userId,

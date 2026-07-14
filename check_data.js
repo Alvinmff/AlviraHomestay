@@ -10,9 +10,12 @@ async function main() {
       checkOut: true,
       createdAt: true,
       status: true,
-      totalPrice: true
+      totalPrice: true,
+      dpAmount: true,
+      groupId: true,
+      paymentStatus: true
     },
-    orderBy: { checkIn: 'asc' }
+    orderBy: { checkIn: 'desc' }
   });
   console.log(JSON.stringify(bookings, null, 2));
 }

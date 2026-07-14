@@ -209,6 +209,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                 // Generate a groupId for multi-room bookings
                 const gid = roomIds.length > 1 ? `grp_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}` : undefined;
                 
+                const dpPerRoom = Math.round((Number(dpAmount) || 0) / (roomIds.length || 1));
                 for (const rId of roomIds) {
                     const range = differentDatesPerRoom ? roomDates[rId] : dateRange;
                     await createManualBookingWithAvailability({
@@ -220,7 +221,7 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         checkOut: toNoonUTC(range.to!),
                         totalPrice: Math.round(pricePerRoom),
                         notes: notes || null,
-                        dpAmount: Math.round(Number(dpAmount)) || 0,
+                        dpAmount: dpPerRoom,
                         guestCount: parseInt(guestCount) || 1,
                         groupId: gid,
                     });
