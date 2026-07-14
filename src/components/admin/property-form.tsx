@@ -271,7 +271,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
         </TabsList>
 
         <div className="mt-6">
-          <TabsContent value="info" className="m-0 border-0 p-0 focus-visible:outline-none">
+          <TabsContent value="info" forceMount className="data-[state=inactive]:hidden m-0 border-0 p-0 focus-visible:outline-none">
             <Card className="shadow-sm border-border/50">
               <CardHeader className="bg-muted/10 border-b">
                 <CardTitle className="font-serif">Informasi Properti</CardTitle>
@@ -318,7 +318,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
             </Card>
           </TabsContent>
 
-          <TabsContent value="lokasi" className="m-0 border-0 p-0 focus-visible:outline-none">
+          <TabsContent value="lokasi" forceMount className="data-[state=inactive]:hidden m-0 border-0 p-0 focus-visible:outline-none">
             <Card className="shadow-sm border-border/50">
               <CardHeader className="bg-muted/10 border-b">
                 <CardTitle className="font-serif">Lokasi & Peta</CardTitle>
@@ -343,7 +343,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
             </Card>
           </TabsContent>
 
-          <TabsContent value="foto" className="m-0 border-0 p-0 focus-visible:outline-none">
+          <TabsContent value="foto" forceMount className="data-[state=inactive]:hidden m-0 border-0 p-0 focus-visible:outline-none">
             <Card className="shadow-sm border-border/50">
               <CardHeader className="bg-muted/10 border-b">
                 <CardTitle className="font-serif">Manajemen Visual</CardTitle>
@@ -508,7 +508,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
             </Card>
           </TabsContent>
 
-          <TabsContent value="fasilitas" className="m-0 border-0 p-0 focus-visible:outline-none">
+          <TabsContent value="fasilitas" forceMount className="data-[state=inactive]:hidden m-0 border-0 p-0 focus-visible:outline-none">
             <Card className="shadow-sm border-border/50">
               <CardHeader className="bg-muted/10 border-b">
                 <CardTitle className="font-serif">Fasilitas Bersama (Common Area)</CardTitle>
@@ -521,7 +521,7 @@ export function PropertyForm({ initialData }: { initialData?: any }) {
             </Card>
           </TabsContent>
 
-          <TabsContent value="kawasan" className="m-0 border-0 p-0 focus-visible:outline-none">
+          <TabsContent value="kawasan" forceMount className="data-[state=inactive]:hidden m-0 border-0 p-0 focus-visible:outline-none">
             <Card className="shadow-sm border-border/50">
               <CardHeader className="bg-muted/10 border-b flex flex-row items-center justify-between py-4">
                 <div>

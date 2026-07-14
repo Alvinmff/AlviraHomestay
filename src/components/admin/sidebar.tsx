@@ -77,6 +77,7 @@ export function Sidebar({ pendingBookings = 0, totalReviews = 0 }: SidebarProps)
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={false}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       "flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 group",

@@ -50,30 +50,30 @@ export default async function AdminOverviewPage() {
   });
   
   // 3. Pending Payments
-  const pendingPaymentsReq = prisma.booking.aggregate({
-    where: { paymentStatus: "UNPAID", status: { notIn: ["CANCELLED"] } },
-    _sum: { totalPrice: true },
-    _count: true
+  const activeBookingsReq = prisma.booking.findMany({
+    where: { status: { notIn: ["CANCELLED"] } },
+    select: { totalPrice: true, dpAmount: true }
   });
 
   const [
     currentMonthRevenueRes, 
     lastMonthRevenueRes, 
     currentMonthBookings,
-    pendingPaymentsRes
+    activeBookings
   ] = await Promise.all([
     currentMonthRevenueReq,
     lastMonthRevenueReq,
     currentMonthBookingsReq,
-    pendingPaymentsReq
+    activeBookingsReq
   ]);
 
   const revenueThisMonth = currentMonthRevenueRes._sum.totalPrice || 0;
   const revenueLastMonth = lastMonthRevenueRes._sum.totalPrice || 0;
   const revenueGrowth = revenueLastMonth === 0 ? 100 : ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100;
 
-  const pendingAmount = pendingPaymentsRes._sum.totalPrice || 0;
-  const pendingCount = pendingPaymentsRes._count || 0;
+  const pendingBookings = activeBookings.filter(b => (b.dpAmount || 0) < b.totalPrice);
+  const pendingAmount = pendingBookings.reduce((sum, b) => sum + (b.totalPrice - (b.dpAmount || 0)), 0);
+  const pendingCount = pendingBookings.length;
 
 
   // --- DYNAMIC CHARTS DATA (30 DAYS) ---
@@ -211,7 +211,7 @@ export default async function AdminOverviewPage() {
 
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-150">
       
       <div className="space-y-1">
         <h2 className="text-4xl font-normal tracking-tight text-foreground">Dashboard</h2>
