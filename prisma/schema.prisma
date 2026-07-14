@@ -63,6 +63,7 @@ model Room {
   monthlyPrice   Float?
   isActive       Boolean            @default(true)
   isShown        Boolean            @default(true)
+  hidePrice      Boolean            @default(false)
   currentStatus  String             @default("AVAILABLE")
   maintenanceNotes String?
   createdAt      DateTime           @default(now())

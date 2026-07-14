@@ -27,6 +27,7 @@ interface Room {
     basePrice: number;
     amenities: any;
     thumbnail: string | null;
+    hidePrice: boolean;
 }
 
 interface Property {
@@ -156,11 +157,23 @@ export function PropertyRoomsClient({
 
                                 <CardFooter className="p-6 border-t border-border/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-auto">
                                     <div>
-                                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Mulai dari</p>
-                                        <p className="text-xl font-serif font-bold text-foreground leading-none">
-                                            {formatRupiah(room.basePrice)}
-                                            <span className="text-xs font-sans font-medium text-muted-foreground ml-1">/{property.type === 'KOST' ? 'Bulan' : 'Malam'}</span>
-                                        </p>
+                                        {room.hidePrice ? (
+                                            <>
+                                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Harga</p>
+                                                <p className="text-lg font-serif font-bold text-primary leading-none">
+                                                    Hubungi Kami
+                                                </p>
+                                                <p className="text-[10px] text-muted-foreground mt-1">Menyesuaikan jumlah tamu</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1">Mulai dari</p>
+                                                <p className="text-xl font-serif font-bold text-foreground leading-none">
+                                                    {formatRupiah(room.basePrice)}
+                                                    <span className="text-xs font-sans font-medium text-muted-foreground ml-1">/{property.type === 'KOST' ? 'Bulan' : 'Malam'}</span>
+                                                </p>
+                                            </>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Link

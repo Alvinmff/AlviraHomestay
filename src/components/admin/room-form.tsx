@@ -63,6 +63,7 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
     weekendPrice: initialData?.weekendPrice?.toString() || "",
     monthlyPrice: initialData?.monthlyPrice?.toString() || "",
     photos: initialPhotos,
+    hidePrice: initialData?.hidePrice || false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -211,6 +212,25 @@ export function RoomForm({ initialData, properties }: RoomFormProps) {
         <div className="space-y-2">
           <Label>Harga Dasar (Rp) *</Label>
           <Input name="basePrice" type="number" value={formData.basePrice} onChange={handleChange} placeholder="Contoh: 250000" required />
+        </div>
+
+        <div className="flex items-center space-x-2 md:col-span-2 py-2">
+          <input
+            type="checkbox"
+            id="hidePrice"
+            name="hidePrice"
+            checked={formData.hidePrice}
+            onChange={(e) => setFormData(p => ({ ...p, hidePrice: e.target.checked }))}
+            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-ring focus:ring-offset-2"
+          />
+          <div className="grid gap-1.5 leading-none">
+            <Label htmlFor="hidePrice" className="cursor-pointer font-medium text-sm text-foreground">
+              Sembunyikan Harga di Website Utama
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Centang jika ingin menyembunyikan harga karena harga menyesuaikan jumlah tamu.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-2 md:col-span-2">

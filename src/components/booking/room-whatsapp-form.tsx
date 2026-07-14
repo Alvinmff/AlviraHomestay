@@ -23,9 +23,10 @@ interface RoomWhatsAppFormProps {
   propertyName: string;
   basePrice: number;
   weekendPrice: number;
+  hidePrice?: boolean;
 }
 
-export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName, basePrice, weekendPrice }: RoomWhatsAppFormProps) {
+export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName, basePrice, weekendPrice, hidePrice = false }: RoomWhatsAppFormProps) {
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -85,7 +86,20 @@ export function RoomWhatsAppForm({ roomName, roomId, propertyCity, propertyName,
     if (weekdayCount > 0) breakdownStr += `- Weekday: ${weekdayCount} malam\n`;
     if (weekendCount > 0) breakdownStr += `- Weekend/Libur: ${weekendCount} malam\n`;
 
-    const message = `Halo Admin Alvira Homestay, saya ingin menanyakan ketersediaan kamar:
+    const message = hidePrice
+      ? `Halo Admin Alvira Homestay, saya ingin menanyakan ketersediaan kamar:
+
+*Properti:* ${propertyName} (${propertyCity})
+*Kamar:* ${roomName}
+
+*Detail Pesanan:*
+Nama: ${guestName}
+Check-in: ${checkIn}
+Check-out: ${checkOut}
+Durasi: ${nightCount} Malam
+
+Mohon informasi harga untuk jumlah tamu yang akan menginap. Terima kasih.`
+      : `Halo Admin Alvira Homestay, saya ingin menanyakan ketersediaan kamar:
 
 *Properti:* ${propertyName} (${propertyCity})
 *Kamar:* ${roomName}
@@ -169,6 +183,7 @@ Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
           </div>
           
           {/* Price Details Information below calendar */}
+          {!hidePrice && (
           <div className="mt-3 p-3 bg-muted/30 rounded-lg text-xs space-y-1.5 border border-border/50">
             <div className="flex justify-between text-muted-foreground">
               <span>Harga Weekday (Sen-Kam):</span>
@@ -179,6 +194,13 @@ Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
               <span className="font-semibold text-foreground">{formatRupiah(weekendPrice)} / malam</span>
             </div>
           </div>
+          )}
+          {hidePrice && (
+          <div className="mt-3 p-3 bg-primary/5 rounded-lg text-xs border border-primary/10">
+            <p className="text-sm font-medium text-primary">Harga menyesuaikan jumlah tamu</p>
+            <p className="text-muted-foreground mt-1">Hubungi admin untuk mendapatkan informasi harga terbaru.</p>
+          </div>
+          )}
         </div>
       </div>
 
@@ -194,7 +216,10 @@ Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-semibold text-foreground">Total Estimasi:</span>
           <span className="text-xl font-bold text-primary">
-            {(() => {
+            {hidePrice ? (
+              "Hubungi Admin"
+            ) : (
+            (() => {
               if (dateRange.from && dateRange.to) {
                 let total = 0;
                 let cur = dateRange.from;
@@ -207,7 +232,8 @@ Apakah kamar ini tersedia untuk tanggal tersebut? Terima kasih.`;
                 return formatRupiah(total);
               }
               return formatRupiah(dateRange.from && isWeekendOrHoliday(dateRange.from) ? weekendPrice : basePrice);
-            })()}
+            })()
+            )}
           </span>
         </div>
 
