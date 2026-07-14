@@ -88,6 +88,9 @@ export default async function AdminBookingsPage({
       const existing = acc[existingIndex];
       existing.roomNames = `${existing.roomNames}, ${current.room.roomName}`;
       existing.totalPrice += current.totalPrice;
+      if (current.dpAmount !== null || existing.dpAmount !== null) {
+        existing.dpAmount = (existing.dpAmount || 0) + (current.dpAmount || 0);
+      }
       existing.allRoomIds.push(current.roomId);
       // 🔥 TAMBAHAN: simpan detail per kamar untuk invoice
       if (!existing.rooms) existing.rooms = [];
