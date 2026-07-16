@@ -56,6 +56,9 @@ export default async function EditBookingPage({ params }: { params: { id: string
             checkIn: b.checkIn,
             checkOut: b.checkOut,
         })),
+        identityType: booking.identityType,
+        identityNumber: booking.identityNumber,
+        identityImage: booking.identityImage,
     };
 
     return (

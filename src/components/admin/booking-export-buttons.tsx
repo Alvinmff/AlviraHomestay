@@ -40,6 +40,9 @@ interface ExportBooking {
   roomNames: string;
   rooms: ExportRoom[];
   notes: string | null;
+  identityType?: string | null;
+  identityNumber?: string | null;
+  identityImage?: string | null;
 }
 
 // ─── Helper Format ───
@@ -273,6 +276,186 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
   };
 
   // ═══════════════════════════════════════════
+  // PDF WITH IDENTITY PHOTOS
+  // ═══════════════════════════════════════════
+  const fetchImageAsBase64 = async (url: string): Promise<string | null> => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const generatePDFWithIdentity = async (propertyFilter?: string) => {
+    const filteredBookings = propertyFilter
+      ? bookings.filter((b) => b.property.name === propertyFilter)
+      : bookings;
+
+    if (filteredBookings.length === 0) return;
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+
+    // ── Page 1+: Standard full report table ──
+    // Watermark
+    (doc as any).saveGraphicsState();
+    doc.setTextColor(220, 220, 220);
+    doc.setFontSize(45);
+    doc.setFont('helvetica', 'bold');
+    doc.text('HOMESTAY ALVIRA', pageW / 2, pageH / 2, { align: 'center', baseline: 'middle', angle: 45 });
+    (doc as any).restoreGraphicsState();
+
+    if (logo) {
+      try { doc.addImage(logo, 'PNG', (pageW / 2) - 75, 8, 22, 22); } catch { /* ignore */ }
+    }
+
+    const headerTitle = propertyFilter ? propertyFilter.toUpperCase() : 'HOMESTAY ALVIRA';
+    doc.setTextColor(27, 94, 32);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text(headerTitle, pageW / 2, 16, { align: 'center' });
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Laporan Booking + Identitas Tamu', pageW / 2, 22, { align: 'center' });
+    doc.text('Jl. Raya Lingkar Barat Gading Fajar 2 Blok C5 No 28, Sidoarjo - Jawa Timur', pageW / 2, 27, { align: 'center' });
+
+    doc.setDrawColor(198, 167, 0);
+    doc.setLineWidth(0.5);
+    doc.line(10, 32, pageW - 10, 32);
+
+    const months = groupByMonth(filteredBookings);
+    let startY = 38;
+
+    Object.entries(months).forEach(([monthName, group]) => {
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${monthName.toUpperCase()}`, 10, startY);
+      startY += 6;
+
+      const headers = ['No', 'Nama', 'HP', 'Identitas', 'Kamar', 'Check In', 'Check Out', 'Total', 'DP', 'Sisa', 'Status'];
+      const body = group.map((b, idx) => [
+        idx + 1,
+        b.guestName,
+        b.guestPhone || '-',
+        b.identityType ? `${b.identityType}${b.identityNumber ? ': ' + b.identityNumber : ''}` : '-',
+        b.roomNames,
+        formatDate(b.checkIn),
+        formatDate(b.checkOut),
+        formatRupiah(b.totalPrice),
+        b.dpAmount ? formatRupiah(b.dpAmount) : '-',
+        b.dpAmount ? formatRupiah(Math.max(0, b.totalPrice - b.dpAmount)) : '-',
+        statusMap[b.status] || b.status,
+      ]);
+
+      autoTable(doc, {
+        startY,
+        head: [headers],
+        body,
+        theme: 'grid',
+        headStyles: { fillColor: [30, 132, 73], textColor: 255, fontSize: 8 },
+        styles: { fontSize: 7, cellPadding: 1.5 },
+        alternateRowStyles: { fillColor: [250, 250, 250] },
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.index === 10) {
+            const status = group[data.row.index]?.status;
+            if (status) {
+              const hex = statusColor(status);
+              const r = parseInt(hex.slice(1, 3), 16);
+              const g = parseInt(hex.slice(3, 5), 16);
+              const bl = parseInt(hex.slice(5, 7), 16);
+              data.cell.styles.fillColor = [r, g, bl];
+              data.cell.styles.textColor = [255, 255, 255];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        },
+      });
+
+      startY = (doc as any).lastAutoTable.finalY + 10;
+    });
+
+    // ── Appendix: Identity Photo Pages ──
+    const bookingsWithIdentity = filteredBookings.filter((b) => b.identityImage);
+    if (bookingsWithIdentity.length > 0) {
+      doc.addPage();
+      const appPageW = doc.internal.pageSize.getWidth();
+      const appPageH = doc.internal.pageSize.getHeight();
+
+      // Section Title
+      doc.setTextColor(27, 94, 32);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LAMPIRAN: ARSIP FOTO IDENTITAS TAMU', appPageW / 2, 15, { align: 'center' });
+      doc.setDrawColor(198, 167, 0);
+      doc.setLineWidth(0.3);
+      doc.line(10, 20, appPageW - 10, 20);
+
+      let cardY = 28;
+      const cardMargin = 10;
+      const imgMaxW = 80;
+      const imgMaxH = 50;
+
+      for (const b of bookingsWithIdentity) {
+        const imgBase64 = await fetchImageAsBase64(b.identityImage!);
+
+        // Check if we need a new page
+        if (cardY + imgMaxH + 20 > appPageH - 15) {
+          doc.addPage();
+          cardY = 15;
+        }
+
+        // Guest info block
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(b.guestName, cardMargin, cardY);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        const infoLine = [
+          b.identityType || '',
+          b.identityNumber || '',
+          `${b.roomNames}`,
+          `${formatDate(b.checkIn)} - ${formatDate(b.checkOut)}`,
+        ].filter(Boolean).join('  |  ');
+        doc.text(infoLine, cardMargin, cardY + 5);
+
+        // Identity image
+        if (imgBase64) {
+          try {
+            doc.addImage(imgBase64, 'JPEG', cardMargin, cardY + 8, imgMaxW, imgMaxH);
+          } catch { /* skip broken images */ }
+        } else {
+          doc.setTextColor(200, 100, 100);
+          doc.setFontSize(8);
+          doc.text('[Gambar tidak dapat dimuat]', cardMargin, cardY + 20);
+        }
+
+        // Separator line
+        cardY += imgMaxH + 15;
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(0.2);
+        doc.line(cardMargin, cardY, appPageW - cardMargin, cardY);
+        cardY += 7;
+      }
+    }
+
+    doc.save(`laporan_identitas_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
+  // ═══════════════════════════════════════════
   // INVOICE (per grup)
   // ═══════════════════════════════════════════
   const generateInvoice = (booking: ExportBooking) => {
@@ -431,6 +614,22 @@ export function BookingExportButtons({ bookings }: { bookings: ExportBooking[] }
                 </DropdownMenuItem>
                 {uniqueProperties.map((prop) => (
                   <DropdownMenuItem key={prop} onClick={() => generatePDF('public', prop)}>
+                    {prop}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>🪪 Laporan + Foto Identitas</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => generatePDFWithIdentity()}>
+                  Semua Properti
+                </DropdownMenuItem>
+                {uniqueProperties.map((prop) => (
+                  <DropdownMenuItem key={prop} onClick={() => generatePDFWithIdentity(prop)}>
                     {prop}
                   </DropdownMenuItem>
                 ))}

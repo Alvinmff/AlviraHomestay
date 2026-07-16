@@ -17,6 +17,9 @@ export async function createManualBookingWithAvailability(data: {
   dpAmount?: number;
   guestCount?: number;
   groupId?: string;
+  identityType?: string | null;
+  identityNumber?: string | null;
+  identityImage?: string | null;
 }) {
   const session = await auth();
   if (!session || !session.user) {
@@ -47,6 +50,9 @@ export async function createManualBookingWithAvailability(data: {
       guestCount: data.guestCount || 1,
       groupId: data.groupId,
       createdById: userId,
+      identityType: data.identityType,
+      identityNumber: data.identityNumber,
+      identityImage: data.identityImage,
     },
     include: {
       room: {
@@ -132,6 +138,9 @@ export async function updateBookingWithAvailability(id: string, data: {
   dpAmount?: number;
   guestCount?: number;
   groupId?: string;
+  identityType?: string | null;
+  identityNumber?: string | null;
+  identityImage?: string | null;
 }) {
   const session = await auth();
   if (!session || !session.user) {
@@ -166,6 +175,9 @@ export async function updateBookingWithAvailability(id: string, data: {
       paymentStatus: (data.dpAmount || 0) >= data.totalPrice ? "PAID" : "UNPAID",
       guestCount: data.guestCount || 1,
       groupId: data.groupId,
+      identityType: data.identityType,
+      identityNumber: data.identityNumber,
+      identityImage: data.identityImage,
     },
     include: {
       room: {
@@ -252,6 +264,9 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
   guestCount?: number;
   groupId?: string;
   roomDetails?: { roomId: string; checkIn: Date; checkOut: Date }[];
+  identityType?: string | null;
+  identityNumber?: string | null;
+  identityImage?: string | null;
 }) {
   const session = await auth();
   if (!session || !session.user) {
@@ -302,6 +317,9 @@ export async function updateGroupedBooking(allBookingIds: string[], data: {
         guestCount: data.guestCount || 1,
         groupId: gid,
         createdById: userId,
+        identityType: data.identityType,
+        identityNumber: data.identityNumber,
+        identityImage: data.identityImage,
       },
       include: { room: { include: { property: true } } }
     });

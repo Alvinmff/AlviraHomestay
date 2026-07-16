@@ -92,6 +92,9 @@ model Booking {
   paymentStatus  String             @default("UNPAID")
   internalNotes  String?
   cancelledAt    DateTime?
+  identityType   String?
+  identityNumber String?
+  identityImage  String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   createdById    String?

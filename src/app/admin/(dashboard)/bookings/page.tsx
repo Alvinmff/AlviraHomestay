@@ -281,7 +281,10 @@ export default async function AdminBookingsPage({
                                   roomNumbers: booking.roomNames,
                                   checkIn: formatDateWIB(booking.checkIn),
                                   checkOut: formatDateWIB(booking.checkOut),
-                                  guestCount: booking.guestCount
+                                  guestCount: booking.guestCount,
+                                  identityType: booking.identityType,
+                                  identityNumber: booking.identityNumber,
+                                  identityImage: booking.identityImage,
                               }} />
                               <BookingActions 
                                 bookingId={booking.id} 

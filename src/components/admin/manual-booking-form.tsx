@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { format, differenceInDays } from "date-fns";
-import { Calendar as CalendarIcon, Save, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Save, Loader2, ImagePlus, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import { createManualBookingWithAvailability, updateBookingWithAvailability, upd
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { uploadToCloudinaryClient } from "@/lib/upload-client";
 
 // Normalize a local date to noon UTC so the calendar date is preserved
 // regardless of the server's timezone (prevents ±1 day shift).
@@ -40,6 +41,9 @@ interface ManualBookingFormProps {
         groupId?: string | null;
         allBookingIds?: string[];
         roomDetails?: { roomId: string; checkIn: Date; checkOut: Date }[];
+        identityType?: string | null;
+        identityNumber?: string | null;
+        identityImage?: string | null;
     };
 }
 
@@ -63,6 +67,32 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
     const [notes, setNotes] = useState(initialData?.notes || "");
     const [dpAmount, setDpAmount] = useState<string>(initialData?.dpAmount?.toString() || "0");
     const [guestCount, setGuestCount] = useState<string>(initialData?.guestCount?.toString() || "1");
+
+    // Identity fields
+    const [identityType, setIdentityType] = useState(initialData?.identityType || "");
+    const [identityNumber, setIdentityNumber] = useState(initialData?.identityNumber || "");
+    const [identityImage, setIdentityImage] = useState(initialData?.identityImage || "");
+    const [uploadingIdentity, setUploadingIdentity] = useState(false);
+    const identityInputRef = useRef<HTMLInputElement>(null);
+
+    const handleIdentityUpload = async (file: File) => {
+        if (!file) return;
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            toast.error("Ukuran file maksimal 5MB");
+            return;
+        }
+        setUploadingIdentity(true);
+        try {
+            const url = await uploadToCloudinaryClient(file);
+            setIdentityImage(url);
+            toast.success("Foto identitas berhasil diunggah");
+        } catch (err: any) {
+            toast.error(err.message || "Gagal mengunggah foto identitas");
+        } finally {
+            setUploadingIdentity(false);
+        }
+    };
     
     // 🔥 TAMBAHAN: State untuk tanggal berbeda per kamar
     const [differentDatesPerRoom, setDifferentDatesPerRoom] = useState(false);
@@ -173,6 +203,9 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     notes: notes || null,
                     dpAmount: Math.round(Number(dpAmount)) || 0,
                     guestCount: parseInt(guestCount) || 1,
+                    identityType: identityType || null,
+                    identityNumber: identityNumber || null,
+                    identityImage: identityImage || null,
                 };
 
                 // Jika ada multiple booking IDs (grouped booking), gunakan updateGroupedBooking
@@ -224,6 +257,9 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                         dpAmount: dpPerRoom,
                         guestCount: parseInt(guestCount) || 1,
                         groupId: gid,
+                        identityType: identityType || null,
+                        identityNumber: identityNumber || null,
+                        identityImage: identityImage || null,
                     });
                 }
                 toast.success(`Berhasil membuat ${roomIds.length} booking untuk ${guestName}`);
@@ -502,6 +538,87 @@ export function ManualBookingForm({ properties, initialData }: ManualBookingForm
                     </div>
                 </div>
 
+            </div>
+
+            {/* 4. Identitas Tamu */}
+            <div className="space-y-4">
+                <h3 className="font-semibold text-lg border-b pb-2">Identitas Tamu</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="identityType">Tipe Identitas</Label>
+                        <select
+                            id="identityType"
+                            value={identityType}
+                            onChange={(e) => setIdentityType(e.target.value)}
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                            <option value="">-- Pilih Tipe --</option>
+                            <option value="KTP">KTP</option>
+                            <option value="SIM">SIM</option>
+                            <option value="Paspor">Paspor</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="identityNumber">Nomor Identitas</Label>
+                        <Input
+                            id="identityNumber"
+                            value={identityNumber}
+                            onChange={(e) => setIdentityNumber(e.target.value)}
+                            placeholder="Contoh: 3578xxxxxxxxxxxx"
+                        />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                        <Label>Foto Identitas (KTP/SIM/Paspor)</Label>
+                        {identityImage ? (
+                            <div className="relative group w-fit">
+                                <img
+                                    src={identityImage}
+                                    alt="Foto Identitas"
+                                    className="max-h-48 rounded-lg border border-border object-contain bg-muted/30"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setIdentityImage("")}
+                                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        ) : (
+                            <div
+                                onClick={() => identityInputRef.current?.click()}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-2 p-8 rounded-lg border-2 border-dashed cursor-pointer transition-colors",
+                                    uploadingIdentity
+                                        ? "border-primary/50 bg-primary/5"
+                                        : "border-border hover:border-primary/40 hover:bg-muted/30"
+                                )}
+                            >
+                                {uploadingIdentity ? (
+                                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                                ) : (
+                                    <Upload className="w-8 h-8 text-muted-foreground" />
+                                )}
+                                <p className="text-sm text-muted-foreground">
+                                    {uploadingIdentity ? "Mengunggah..." : "Klik untuk unggah foto identitas"}
+                                </p>
+                                <p className="text-xs text-muted-foreground/70">JPG, PNG, maks 5MB</p>
+                            </div>
+                        )}
+                        <input
+                            ref={identityInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleIdentityUpload(file);
+                                e.target.value = "";
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className="pt-6 flex items-center justify-end gap-3 border-t">
